@@ -26,7 +26,8 @@ public class SetPrefs extends Activity  {
 	private Button adwButton;
 	private Button ushahidiButton;
 	private SharedPreferences.Editor editor;
-	private ToggleButton collectToggle;
+	private ToggleButton collectMenuToggle;
+	private ToggleButton collectLogToggle;
 	private ToggleButton ushahidiToggle;
 	private ToggleButton clinicToggle;
 	private ToggleButton adwToggle;
@@ -146,27 +147,27 @@ public class SetPrefs extends Activity  {
 			}
 		});
         
-        collectToggle = (ToggleButton) findViewById(R.id.collect_checkbox);
+        collectMenuToggle = (ToggleButton) findViewById(R.id.collect_checkbox);
         if (settings.getBoolean("CollectMenuEnabled", false)){
-        	collectToggle.setChecked(true);
+        	collectMenuToggle.setChecked(true);
         }
        
-        collectToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        collectMenuToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		        Intent i = new Intent(Intent.ACTION_VIEW); 
 		        i.setComponent(new ComponentName("org.odk.collect.android","org.odk.collect.android.activities.ViewMenuPreference"));
-				if (collectToggle.isChecked()) {
-		        	collectToggle.setChecked(true);
+				if (collectMenuToggle.isChecked()) {
+		        	collectMenuToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
 	    		     Log.e("SetPrefs", "ShowMenu is set to true because checkBox is checked!");
 	    		     editor.putBoolean("CollectMenuEnabled", true);
 	    		        
 		         }
 		        else{
-		        	collectToggle.setChecked(false);
+		        	collectMenuToggle.setChecked(false);
 		        	i.putExtra("ShowMenu", false);
 		        	editor.putBoolean("CollectMenuEnabled", false);
 		        	 Log.e("SetPrefs", "ShowMenu is set to false because else is checked!");
@@ -177,6 +178,40 @@ public class SetPrefs extends Activity  {
 				
 			}
 		});
+        
+        
+        collectLogToggle = (ToggleButton) findViewById(R.id.collect_log_checkbox);
+        if (settings.getBoolean("CollectLogEnabled", false)){
+        	collectLogToggle.setChecked(true);
+        }
+       
+        collectLogToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		        Intent i = new Intent(Intent.ACTION_VIEW); 
+		        i.setComponent(new ComponentName("org.odk.collect.android","org.odk.collect.android.activities.ViewMenuPreference"));
+				if (collectLogToggle.isChecked()) {
+		        	collectLogToggle.setChecked(true);
+	    		     i.putExtra("LogActivities", true);
+	    		     editor.putBoolean("CollectLogEnabled", true);
+	    		        
+		         }
+		        else{
+		        	collectLogToggle.setChecked(false);
+		        	i.putExtra("LogActivities", false);
+		        	editor.putBoolean("CollectLogEnabled", false);
+		        }
+		        editor.commit();
+		        startActivity(i);
+				
+			}
+		});
+        
+        
+        
+        
         
         adwToggle = (ToggleButton) findViewById(R.id.adw_checkbox);
         if (settings.getBoolean("AdwMenuEnabled", false)){

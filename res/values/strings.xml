@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">CHV Application Settings</string>
     <string name="lblPassword">Password :</string>
     <string name="default_pwd"></string>
-    
     <string name="btn_submit">Submit</string>
-    
     <string name="odk_collect">ODK Collect</string>
-	<string name="collectEdit">Edit</string>
+    <string name="enable_log">Log Activities</string>
+    <string name="collectEdit">Edit</string>
+    <string name="odk_clinic">ODK Clinic</string>
+    <string name="clinicEdit">Edit</string>
+    <string name="adw_launcher">ADW Launcher</string>
+    <string name="ushahidi">Ushahidi</string>
+    <string name="adwEdit">Edit</string>
+    <string name="view_settings">Show Menu in App</string>
+    <string name="edit_settings">Preferences</string>
+    <string name="clock_service_start">Starting Clock Check</string>
+    <string name="clock_service_ticker">Checking Date and Time</string>
+    <string name="clock_service_label">Checking System Date and Time</string>
+    <string name="clock_service_text">Updating System Clock against NTP internet Time</string>
+    <string name="clock_needs_update">System Clock is out of date. Please Update in Settings, Date and Time</string>
+    <string name="clock_updated_success">System Clock has been updated by NTP</string>
 
-	<string name="odk_clinic">ODK Clinic</string>
-	<string name="clinicEdit">Edit</string>
-	
-	<string name="adw_launcher">ADW Launcher</string>
-	<string name="ushahidi">Ushahidi</string>
-	<string name="adwEdit">Edit</string>
-	
-	<string name="view_settings">Show Menu in App</string>
-	<string name="edit_settings">Preferences</string>
-	
-	<string name="clock_service_start">Starting Clock Check</string>
-	<string name="clock_service_ticker">Checking Date and Time</string>
-	<string name="clock_service_label">Checking System Date and Time</string>	
-	<string name="clock_service_text">Updating System Clock against NTP internet Time</string>
-	<string name="clock_needs_update">System Clock is out of date. Please Update in Settings, Date and Time</string>	
-	<string name="clock_updated_success">System Clock has been updated by NTP</string>
-	
 </resources>
