@@ -20,5 +20,5 @@ local.properties
 .project
 
 #proguard files
-/proguard
+proguard/
 *proguard*
