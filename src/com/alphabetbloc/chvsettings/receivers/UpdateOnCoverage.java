@@ -37,7 +37,7 @@ public class UpdateOnCoverage extends BroadcastReceiver {
 	 
 	@Override
 	public void onReceive(Context context, Intent intent) {      
-		Log.e(TAG, "Broadcast UpdateOnCoverage received an intent initially");
+		
 		try { 
 //		Bundle bundle = intent.getExtras();
 //	     String message = bundle.getString("alarm_message");

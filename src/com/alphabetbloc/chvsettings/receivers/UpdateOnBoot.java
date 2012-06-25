@@ -25,23 +25,9 @@ public class UpdateOnBoot extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {      
-		Log.e(TAG, "Broadcast BOOT_COMPLETED received an intent initially");
+	
 		
         if( "android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-        	Log.e(TAG, "Received intent name: " + intent.toString()); 
-        	Log.e(TAG, "Broadcast BOOT_COMPLETED received and double-checked");
-        	
-//        	ACTIVITY ATTEMPT
-//          ComponentName comp = new ComponentName("com.alphabetbloc.chvsettings.activities", UpdateClockTask.class.getName());
-//          ComponentName asynctask = context.startActivity(new Intent().setComponent(comp));
-//          Intent i = new Intent(context, UpdateClockTask.class);  
-//          i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//          context.startActivity(i);
-        	
-//        	SERVICE ATTEMPTS        	
-//          Intent serviceIntent = new Intent("com.alphabetbloc.chvsettings.services.UpdateClockService");
-//          Intent serviceIntent = new Intent(context, UpdateTimeService.class); 
-//          context.startService(serviceIntent);
         	
          ComponentName comp = new ComponentName(context.getPackageName(), UpdateClockService.class.getName());
          ComponentName service = context.startService(new Intent().setComponent(comp));

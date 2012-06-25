@@ -36,7 +36,7 @@ public class SetPrefs extends Activity  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e("SetPrefs", "OnCreate!");
+     
         setContentView(R.layout.editprefs);     
         SharedPreferences settings = getSharedPreferences("ChwSettings", MODE_PRIVATE);
         editor = settings.edit();
@@ -82,10 +82,10 @@ public class SetPrefs extends Activity  {
         
 //        check boxes / toggle buttons
         ushahidiToggle = (ToggleButton) findViewById(R.id.ushahidi_checkbox);
-        Log.e("SetPrefs", "Ushahidi checkbox created");
+ 
         if (settings.getBoolean("UshahidiMenuEnabled", false)){
         	ushahidiToggle.setChecked(true);
-        	Log.e("SetPrefs", "Ushahidi should be true!");
+        
         }
        
         ushahidiToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -98,7 +98,7 @@ public class SetPrefs extends Activity  {
 				if (ushahidiToggle.isChecked()) {
 		        	ushahidiToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		     Log.e("SetPrefs", "ShowMenu is set to true because checkBox is checked!");
+	    		
 	    		        editor.putBoolean("UshahidiMenuEnabled", true);
 	    		        
 		         }
@@ -106,11 +106,11 @@ public class SetPrefs extends Activity  {
 		        	ushahidiToggle.setChecked(false);
 		        	i.putExtra("ShowMenu", false);
 		        	editor.putBoolean("UshahidiMenuEnabled", false);
-		        	 Log.e("SetPrefs", "ShowMenu is set to false because else is checked!");
+		    
 		        }
 		        editor.commit();
 		        startActivity(i);
-		        Log.e("SetPrefs", "Started intent!");
+		  
 				
 			}
 		});
@@ -130,7 +130,7 @@ public class SetPrefs extends Activity  {
 				if (clinicToggle.isChecked()) {
 		        	clinicToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		     Log.e("SetPrefs", "ShowMenu is set to true because checkBox is checked!");
+	    		
 	    		     editor.putBoolean("ClinicMenuEnabled", true);
 	    		        
 		         }
@@ -138,11 +138,11 @@ public class SetPrefs extends Activity  {
 		        	clinicToggle.setChecked(false);
 		        	i.putExtra("ShowMenu", false);
 		        	editor.putBoolean("ClinicMenuEnabled", false);
-		        	 Log.e("SetPrefs", "ShowMenu is set to false because else is checked!");
+		       
 		        }
 		        editor.commit();
 		        startActivity(i);
-		        Log.e("SetPrefs", "Started intent!");
+		    
 				
 			}
 		});
@@ -162,7 +162,7 @@ public class SetPrefs extends Activity  {
 				if (collectMenuToggle.isChecked()) {
 		        	collectMenuToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		     Log.e("SetPrefs", "ShowMenu is set to true because checkBox is checked!");
+	    		
 	    		     editor.putBoolean("CollectMenuEnabled", true);
 	    		        
 		         }
@@ -170,11 +170,11 @@ public class SetPrefs extends Activity  {
 		        	collectMenuToggle.setChecked(false);
 		        	i.putExtra("ShowMenu", false);
 		        	editor.putBoolean("CollectMenuEnabled", false);
-		        	 Log.e("SetPrefs", "ShowMenu is set to false because else is checked!");
+		  
 		        }
 		        editor.commit();
 		        startActivity(i);
-		        Log.e("SetPrefs", "Started intent!");
+		
 				
 			}
 		});
@@ -228,7 +228,7 @@ public class SetPrefs extends Activity  {
 				if (adwToggle.isChecked()) {
 		        	adwToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		     Log.e("SetPrefs", "ShowMenu is set to true because checkBox is checked!");
+	    		
 	    		     editor.putBoolean("AdwMenuEnabled", true);
 	    		        
 		         }
@@ -236,11 +236,11 @@ public class SetPrefs extends Activity  {
 		        	adwToggle.setChecked(false);
 		        	i.putExtra("ShowMenu", false);
 		        	editor.putBoolean("AdwMenuEnabled", false);
-		        	 Log.e("SetPrefs", "ShowMenu is set to false because else is checked!");
+		
 		        }
 		        editor.commit();
 		        startActivity(i);
-		        Log.e("SetPrefs", "Started intent!");
+	
 				
 			}
 		});
