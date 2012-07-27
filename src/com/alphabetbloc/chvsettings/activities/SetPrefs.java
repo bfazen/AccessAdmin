@@ -157,23 +157,22 @@ public class SetPrefs extends Activity  {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		        Intent i = new Intent(Intent.ACTION_VIEW); 
-		        i.setComponent(new ComponentName("org.odk.collect.android","org.odk.collect.android.activities.ViewMenuPreference"));
-				if (collectMenuToggle.isChecked()) {
-		        	collectMenuToggle.setChecked(true);
-	    		     i.putExtra("ShowMenu", true);
-	    		
-	    		     editor.putBoolean("CollectMenuEnabled", true);
+		        Intent i = new Intent("com.android.launcher.ViewMenuPreference.ACTION"); 
+		        i.setComponent(new ComponentName("com.android.launcher.","com.android.launcher.ViewMenuPreference"));
+				if (collectLogToggle.isChecked()) {
+		        	collectLogToggle.setChecked(true);
+	    		     i.putExtra("LogActivities", true);
+	    		     i.setAction("com.android.launcher.ViewMenuPreference.ACTION");
+	    		     editor.putBoolean("CollectLogEnabled", true);
 	    		        
 		         }
 		        else{
-		        	collectMenuToggle.setChecked(false);
-		        	i.putExtra("ShowMenu", false);
-		        	editor.putBoolean("CollectMenuEnabled", false);
-		  
+		        	collectLogToggle.setChecked(false);
+		        	i.putExtra("LogActivities", false);
+		        	i.addCategory("com.android.launcher.ViewMenuPreference.CATEGORY");
+		        	editor.putBoolean("CollectLogEnabled", false);
+		        	
 		        }
-		        editor.commit();
-		        startActivity(i);
 		
 				
 			}
@@ -191,17 +190,22 @@ public class SetPrefs extends Activity  {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		        Intent i = new Intent(Intent.ACTION_VIEW); 
-		        i.setComponent(new ComponentName("org.odk.collect.android","org.odk.collect.android.activities.ViewMenuPreference"));
+		        
+		        
+		        i.setComponent(new ComponentName("com.android.launcher.","com.android.launcher.ViewMenuPreference"));
 				if (collectLogToggle.isChecked()) {
 		        	collectLogToggle.setChecked(true);
 	    		     i.putExtra("LogActivities", true);
+	    		     i.setAction("com.android.launcher.ViewMenuPreference.ACTION");
 	    		     editor.putBoolean("CollectLogEnabled", true);
 	    		        
 		         }
 		        else{
 		        	collectLogToggle.setChecked(false);
 		        	i.putExtra("LogActivities", false);
+		        	i.addCategory("com.alphabetbloc.clinic.android.ViewMenuPreference.CATEGORY");
 		        	editor.putBoolean("CollectLogEnabled", false);
+		        	
 		        }
 		        editor.commit();
 		        startActivity(i);
@@ -228,7 +232,7 @@ public class SetPrefs extends Activity  {
 				if (adwToggle.isChecked()) {
 		        	adwToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		
+	    		     i.setAction("com.alphabetbloc.clinic.android.ViewMenuPreference.ACTION");
 	    		     editor.putBoolean("AdwMenuEnabled", true);
 	    		        
 		         }
