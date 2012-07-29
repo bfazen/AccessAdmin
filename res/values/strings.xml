@@ -3,7 +3,7 @@
 
     <string name="app_name">CHV Application Settings</string>
     <string name="lblPassword">Password :</string>
-    <string name="default_pwd"></string>
+    <string name="default_pwd">***REMOVED***</string>
     <string name="btn_submit">Submit</string>
     <string name="odk_collect">ODK Collect</string>
     <string name="enable_log">Log Activities</string>

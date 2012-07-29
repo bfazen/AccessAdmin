@@ -223,12 +223,12 @@ public class SetPrefs extends Activity  {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		        Intent i = new Intent(Intent.ACTION_VIEW); 
+		        Intent i = new Intent(Intent.ACTION_VIEW); 	        
 		        i.setComponent(new ComponentName("com.android.launcher","com.android.launcher.ViewMenuPreference"));
 				if (adwToggle.isChecked()) {
 		        	adwToggle.setChecked(true);
 	    		     i.putExtra("ShowMenu", true);
-	    		
+	    		     i.setAction("com.android.launcher.ViewMenuPreference.ACTION");
 	    		     editor.putBoolean("AdwMenuEnabled", true);
 	    		        
 		         }

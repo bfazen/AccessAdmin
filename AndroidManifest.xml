@@ -4,47 +4,52 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-
-
     <uses-sdk android:minSdkVersion="8" />
-        <uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.INTERNET" />
-    <uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.SET_TIME" />
-    <uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.SET_TIME_ZONE" />
-    <uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission xmlns:android="http://schemas.android.com/apk/res/android"
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="android.permission.SET_DEBUG_APP" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="com.android.launcher.permission.VIEW_MENU_PREFERENCE" />
 
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
-        
         <activity
+            android:name=".activities.PrefsPassword"
             android:label="@string/app_name"
-            android:name=".activities.PrefsPassword" 
-            android:screenOrientation="portrait">
-            <intent-filter >
+            android:screenOrientation="portrait" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-             <intent-filter>
-                <action android:name="org.odk.clinic.android.activities.PrefsPassword"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+            <intent-filter>
+                <action android:name="org.odk.clinic.android.activities.PrefsPassword" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-			android:label="@string/app_name"
-			android:name=".activities.SetPrefs">
-		</activity>
-        
+            android:name=".activities.SetPrefs"
+            android:label="@string/app_name" >
+        </activity>
 
         <service
             android:name=".services.UpdateClockService"
@@ -59,15 +64,16 @@
             android:enabled="true"
             android:exported="true"
             android:label="UpdateOnBoot" >
-            <!--TODO: do you really need this intent-filter? where did I get this from?  -->
+
+            <!-- TODO: do you really need this intent-filter? where did I get this from? -->
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.UpdateOnCoverage"
-            android:process=":remote"
-            android:label="UpdateOnCoverage" >
+            android:label="UpdateOnCoverage"
+            android:process=":remote" >
         </receiver>
     </application>
 
