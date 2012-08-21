@@ -15,47 +15,34 @@ package com.alphabetbloc.chvsettings.services;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import android.app.IntentService;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Intent;
-import android.graphics.Paint.Join;
-import android.os.IBinder;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.activities.PrefsPassword;
-import com.alphabetbloc.chvsettings.services.UpdateClockService.ExecShell.SHELL_CMD;
-
-import android.app.AlarmManager;
-import android.bluetooth.BluetoothClass.Device;
-import android.os.AsyncTask;
+import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.text.format.DateFormat;
 import android.util.Config;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.alphabetbloc.chvsettings.R;
+import com.alphabetbloc.chvsettings.activities.SetUserPassword;
+import com.alphabetbloc.chvsettings.services.UpdateClockService.ExecShell.SHELL_CMD;
 
 public class UpdateClockService extends IntentService {
 
@@ -65,10 +52,10 @@ public class UpdateClockService extends IntentService {
 	private boolean needNtpComparison;
 	private boolean clockUpdated;
 
-	private Exception exception;
+//	private Exception exception;
 	private static final String TAG = "UpdateClockService";
 
-	private static final int REFERENCE_TIME_OFFSET = 16;
+//	private static final int REFERENCE_TIME_OFFSET = 16;
 	private static final int ORIGINATE_TIME_OFFSET = 24;
 	private static final int RECEIVE_TIME_OFFSET = 32;
 	private static final int TRANSMIT_TIME_OFFSET = 40;
@@ -93,13 +80,13 @@ public class UpdateClockService extends IntentService {
 	private long mNtpTimeReference;
 
 	// round trip time in milliseconds
-	private long mRoundTripTime;
-
+//	private long mRoundTripTime;
+//	private Handler mNtpHandler;
 	private int timeout = 10000;
 	private String host = "pool.ntp.org";
 
 	private Handler mToastHandler;
-	private Handler mNtpHandler;
+
 
 	/**
 	 * A constructor is required, and must call the super IntentService(String)
@@ -108,7 +95,7 @@ public class UpdateClockService extends IntentService {
 	public UpdateClockService() {
 		super("UpdateClockService");
 		mToastHandler = new Handler();
-		mNtpHandler = new Handler();
+//		mNtpHandler = new Handler();
 	}
 
 	/**
@@ -192,7 +179,7 @@ public class UpdateClockService extends IntentService {
 		CharSequence tickerText = getText(R.string.clock_service_ticker);
 		CharSequence dropdownText = getText(R.string.clock_service_text);
 		Notification notification = new Notification(R.drawable.clock_update, tickerText, System.currentTimeMillis());
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, PrefsPassword.class), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, SetUserPassword.class), 0);
 		notification.setLatestEventInfo(this, getText(R.string.clock_service_label), dropdownText, contentIntent);
 		mNM.notify(NOTIFICATION, notification);
 	}
@@ -261,7 +248,7 @@ public class UpdateClockService extends IntentService {
 	}
 
 	private Runnable mRequestNtpTime = new Runnable() {
-		int i = 1;
+//		int i = 1;
 		
 		public void run() {
 			try {
@@ -300,7 +287,7 @@ public class UpdateClockService extends IntentService {
 				long originateTime = readTimeStamp(buffer, ORIGINATE_TIME_OFFSET);
 				long receiveTime = readTimeStamp(buffer, RECEIVE_TIME_OFFSET);
 				long transmitTime = readTimeStamp(buffer, TRANSMIT_TIME_OFFSET);
-				long roundTripTime = responseTicks - requestTicks - (transmitTime - receiveTime);
+//				long roundTripTime = responseTicks - requestTicks - (transmitTime - receiveTime);
 				// receiveTime = originateTime + transit + skew
 				// responseTime = transmitTime + transit - skew
 				// clockOffset = ((receiveTime - originateTime) + (transmitTime
@@ -324,10 +311,10 @@ public class UpdateClockService extends IntentService {
 				// (response rather than request time)
 				mNtpTime = responseTime + clockOffset;
 				mNtpTimeReference = responseTicks;
-				mRoundTripTime = roundTripTime;
+//				mRoundTripTime = roundTripTime;
 
 				needNtpComparison = false;
-				i++;
+//				i++;
 				
 			} catch (UnknownHostException e) {
 				needNtpComparison = true;
@@ -354,7 +341,7 @@ public class UpdateClockService extends IntentService {
 				//
 //								@Override
 //								public void uncaughtException(Thread thread, Throwable ex) {
-//									// TODO Auto-generated method stub
+//									//  Auto-generated method stub
 //									System.out.println("Caught " + ex);
 //									
 //								}
@@ -373,7 +360,7 @@ public class UpdateClockService extends IntentService {
 
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub
 //		Log.e(TAG, "onDestroy has been called!");
 		super.onDestroy();
 	}
@@ -386,7 +373,7 @@ public class UpdateClockService extends IntentService {
 //		Log.e(TAG, "clockNeedsUpdate Called... Asking if Clock Needs Update?");
 		long now = mNtpTime + SystemClock.elapsedRealtime() - mNtpTimeReference;
 		mSystemTime = Calendar.getInstance().getTimeInMillis();
-		long sys2 = System.currentTimeMillis();
+//		long sys2 = System.currentTimeMillis();
 
 		long delta = Math.abs(now - mSystemTime);
 
@@ -495,7 +482,7 @@ public class UpdateClockService extends IntentService {
 	}
 
 	public boolean checkRootMethod1() {
-		String buildTags = android.os.Build.TAGS;
+//		String buildTags = android.os.Build.TAGS;
 
 		// if (buildTags != null && buildTags.contains("test-keys")) {
 		// return true;
@@ -553,7 +540,7 @@ public class UpdateClockService extends IntentService {
 				// e.printStackTrace();
 			}
 
-			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
+//			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
 			BufferedReader in = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
 
 			try {

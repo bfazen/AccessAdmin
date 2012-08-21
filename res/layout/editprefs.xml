@@ -1,275 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <ScrollView
+    <TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:stretchColumns="0" >
 
-        <TableLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_color" />
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:background="#969696" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/adw_launcher"
+                android:textColor="#dfdfdf"
+                android:textSize="16sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:stretchColumns="0" >
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
 
-            <TableRow
-                android:id="@+id/tableRow1"
-                android:layout_width="wrap_content"
-                android:background="#969696" >
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/view_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/adw_launcher"
-                    android:textColor="#dfdfdf"
-                    android:textSize="16sp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow2"
+            <CheckBox
+                android:id="@+id/adw_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp" >
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/view_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp" >
 
-                <ToggleButton
-                    android:id="@+id/adw_checkbox"
-                    android:layout_width="80dp"
-                    android:layout_marginRight="15dp" />
-            </TableRow>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/edit_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-            <TableRow
-                android:id="@+id/tableRow3"
+            <Button
+                android:id="@+id/adwButton"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:text="@string/adwEdit"
+                android:textSize="16sp" />
+        </TableRow>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_color" />
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:background="#969696" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/odk_collect"
+                android:textColor="#dfdfdf"
+                android:textSize="16sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/view_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <CheckBox
+                android:id="@+id/collect_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp" >
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/edit_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+        <TableRow
+            android:id="@+id/tableRowLog1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
 
-                <Button
-                    android:id="@+id/adwButton"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:text="@string/adwEdit"
-                    android:textSize="16sp" />
-            </TableRow>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/enable_log"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-            <TableRow
-                android:id="@+id/tableRow4"
-                android:background="#969696" >
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/odk_collect"
-                    android:textColor="#dfdfdf"
-                    android:textSize="16sp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow5"
+            <CheckBox
+                android:id="@+id/collect_log_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp" >
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/view_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp" >
 
-                <ToggleButton
-                    android:id="@+id/collect_checkbox"
-                    android:layout_width="80dp"
-                    android:layout_marginRight="15dp" />
-            </TableRow>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/edit_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-            <TableRow
-                android:id="@+id/tableRowLog1"
+            <Button
+                android:id="@+id/collectButton"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:text="@string/collectEdit"
+                android:textSize="16sp" />
+        </TableRow>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_color" />
+
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:background="#969696" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/odk_clinic"
+                android:textColor="#dfdfdf"
+                android:textSize="16sp" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/view_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <CheckBox
+                android:id="@+id/clinic_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp" >
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/enable_log"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+        <TableRow
+            android:id="@+id/tableRow9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp" >
 
-                <ToggleButton
-                    android:id="@+id/collect_log_checkbox"
-                    android:layout_width="80dp"
-                    android:layout_marginRight="15dp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow6"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp" >
+                android:layout_gravity="center_vertical"
+                android:text="@string/edit_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/edit_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+            <Button
+                android:id="@+id/clinicButton"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:text="@string/clinicEdit"
+                android:textSize="16sp" >
+            </Button>
+        </TableRow>
 
-                <Button
-                    android:id="@+id/collectButton"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:text="@string/collectEdit"
-                    android:textSize="16sp" />
-            </TableRow>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/white_color" />
 
-            <TableRow
-                android:id="@+id/tableRow7"
-                android:background="#969696" >
+        <TableRow
+            android:id="@+id/tableRow10"
+            android:layout_width="wrap_content"
+            android:background="#969696" >
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/odk_clinic"
-                    android:textColor="#dfdfdf"
-                    android:textSize="16sp" />
-            </TableRow>
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/ushahidi"
+                android:textColor="#dfdfdf"
+                android:textSize="16sp" />
+        </TableRow>
 
-            <TableRow
-                android:id="@+id/tableRow8"
+        <TableRow
+            android:id="@+id/tableRow11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/view_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
+
+            <CheckBox
+                android:id="@+id/ushahidi_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp" >
+                android:layout_gravity="center_horizontal" />
+        </TableRow>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/view_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
+        <TableRow
+            android:id="@+id/tableRow12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp" >
 
-                <ToggleButton
-                    android:id="@+id/clinic_checkbox"
-                    android:layout_width="80dp"
-                    android:layout_marginRight="15dp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow9"
-                android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp" >
+                android:layout_gravity="center_vertical"
+                android:text="@string/edit_settings"
+                android:textColor="#ffffff"
+                android:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/edit_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/clinicButton"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:text="@string/clinicEdit"
-                    android:textSize="16sp" >
-                </Button>
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow10"
-                android:layout_width="wrap_content"
-                android:background="#969696" >
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/ushahidi"
-                    android:textColor="#dfdfdf"
-                    android:textSize="16sp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow11"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/ushahidiButton"
+                android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingTop="5dp" >
+                android:layout_marginRight="15dp"
+                android:text="@string/adwEdit"
+                android:textSize="16sp" />
+        </TableRow>
+    </TableLayout>
 
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/view_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
-
-                <ToggleButton
-                    android:id="@+id/ushahidi_checkbox"
-                    android:layout_width="80dp"
-                    android:layout_marginRight="15dp" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRow12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="10dp" >
-
-                <TextView
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="@string/edit_settings"
-                    android:textColor="#ffffff"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/ushahidiButton"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="15dp"
-                    android:text="@string/adwEdit"
-                    android:textSize="16sp" />
-            </TableRow>
-        </TableLayout>
-    </ScrollView>
-
-</LinearLayout>
+</ScrollView>

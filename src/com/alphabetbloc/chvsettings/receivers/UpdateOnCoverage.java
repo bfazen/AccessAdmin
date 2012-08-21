@@ -3,17 +3,9 @@
  */
 package com.alphabetbloc.chvsettings.receivers;
 
-import java.util.Calendar;
-
-import com.alphabetbloc.chvsettings.activities.SetPrefs;
-import com.alphabetbloc.chvsettings.services.UpdateClockService;
-
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -22,19 +14,13 @@ import android.widget.Toast;
  */
 public class UpdateOnCoverage extends BroadcastReceiver {
 
-	private static final String TAG = "UpdateOnCoverage";
+//	private static final String TAG = "UpdateOnCoverage";
 	Context mContext;
 	
 	public UpdateOnCoverage() {
-		// TODO Auto-generated constructor stub
+		// Auto-generated constructor stub
 	}
 
-	
-
-
-
-	 
-	 
 	@Override
 	public void onReceive(Context context, Intent intent) {      
 		
@@ -42,7 +28,7 @@ public class UpdateOnCoverage extends BroadcastReceiver {
 //		Bundle bundle = intent.getExtras();
 //	     String message = bundle.getString("alarm_message");
 //	     
-//	     Intent newIntent = new Intent(context, SetPrefs.class);
+//	     Intent newIntent = new Intent(context, SetAppPreferences.class);
 //	     newIntent.putExtra("alarm_message", message);
 //	     newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //	     context.startActivity(newIntent);

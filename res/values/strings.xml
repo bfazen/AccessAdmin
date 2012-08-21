@@ -2,9 +2,71 @@
 <resources>
 
     <string name="app_name">CHV Application Settings</string>
-    <string name="lblPassword">Password :</string>
+    <!-- ADMIN STRINGS -->
+    <string name="device_settings">Device Settings</string>
+
+    <!-- Admin login activity -->
+    <string name="admin_login_activity">Administrator Login</string>
+    <string name="admin_password">Administrator Password</string>
+    <!-- Admin update password activity -->
+    <string name="admin_password_activity">Admin Password</string>
+    <string name="verify_admin_password">Verify the current administrator password:</string>
+    <string name="update_admin_password">Enter new administrator password:</string>
+    <string name="secure_admin_password">Password must contain letters and numbers, include upper and lower case, and be at least 8 characters long.</string>
+    <string name="confirm_admin_password">Re-enter new administrator password to confirm:</string>
+    <string name="sms_settings">SMS</string>
+    <string name="app_settings">Application Settings</string>
+    <string name="device_policy_settings">Device Policy Settings</string>
+
+    <!-- Device Policy Settings -->
+    <string name="alert_title_first_warning">WARNING !!!</string>
+    <string name="alert_odk_body_first_warning">This will ERASE ALL patient data ever collected on this device. \n \n Are you sure?</string>
+    <string name="alert_wipe_body_first_warning">This will ERASE ALL DATA on this device!! \n \n ALL patient data, all contacts, and all calendars will be erased, but data on the SD Card will remain. The device will then reset to factory settings and guide user to set up new password and provider ID.  \n \n Are you sure you want to do this? \n \n</string>
+    <string name="alert_ok_button">ERASE ALL DATA</string>
+    <string name="alert_first_cancel_button">Not sure, Keep Data</string>
+    <string name="alert_title_second_warning">WARNING ! WARNING ! WARNING ! WARNING !</string>
+    <string name="alert_odk_body_second_warning">Once erased, you CAN NEVER retreive this data! \n \n Are you absolutely sure you want to erase all patient data?</string>
+    <string name="alert_wipe_body_second_warning">Once erased, you CAN NEVER retreive this data! \n \n Are you absolutely sure you want to reset device?</string>
+    <string name="alert_second_cancel_button">Not Sure, Keep Data For Now</string>
+    <string name="nothing_erased">Nothing has been erased, and no changes have been made to the device.</string>
+    <string name="wiping_data">! Erasing Data Now !</string>
+    <string name="admin_section">Administrator Controls</string>
+    <string name="enable_admin">Enable Administration</string>
+    <string name="wipe_patient_data">Erase All Patient Data</string>
+    <string name="erase">Erase</string>
+    <string name="wipe_data">Erase And Reset Device</string>
+    <string name="user_section">User Requirements</string>
+    <string name="pwd_quality_title">Password Type</string>
+    <string name="pwd_length_title">Minimum Password Length</string>
+    <string name="max_time_to_lock_title">Time Before Screen Lock</string>
+    <string name="max_pwd_to_wipe_title">Password Errors Before Wipe</string>
+    <string name="max_pwd_setting_first_warning">ALL DATA from this device will be wiped after %d incorrect password attempts. Are you sure?</string>
+    <string name="max_pwd_setting_second_warning">A value below 10 may lead to accidental deletion of ALL DATA, for example, if a child is playing with the lockscreen.  \n \n Are you absolutely sure you want erase ALL DATA after %d incorrect password attempts?</string>
+    <string name="max_pwd_setting_ok_button">Yes, Set at %d Errors</string>
+    <string name="max_pwd_setting_cancel_button">Cancel</string>
+    
+    
+    <!-- Device Settings List -->
+    <!-- full menu with long names -->
+    <string name="list_admin_password">Update Admin Password</string>
+    <string name="list_admin_policy">Device Admin Policy</string>
+    <string name="list_app_settings">Application Settings</string>
+    <string name="list_sms_settings">SMS Admin Settings</string>
+    <!-- short menu (overflow menu) -->
+    <string name="list_short_password">Password</string>
+    <string name="list_short_policy">Policy</string>
+    <string name="list_short_apps">Apps</string>
+    <string name="list_short_sms">SMS</string>
+
+    <!-- Password Settings -->
+    <string name="change_password">Change Password</string>
+    <string name="device_admin">Device Administration</string>
+    <string name="updating_data">Updating Data</string>
+    <string name="please_wait">Please Wait</string>
     <string name="default_pwd">***REMOVED***</string>
     <string name="btn_submit">Submit</string>
+
+    <!-- Application Settings -->
     <string name="odk_collect">ODK Collect</string>
     <string name="enable_log">Log Activities</string>
     <string name="collectEdit">Edit</string>
@@ -15,11 +77,99 @@
     <string name="adwEdit">Edit</string>
     <string name="view_settings">Show Menu in App</string>
     <string name="edit_settings">Preferences</string>
+
+    <!-- Clock Service -->
     <string name="clock_service_start">Starting Clock Check</string>
     <string name="clock_service_ticker">Checking Date and Time</string>
     <string name="clock_service_label">Checking System Date and Time</string>
     <string name="clock_service_text">Updating System Clock against NTP internet Time</string>
     <string name="clock_needs_update">System Clock is out of date. Please Update in Settings, Date and Time</string>
     <string name="clock_updated_success">System Clock has been updated by NTP</string>
+    <string name="message_gpsdisabled">GPS is disabled. Trying to use wireless network to determine your location.</string>
+    <string name="message_locationunavailable">GPS and Network detection is disabled. Your current location is temporarily unavailable.</string>
+    <string name="message_lastknownlocation">GPS and Network detection is disabled. Showing last known location.</string>
+    <string name="app_policy_admin_name">Policy Admin Receiver</string>
+
+    <!-- SMS SETTINGS -->
+    <string name="sms_example">Example SMS</string>
+    <string name="sms_code">Code</string>
+    <string name="sms_admin_divider_title">SMS Device Administration</string>
+    <string name="sms_admin_divider_description">This device may be managed by SMS. For security, SMS must include the following unique device ID in order to take effect:</string>
+    <string name="sms_reset_divider_title">SMS Device Reset</string>
+    <string name="sms_reset_divider_description">If the password or unique device id are lost, the device codes may be reset by SMS. New codes will be sent to the number:</string>
+    <string name="reset_sms_line">Reset SMS Line</string>
+    <string name="reset_admin_id">Reset Unique ID</string>
+    
+    <!-- lock the device -->
+    <string name="sms_title_lock">Lock Device</string>
+    <string name="sms_description_lock">Lock the device with the existing password. Use in case of lost device when password is still secure.</string>
+    <!-- send GPS coordiantes -->
+    <string name="sms_title_gps">Get Current Location</string>
+    <string name="sms_description_gps">Retreive the current location of the device by GPS if possible, or through network tower coverage otherwise. SMS will report the Latitude, Longitude, Altitude, and Accuracy where available.</string>
+    <!-- hold the device -->
+    <string name="sms_title_hold">Hold Device with Message</string>
+    <string name="sms_description_hold">Present a new screen to the user asking user to Please Wait, with the body of the SMS message presented to the user as a dialog box. The user will not be able to readily exit this screen, so it may, for example, be used to communicate to the user while wiping data in the background.</string>
+    <!-- reset password to default -->
+    <string name="sms_title_pwd_default">Reset Password to Default</string>
+    <string name="sms_description_pwd_default">Resets the device password to a default password of 0. Given that this will not conform to the device policy, the user will be requested to change the password on next unlock.</string>
+    <!-- wipe data -->
+    <string name="sms_title_wipe_data">Factory Reset</string>
+    <string name="sms_description_wipe_data">Performs a wipe of all Patient Data before conducting a full wipe of internal memory and factory reset. The device will reboot and guide user through the initial device setup instructions again.</string>
+    <!-- wipe odk data -->
+    <string name="sms_title_wipe_odk">Wipe All Patient Data</string>
+    <string name="sms_description_wipe_odk">Performs a wipe of all Patient data.  This includes patient information from OpenMRS and all forms previously filled out on the device, but does not include SMS messages, notes, or calendar obligations that may still contain sensitive patient data.</string>
+    <!-- cancel all alarms -->
+    <string name="sms_title_cancel_alarm">Cancel Device Admin Alarms</string>
+    <string name="sms_description_cancel_alarm">Be default, all SMS codes sent to the device will repeat until they are complete. This message will cancel the current alarms.</string>
+    <!-- reset admin id -->
+    <string name="sms_title_reset_admin">Reset SMS Code</string>
+    <string name="sms_description_reset_admin">Reset the administration code used for all SMS messages.  This will be sent to the phone number registered on the device as the administrator. This phone number can be changed under Device Administration section.</string>
+    <!-- reset password to secret -->
+    <string name="sms_title_pwd_secret">Lock with Secure Password</string>
+    <string name="sms_description_pwd_secret">Lock the device with a new secure password that conforms to the device policy.  This password is randomly generated and saved by the device itself.  The only method of resetting this password is to send another SMS requesting password be reset to a default of 0.</string>
+
+    <!-- USER STRINGS -->
+    <!-- Intro -->
+    <string name="initial_instructions">Welcome to Android! Please take a moment to set up your device. Begin by enabling the device policies.</string>
+    <string name="start">Start</string>
+    <string name="setup_error">Sorry, something has gone wrong with the device setup. Please setup the device again.</string>
+
+    <!-- Device Admin -->
+    <string name="admin_requirement">You must accept the device policy to use this device. Please accept the policy or return the device.</string>
+    <string name="set_admin">Enable Device</string>
+
+    <!-- Set Password -->
+    <string name="pwd_instructions">Please set up a password for this device.</string>
+    <string name="update_password">Update Password</string>
+    <string name="password_not_allowed">Current password is not allowed.  You must update your password to use this device.</string>
+    <string name="exit">Exit</string>
+    <string name="password_allowed">Current password is allowed.  Device is protected.</string>
+    <string name="pwd_requirement">You must use a password with this device. Please choose a password that conforms to the requirements.</string>
+    <string name="set_pwd">Create Password</string>
+    <string name="view_policy_instruction">Password Requirements:</string>
+    <string name="view_password_quality">Characters:</string>
+    <string name="view_password_length">Minimum Length:</string>
+    <string name="view_password_lockout">Permanent Lock:</string>
+
+    <!-- Provider ID -->
+    <string name="provider_id">Enter Your Provider ID:</string>
+    <string name="confirm_id">Please Re-Enter Provider ID:</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="provider_instructions">Please enter your provider identification number.</string>
+    <string name="provider_requirement">You must be a provider to use this device.  Please enter your assigned provider ID.</string>
+    <string name="set_provider">Set Provider ID</string>
+
+    <!-- Account Setup -->
+    <string name="account_instructions">Please set up an account for your phone numbers and calendars.</string>
+    <string name="account_notset">You have chosen not to setup an account for synchronizing calendars and phone numbers. You may do this at a later time by clicking on the calendar. </string>
+    <string name="set_account">Create Account</string>
+
+    <!-- Finish -->
+    <string name="finish">Finish</string>
+
+    <plurals name="congrats">
+        <item quantity="one">Congratulations!  An account is currently setup for your calendar and phone numbers. You are now ready to use the device.</item>
+        <item quantity="other">Congratulations!  %d accounts are currently setup for your calendar and phone numbers. You are now ready to use the device.</item>
+    </plurals>
 
 </resources>

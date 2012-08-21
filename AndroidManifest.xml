@@ -4,7 +4,9 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="14" />
 
     <uses-permission
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,12 +28,29 @@
         android:name="android.permission.SET_DEBUG_APP" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="com.android.launcher.permission.VIEW_MENU_PREFERENCE" />
+    <uses-permission android:name="android.permission.SEND_SMS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RECEIVE_SMS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+
+        <!-- User Activities -->
         <activity
-            android:name=".activities.PrefsPassword"
+            android:name=".activities.SetUserPassword"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -41,16 +60,60 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="org.odk.clinic.android.activities.PrefsPassword" />
+                <action android:name="org.odk.clinic.android.activities.UserPasswordActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.SetPrefs"
+            android:name=".activities.InitialSetupActivity"
+            android:label="@string/app_name" />
+        <activity
+            android:name=".activities.SetProviderId"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".activities.DeviceHoldActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".activities.MessageHoldActivity"
             android:label="@string/app_name" >
         </activity>
 
+        <!-- Device Admin Activities -->
+        <activity
+            android:name=".activities.AdminLoginActivity"
+            android:label="@string/admin_login_activity"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+        <activity
+            android:name=".activities.SetAdminPassword"
+            android:label="@string/admin_password_activity"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+        <activity
+            android:name=".activities.SetAppPreferences"
+            android:label="@string/app_settings"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+        <activity
+            android:name=".activities.SetDevicePolicy"
+            android:label="@string/device_policy_settings"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+        <activity
+            android:name=".activities.AdminSettingsActivity"
+            android:label="@string/device_settings"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+        <activity
+            android:name=".activities.ViewSmsSettings"
+            android:label="@string/sms_settings"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
+
+        <!-- Services -->
         <service
             android:name=".services.UpdateClockService"
             android:label="UpdateClockService" >
@@ -58,17 +121,75 @@
                 <action android:name="com.alphabetbloc.chvsettings.services.UpdateClockService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.DeviceAdminService"
+            android:label="DeviceAdminService" >
+            <intent-filter>
+                <action android:name="com.alphabetbloc.chvsettings.services.DeviceAdminService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".services.SendSMSService"
+            android:label="SendSMSService" >
+        </service>
 
+        <!--
+        Receivers
+        <receiver
+            android:name="com.alphabetbloc.chvsettings.receivers.Policy$PolicyAdmin"
+            android:label="@string/app_policy_admin_name"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+        -->
+        <receiver
+            android:name="com.alphabetbloc.chvsettings.receivers.AirplaneReceiver"
+            android:enabled="true"
+            android:label="AirplaneReceiver" >
+        </receiver>
+        <receiver
+            android:name="com.alphabetbloc.chvsettings.receivers.DeviceAdmin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receivers.SmsReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="SmsReceiver" >
+            <intent-filter android:priority="1000" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".receivers.UpdateOnBoot"
             android:enabled="true"
             android:exported="true"
             android:label="UpdateOnBoot" >
-
-            <!-- TODO: do you really need this intent-filter? where did I get this from? -->
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+        <receiver android:name="com.commonsware.cwac.wakeful.WakelockReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="com.commonsware.cwac.wakeful"
+                android:resource="@xml/wakeful" />
         </receiver>
         <receiver
             android:name=".receivers.UpdateOnCoverage"
