@@ -175,7 +175,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * message to the user in a dialog box.
 	 * 
 	 */
-	// TODO: check this
+	// TODO! check this
 	private void holdDevice(String toast) {
 		Intent i = new Intent(mContext, MessageHoldActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -218,7 +218,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 	}
 
-	// TODO: fix this.
+	// TODO! fix this.
 	public void wipeDevice() {
 		Log.e(TAG, "Wiping the device");
 		wipeOdkData();
@@ -228,7 +228,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		mDPM.wipeData(0);
 	}
 
-	// TODO: fix this.
+	// TODO! fix this.
 	public void wipeOdkData() {
 		Log.e(TAG, "wiping client data from device");
 		mDPM.wipeData(0);

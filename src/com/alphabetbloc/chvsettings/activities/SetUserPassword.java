@@ -32,7 +32,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// TODO: changing this:
+		// TODO! changing this:
 		mNewInstall = getIntent().getBooleanExtra(Constants.NEW_INSTALL, true);
 		if (mNewInstall == null)
 			mNewInstall = true;

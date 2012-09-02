@@ -29,8 +29,7 @@ public class AdminSettingsActivity extends SherlockListActivity {
         addListItem(getString(R.string.list_app_settings), SetAppPreferences.class.getName());
         addListItem(getString(R.string.list_sms_settings), ViewSmsSettings.class.getName());
         
-        setListAdapter(new SimpleAdapter(this, mList, android.R.layout.simple_list_item_1, new String[] { "title" },
-                new int[] { android.R.id.text1 }));
+        setListAdapter(new SimpleAdapter(this, mList, android.R.layout.simple_list_item_1, new String[] { "title" }, new int[] { android.R.id.text1 }));
         getListView().setTextFilterEnabled(true);
     }
     

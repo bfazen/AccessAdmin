@@ -34,7 +34,7 @@ public class SetAppPreferences extends SherlockActivity{
 	private CheckBox clinicToggle;
 	private CheckBox adwToggle;
 
-	//TODO: check if the packages exist before showing the buttons... if don't exist, set to GONE...
+	//TODO!: check if the packages exist before showing the buttons... if don't exist, set to GONE...
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

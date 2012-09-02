@@ -279,7 +279,7 @@ public class Policy {
 
 	// Provider ID
 	// A non-android policy that we are ensuring is also implemented as policy
-	// TODO: send the Provider ID to Clinic For CHWS!
+	// TODO! send the Provider ID to Clinic For CHWS!
 	/**
 	 * Set the maximum time screen can be unlocked.
 	 * 
