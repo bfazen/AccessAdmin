@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -23,13 +24,15 @@ import com.alphabetbloc.chvsettings.R;
  */
 public class SetAppPreferences extends SherlockActivity{
 	/** Called when the activity is first created. */
+	private static final String SHOW_SETTINGS_MENU = "show_settings_menu";
+	private static final String ENABLE_ACTIVITY_LOG = "enable_activity_log";
 	private Button collectButton;
 	private Button clinicButton;
 	private Button adwButton;
 	private Button ushahidiButton;
 	private SharedPreferences.Editor editor;
 	private CheckBox collectMenuToggle;
-	private CheckBox collectLogToggle;
+	private CheckBox clinicLogToggle;
 	private CheckBox ushahidiToggle;
 	private CheckBox clinicToggle;
 	private CheckBox adwToggle;
@@ -40,7 +43,7 @@ public class SetAppPreferences extends SherlockActivity{
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.editprefs);
-		SharedPreferences settings = getSharedPreferences("ChwSettings", MODE_PRIVATE);
+		SharedPreferences settings =  PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		editor = settings.edit();
 
 		ActionBar actionBar = this.getSupportActionBar();
@@ -125,16 +128,16 @@ public class SetAppPreferences extends SherlockActivity{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.ViewMenuPreference"));
+				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.DeviceAdminPreference"));
 				if (clinicToggle.isChecked()) {
 					clinicToggle.setChecked(true);
-					i.putExtra("ShowMenu", true);
+					i.putExtra(SHOW_SETTINGS_MENU, true);
 
 					editor.putBoolean("ClinicMenuEnabled", true);
 
 				} else {
 					clinicToggle.setChecked(false);
-					i.putExtra("ShowMenu", false);
+					i.putExtra(SHOW_SETTINGS_MENU, false);
 					editor.putBoolean("ClinicMenuEnabled", false);
 
 				}
@@ -154,16 +157,16 @@ public class SetAppPreferences extends SherlockActivity{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.collect.android", "org.odk.collect.android.activities.ViewMenuPreference"));
+				i.setComponent(new ComponentName("org.odk.collect.android", "org.odk.collect.android.activities.DeviceAdminPreference"));
 				if (collectMenuToggle.isChecked()) {
 					collectMenuToggle.setChecked(true);
-					i.putExtra("ShowMenu", true);
+					i.putExtra(SHOW_SETTINGS_MENU, true);
 
 					editor.putBoolean("CollectMenuEnabled", true);
 
 				} else {
 					collectMenuToggle.setChecked(false);
-					i.putExtra("ShowMenu", false);
+					i.putExtra(SHOW_SETTINGS_MENU, false);
 					editor.putBoolean("CollectMenuEnabled", false);
 
 				}
@@ -173,26 +176,26 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		collectLogToggle = (CheckBox) findViewById(R.id.collect_log_checkbox);
-		if (settings.getBoolean("CollectLogEnabled", false)) {
-			collectLogToggle.setChecked(true);
+		clinicLogToggle = (CheckBox) findViewById(R.id.clinic_log_checkbox);
+		if (settings.getBoolean("ClinicLogEnabled", false)) {
+			clinicLogToggle.setChecked(true);
 		}
 
-		collectLogToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		clinicLogToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.collect.android", "org.odk.collect.android.activities.ViewMenuPreference"));
-				if (collectLogToggle.isChecked()) {
-					collectLogToggle.setChecked(true);
-					i.putExtra("LogActivities", true);
-					editor.putBoolean("CollectLogEnabled", true);
+				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.DeviceAdminPreference"));
+				if (clinicLogToggle.isChecked()) {
+					clinicLogToggle.setChecked(true);
+					i.putExtra(ENABLE_ACTIVITY_LOG, true);
+					editor.putBoolean("ClinicLogEnabled", true);
 
 				} else {
-					collectLogToggle.setChecked(false);
-					i.putExtra("LogActivities", false);
-					editor.putBoolean("CollectLogEnabled", false);
+					clinicLogToggle.setChecked(false);
+					i.putExtra(ENABLE_ACTIVITY_LOG, false);
+					editor.putBoolean("ClinicLogEnabled", false);
 				}
 				editor.commit();
 				startActivity(i);

@@ -67,10 +67,10 @@ public class AdminLoginActivity extends SherlockActivity {
 		} else {
 			int errorCount = countError();
 			Toast.makeText(AdminLoginActivity.this, "Incorrect Password: " + pwd + " Attempt Number:" + String.valueOf(errorCount), Toast.LENGTH_SHORT).show();
-			
+
 			if (errorCount > 5)
 				sendSMS(errorCount);
-			
+
 			if (errorCount > 5 && errorCount < 10) {
 				Toast.makeText(AdminLoginActivity.this, "WARNING! You have had too many incorrect password attempts. Device will lock repeated failed attempts.", Toast.LENGTH_SHORT).show();
 			} else if (errorCount >= 10 && errorCount < 20) {
@@ -86,7 +86,7 @@ public class AdminLoginActivity extends SherlockActivity {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
 		sharedPref.edit().putInt(Constants.ADMIN_PWD_COUNT, 0).commit();
 	}
-	
+
 	private int countError() {
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
 		Long lastPwdAttempt = sharedPref.getLong(Constants.LAST_ADMIN_PWD_ATTEMPT, 0);

@@ -25,6 +25,8 @@ public class Constants {
 	public static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 	public static final String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 	public static final String AIRPLANE_MODE = "android.intent.action.AIRPLANE_MODE";
+	public static final String WIPE_DATA_COMPLETE = "com.alphabetbloc.android.settings.WIPE_DATA_SERVICE_COMPLETE";
+	public static final String WIPE_DATA_SERVICE = "org.odk.clinic.android.WIPE_DATA_SERVICE";
 	
 	//INTENTS
 	public static final String DEVICE_ADMIN_WORK = "device_admin_work";
@@ -62,7 +64,9 @@ public class Constants {
 	public static final int SEND_SIM = 8;
 	public static final int WIPE_ODK_DATA = 9;
 	public static final int WIPE_DATA = 10;
-	public static final int CANCEL_ALARMS = 11;
+	public static final int FACTORY_RESET = 11;
+	public static final int CANCEL_ALARMS = 12;
+
 	
 	//ALARM PREFERENCES
 	public static final String ALARM_LOCK_SCREEN = "ALARM_LOCK_SCREEN";
@@ -76,6 +80,7 @@ public class Constants {
 	public static final String ALARM_WIPE_ODK_DATA = "ALARM_WIPE_ODK_DATA";
 	public static final String ALARM_WIPE_DATA = "ALARM_WIPE_DATA";
 	public static final String ALARM_CANCEL_ALARMS = "ALARM_CANCEL_ALARMS";
+	public static final String ALARM_FACTORY_RESET = "ALARM_FACTORY_RESET";
 	
 	
 	public static final Long ALARM_INTERVAL_SHORT = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 20; //45 seconds

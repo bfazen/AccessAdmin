@@ -84,9 +84,13 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 		case Constants.HOLD_DEVICE:
 			interval = prefs.getLong(Constants.ALARM_HOLD_DEVICE, Constants.ALARM_INTERVAL_SHORT);
 			break;
+		case Constants.FACTORY_RESET:
+			interval = prefs.getLong(Constants.ALARM_FACTORY_RESET, Constants.ALARM_INTERVAL_SHORT);
+			break;
 		case Constants.CANCEL_ALARMS:
 			interval = prefs.getLong(Constants.ALARM_CANCEL_ALARMS, Constants.ALARM_INTERVAL_SHORT);
 			break;
+
 		default:
 			break;
 		}

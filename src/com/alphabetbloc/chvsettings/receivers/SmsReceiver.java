@@ -9,13 +9,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
 import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.data.StringGenerator;
 import com.alphabetbloc.chvsettings.services.DeviceAdminService;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
@@ -68,9 +65,15 @@ public class SmsReceiver extends BroadcastReceiver {
 				}
 
 			}
+		} else if (intent.getAction().equals(Constants.WIPE_DATA_COMPLETE)) {
+			Intent i = new Intent(mContext, DeviceAdminService.class);
+			i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.FACTORY_RESET);
+			WakefulIntentService.sendWakefulWork(mContext, i);
 		}
 	}
 
+	// TODO! does this receiver need to be a wakelock receover, or do all
+	// receivers have a wakelock for the duration of their onReceive?
 	private void readSMS() {
 		if (Imei == null)
 			createSmsStrings();
@@ -89,7 +92,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String smsAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
 
-		//REQUIRE smsAdminId:
+		// REQUIRE smsAdminId:
 		lockDevice = smsAdminId + Constants.SMS_CODE_LOCK;
 		sendGPS = smsAdminId + Constants.SMS_CODE_GPS;
 		wipeData = smsAdminId + Constants.SMS_CODE_WIPE_DATA;
@@ -97,11 +100,11 @@ public class SmsReceiver extends BroadcastReceiver {
 		holdScreen = smsAdminId + Constants.SMS_CODE_HOLD;
 		cancelAlarm = smsAdminId + Constants.SMS_CODE_CANCEL_ALARM;
 		resetPwdToDefault = smsAdminId + Constants.SMS_CODE_RESET_PWD_DEFAULT;
-		
-		//DO NOT REQUIRE smsAdminId:
+
+		// DO NOT REQUIRE smsAdminId:
 		lockSecretPwd = Constants.SMS_CODE_RESET_PWD_SECRET;
 		resetAdminId = Constants.SMS_CODE_RESET_ADMIN_ID;
-		
+
 	}
 
 	private boolean matchingSmsString() {

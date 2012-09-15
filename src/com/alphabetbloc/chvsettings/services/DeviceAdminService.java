@@ -7,8 +7,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -37,14 +39,15 @@ import com.commonsware.cwac.wakeful.WakelockWorkReceiver;
  * 
  * <p>
  * DEVICE_ADMIN_WORK type extras: <br>
- * 1. SEND_SMS: sends SMS with a repeat alarm until sent
- * 2. SEND_GPS: Sending an SMS with GPS coordinates<br>
+ * 1. SEND_SMS: sends SMS with a repeat alarm until sent 2. SEND_GPS: Sending an
+ * SMS with GPS coordinates<br>
  * 3. SEND_SIM: Sending SMS with new serial and line when SIM is changed<br>
  * 4. LOCK_SCREEN: Locks the Screen<br>
  * 5. WIPE_ODK_DATA: Wiping the patient sensitive data<br>
  * 6. WIPE_DATA: Wiping the entire device to factory reset (will allow user to
  * setup new device)<br>
- * 7. RESET_TO_DEFAULT_PWD: Resetting password to a default, depends on what the password quality is<br>
+ * 7. RESET_TO_DEFAULT_PWD: Resetting password to a default, depends on what the
+ * password quality is<br>
  * 8. LOCK_SECRET_PWD: Resetting password to a random string (so as to
  * permanently lock device until reset password to default)<br>
  * 9. HOLD_DEVICE: Starting MessageHoldActivity to send message to user before
@@ -77,6 +80,7 @@ public class DeviceAdminService extends WakefulIntentService {
 
 	private Context mContext;
 	private static final String TAG = "DeviceAdminService";
+	private static final String PERFORM_FACTORY_RESET = "perform_factory_reset";
 
 	public DeviceAdminService() {
 		super("AppService");
@@ -126,8 +130,8 @@ public class DeviceAdminService extends WakefulIntentService {
 			// (after boot or kill, intent extras would be lost)
 			// do not reset alarms
 			smsIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
-			smsLine = mPrefs.getString(Constants.SMS_LINE, "");
-			smsMessage = mPrefs.getString(Constants.SMS_MESSAGE, "");
+			smsLine = mPrefs.getString(Constants.SAVED_SMS_LINE, "");
+			smsMessage = mPrefs.getString(Constants.SAVED_SMS_MESSAGE, "");
 		}
 
 		switch (smsIntent) {
@@ -162,6 +166,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		case Constants.HOLD_DEVICE:
 			holdDevice(smsMessage);
 			break;
+		case Constants.FACTORY_RESET:
+			factoryReset();
+			break;
 		case Constants.CANCEL_ALARMS:
 			cancelAdminAlarms();
 			break;
@@ -170,7 +177,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 	}
 
-		/**
+	/**
 	 * Holds the device in an activity the user can not leave, and posts a wait
 	 * message to the user in a dialog box.
 	 * 
@@ -195,7 +202,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (isDeviceLocked()) {
 			cancelAdminAlarms();
 			sendSingleSMS("Device locked");
-		} 
+		}
 	}
 
 	/**
@@ -218,48 +225,71 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 	}
 
+	public void factoryReset() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		boolean resetDevice = prefs.getBoolean(PERFORM_FACTORY_RESET, false);
+		if (resetDevice) {
+			sendSingleSMS("Performing a Factory Reset");
+
+			// wait a minute for SMS to send, then perform factory reset
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					mDPM.wipeData(0);
+				}
+			}, 1000 * 60);
+		}
+	}
+
 	// TODO! fix this.
 	public void wipeDevice() {
-		Log.e(TAG, "Wiping the device");
+		// NB. we don't monitor this, we simply clear Client data. On completion
+		// client data will be wiped (managed by Clinic). On receipt of
+		// a broadcast to wipe data and if preference is set, then this process
+		// will resume and the factoryReset() method will be called.
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		Editor editor = prefs.edit();
+		editor.putBoolean(PERFORM_FACTORY_RESET, true);
+		editor.commit();
 		wipeOdkData();
-		// check?
-		cancelAdminAlarms();
-		sendSingleSMS("Wiping Device");
-		mDPM.wipeData(0);
 	}
 
 	// TODO! fix this.
 	public void wipeOdkData() {
+		// we don't check this one, because we dont manage the process
+		// instead we wait for a broadcast to tell us to send a message
 		Log.e(TAG, "wiping client data from device");
-		mDPM.wipeData(0);
-		// then check...
+		sendSingleSMS("Wiping Client Data");
+
+		Intent i = new Intent(Constants.WIPE_DATA_SERVICE);
+		sendBroadcast(i);
+
 		cancelAdminAlarms();
 	}
 
-	
 	/**
-	 * Resets the AdminID code for sending SMS, and sends an SMS
-	 * with the new Admin ID to the reporting line.
+	 * Resets the AdminID code for sending SMS, and sends an SMS with the new
+	 * Admin ID to the reporting line.
 	 */
 	public void resetSmsAdminId() {
-		
+
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String oldAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
 		String rAlphaNum = (new StringGenerator(15)).getRandomAlphaNumericString();
 		prefs.edit().putString(Constants.UNIQUE_DEVICE_ID, rAlphaNum).commit();
 		String newAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
-		
-		if (!newAdminId.equals(oldAdminId)){
+
+		if (!newAdminId.equals(oldAdminId)) {
 			cancelAdminAlarms();
 			sendRepeatingSMS(Constants.RESET_ADMIN_ID, newAdminId);
 		} else {
 			sendRepeatingSMS(Constants.RESET_ADMIN_ID, "Unable to reset Admin ID");
 		}
 	}
-	
+
 	/**
-	 * Resets the password to a default string that follows the device admin policy, and sends an SMS
-	 * confirmation to the reporting line.
+	 * Resets the password to a default string that follows the device admin
+	 * policy, and sends an SMS confirmation to the reporting line.
 	 */
 	public void resetPassword() {
 		Log.e(TAG, "resetting password to default on device");
@@ -274,9 +304,9 @@ public class DeviceAdminService extends WakefulIntentService {
 	}
 
 	/**
-	 * Locks the device with a random secure string that only the device knows. The only way to unlock device is
-	 * through sending an sms to reset the password to default. Also sends an SMS to the reporting
-	 * line.
+	 * Locks the device with a random secure string that only the device knows.
+	 * The only way to unlock device is through sending an sms to reset the
+	 * password to default. Also sends an SMS to the reporting line.
 	 */
 	public void lockSecretPassword() {
 		Log.e(TAG, "resetting to secret password on device");
@@ -440,8 +470,8 @@ public class DeviceAdminService extends WakefulIntentService {
 			mContext.startService(i);
 		}
 	}
-	
-	public void sendRepeatingSMS(int smstype, String message){
+
+	public void sendRepeatingSMS(int smstype, String message) {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String line = prefs.getString(Constants.SMS_REPLY_LINE, "");
 		sendRepeatingSMS(smstype, line, message);
