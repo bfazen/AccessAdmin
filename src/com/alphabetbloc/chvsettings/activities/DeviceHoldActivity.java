@@ -66,7 +66,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	protected void stopAirplaneMode() {
 		unregisterReceiver(mAirplaneReceiver);
-		Log.e(TAG, "registering airplane receiver");
+		Log.e(TAG, "unregistering airplane receiver");
 		boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
 		if (enabled) {
 			Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);

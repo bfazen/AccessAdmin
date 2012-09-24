@@ -67,7 +67,7 @@ public class Policy {
 		mDPM = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mPolicyAdmin = new ComponentName(context, DeviceAdmin.class);
 		
-		Log.e(TAG, "passwordQuality is" + getPasswordQuality());
+		Log.e(TAG, "Policy passwordQuality is" + getPasswordQuality());
 	}
 	
 	public void initializeDefaultPolicy(){
@@ -75,7 +75,7 @@ public class Policy {
 		setPasswordLength(mPasswordLength);
 		setMaxFailedPw(mMaxPwdToWipe);
 		setMaxTimeToLock(mMaxTimeToLock);
-		Log.e(TAG, "passwordQuality is" + getPasswordQuality());
+		Log.e(TAG, "Initializing passwordQuality is" + getPasswordQuality());
 	}
 
 	// 4 Policy Setters for Android 2.3
@@ -86,7 +86,7 @@ public class Policy {
 		mPrefs.edit().putInt(KEY_PASSWORD_QUALITY, quality).commit();
 		mDPM.setPasswordQuality(mPolicyAdmin, PASSWORD_QUALITY_VALUES[quality]);
 		updateDefaultPassword();
-		Log.e(TAG, "passwordQuality is" + getPasswordQuality());
+		Log.e(TAG, "Set passwordQuality =" + getPasswordQuality());
 	}
 
 	/**
@@ -275,51 +275,6 @@ public class Policy {
 	public void removeActiveAdmin() {
 		Log.e("POLICY", "remove active admin");
 		mDPM.removeActiveAdmin(mPolicyAdmin);
-	}
-
-	// Provider ID
-	// A non-android policy that we are ensuring is also implemented as policy
-	// TODO! send the Provider ID to Clinic For CHWS!
-	/**
-	 * Set the maximum time screen can be unlocked.
-	 * 
-	 */
-	public void setProviderId(int providerId) {
-		mPrefs.edit().putInt(PROVIDER_ID, providerId).commit();
-	}
-
-	/**
-	 * Returns the Provider ID
-	 * 
-	 * @return Provider ID
-	 */
-	public int getProviderId() {
-		return mProviderId;
-	}
-
-	/**
-	 * Indicates whether the Provider ID has been set
-	 * 
-	 * @return True if Provider ID has been set
-	 */
-	public boolean isProviderActive() {
-		if (mProviderId > 0 && mProviderId < 1000000000) {
-			Log.e("POLICY", "provider is active");
-			return true;
-		} else
-			return false;
-	}
-
-	/**
-	 * Indicates whether the Provider ID has been set
-	 * 
-	 * @return True if Provider ID has been set
-	 */
-	public boolean isDeviceSetupComplete() {
-		if (isDeviceSecured() && isProviderActive())
-			return true;
-		else
-			return false;
 	}
 
 }

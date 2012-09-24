@@ -43,7 +43,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		if (Constants.BOOT_COMPLETED.equals(intent.getAction())) {
 			// always check clock...
 			mContext.startService(new Intent(mContext, UpdateClockService.class));
-
+			Log.e("BootReceiver", "Boot Receiver is receiving!");
 			// check security...
 			mPolicy = new Policy(mContext);
 			mSettings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -66,7 +66,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 					i.putExtra(Constants.DEVICE_ADMIN_WORK, mSecurityCode);
 					mContext.startService(i);
 				}
-				if (!mPolicy.isDeviceSecured() || !mPolicy.isProviderActive()) {
+				if (!mPolicy.isDeviceSecured()) {
 					Intent i = new Intent(context, InitialSetupActivity.class);
 					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					context.startActivity(i);

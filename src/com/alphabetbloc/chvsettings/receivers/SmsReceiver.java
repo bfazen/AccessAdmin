@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
@@ -49,6 +50,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		mContext = context;
+		Log.e("SmsReceiver", "Sms Receiver is receiving!");
 		Policy policy = new Policy(context);
 		if (intent.getAction().equals(Constants.SMS_RECEIVED) && policy.isAdminActive()) {
 			Bundle bundle = intent.getExtras();

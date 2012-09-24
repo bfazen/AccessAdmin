@@ -89,6 +89,7 @@ public class DeviceAdminService extends WakefulIntentService {
 
 	@Override
 	protected void doWakefulWork(Intent intent) {
+		Log.e(TAG, "doWakefulWork is called! and creating a new policy!");
 		mContext = this;
 		mDPM = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mDeviceAdmin = new ComponentName(DeviceAdminService.this, DeviceAdmin.class);

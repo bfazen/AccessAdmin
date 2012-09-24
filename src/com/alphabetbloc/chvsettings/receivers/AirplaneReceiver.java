@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.alphabetbloc.chvsettings.data.Policy;
 
@@ -31,10 +32,11 @@ public class AirplaneReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.e("AirplaneReceiver", "Airplane Receiver is receiving!");
 		Policy policy = new Policy(context);
 
 		// if device is not setup:
-		if (!policy.isDeviceSecured() || !policy.isProviderActive()) {
+		if (!policy.isDeviceSecured()) {
 
 			// if airplane mode is off, then turn it on...
 			boolean enabled = Settings.System.getInt(context.getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;

@@ -2,7 +2,9 @@ package com.alphabetbloc.chvsettings.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -20,42 +22,37 @@ public class SetUserPassword extends DeviceHoldActivity {
 	private Policy mPolicy;
 	private Button mExitBtn;
 	private Button mPwdBtn;
-	private Boolean mNewInstall;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		startAirplaneMode();
-		mPolicy = new Policy(this);
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// TODO! changing this:
-		mNewInstall = getIntent().getBooleanExtra(Constants.NEW_INSTALL, true);
-		if (mNewInstall == null)
-			mNewInstall = true;
-		// to this:
-		// SharedPreferences settings =
-		// PreferenceManager.getDefaultSharedPreferences(mContext);
-		// mNewInstall = settings.getBoolean(NEW_INSTALL, true);
 
-		if (mNewInstall) {
-			Intent i = new Intent(this, InitialSetupActivity.class);
-			startActivity(i);
-
-			// Editor editor = settings.edit();
-			// editor.putBoolean(NEW_INSTALL, false);
-			// editor.commit();
-
-			finish();
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean newInstall = settings.getBoolean(Constants.NEW_INSTALL, true);
+		if (newInstall) {
+			launchInitialSetupActivity();
 		} else {
-			// in case device admin has logged in and then returned to screen..
-
+			mPolicy = new Policy(this);
+//			if (!mPolicy.isDeviceSecured()) {
+//				Log.e("SetUserPassword", "Something went drastically wrong!  Lost device setup after install!");
+//				launchInitialSetupActivity();
+//			}
+			//Device Admin is successfully setup, so continue
 			refreshView();
 		}
 
+	}
+
+	private void launchInitialSetupActivity() {
+		Intent i = new Intent(this, InitialSetupActivity.class);
+		startActivity(i);
+		finish();
 	}
 
 	// Initialize policy viewing screen.
@@ -65,7 +62,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 		TextView setupMessage = (TextView) findViewById(R.id.setup_message);
 		ImageView exclaim = (ImageView) findViewById(R.id.exclamation);
 		exclaim.setVisibility(View.VISIBLE);
-		
+
 		// Minimum Password Length
 		TextView pwdLength = (TextView) findViewById(R.id.policy_password_length);
 		pwdLength.setText(String.valueOf(mPolicy.getPasswordLength()));
@@ -78,8 +75,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 		// Password Case
 		TextView pwdLock = (TextView) findViewById(R.id.policy_password_lockout);
 		pwdLock.setText(String.valueOf(mPolicy.getMaxFailedPwd()));
-		
-		
+
 		mPwdBtn = (Button) findViewById(R.id.setup_action_btn);
 		mPwdBtn.setText(R.string.change_password);
 		mPwdBtn.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +92,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 			Intent data = new Intent();
 			setResult(RESULT_CANCELED, data);
 		} else {
-			//Can exit
+			// Can exit
 			setupMessage.setText(R.string.password_allowed);
 			exclaim.setVisibility(View.GONE);
 			mExitBtn = (Button) findViewById(R.id.exit);

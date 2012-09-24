@@ -14,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,9 +45,8 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	private static final int START = 6;
 	private static final int SET_ADMIN = 1;
 	private static final int SET_PWD = 2;
-	private static final int SET_PROVIDER = 3;
-	private static final int SET_ACCOUNT = 4;
-	private static final int FINISH = 5;
+	private static final int SET_ACCOUNT = 3;
+	private static final int SETUP_CLINIC = 4;
 	private int mStep;
 	private Context mContext;
 	private TextView mInstructionText;
@@ -100,14 +98,11 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 				case SET_PWD:
 					setPassword();
 					break;
-				case SET_PROVIDER:
-					setProvider();
-					break;
 				case SET_ACCOUNT:
 					setAccount();
 					break;
-				case FINISH:
-					finish();
+				case SETUP_CLINIC:
+					setupClinic();
 					break;
 				default:
 					break;
@@ -138,13 +133,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			mStepText.setVisibility(View.VISIBLE);
 			break;
 		case SET_PWD:
-			mInstructionText.setText(R.string.provider_instructions);
-			mButton.setText(R.string.set_provider);
-			mStep = SET_PROVIDER;
-			mStepText.setText(String.valueOf(SET_PROVIDER));
-			break;
-		case SET_PROVIDER:
-			if (mPolicy.isDeviceSetupComplete()) {
+			if (mPolicy.isDeviceSecured()) {
 				stopAirplaneMode();
 				mInstructionText.setText(R.string.account_instructions);
 				mButton.setText(R.string.set_account);
@@ -160,14 +149,14 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		case SET_ACCOUNT:
 			Account[] accounts = AccountManager.get(this).getAccounts();
 			if (accounts.length <= 0) {
-				mInstructionText.setText(R.string.account_notset);
+				mInstructionText.setText(R.string.clinic_instructions_account_notset);
 			} else {
 				Resources res = getResources();
-				mInstructionText.setText(res.getQuantityString(R.plurals.congrats, accounts.length, accounts.length));
+				mInstructionText.setText(res.getQuantityString(R.plurals.clinic_instructions_with_account, accounts.length, accounts.length));
 			}
-			mButton.setText(R.string.finish);
-			mStep = FINISH;
-			mStepText.setVisibility(View.GONE);
+			mButton.setText(R.string.setup_clinic);
+			mStep = SETUP_CLINIC;
+			mStepText.setText(String.valueOf(SETUP_CLINIC));
 			break;
 		default:
 			break;
@@ -189,23 +178,17 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			mStep = SET_PWD;
 			mStepText.setText(String.valueOf(SET_PWD));
 			break;
-		case SET_PROVIDER:
-			mInstructionText.setText(R.string.provider_requirement);
-			mButton.setText(R.string.set_provider);
-			mStep = SET_PROVIDER;
-			mStepText.setText(String.valueOf(SET_PROVIDER));
-			break;
 		case SET_ACCOUNT:
 			Account[] accounts = AccountManager.get(this).getAccounts();
 			if (accounts.length <= 0) {
-				mInstructionText.setText(R.string.account_notset);
+				mInstructionText.setText(R.string.clinic_instructions_account_notset);
 			} else {
 				Resources res = getResources();
-				mInstructionText.setText(res.getQuantityString(R.plurals.congrats, accounts.length, accounts.length));
+				mInstructionText.setText(res.getQuantityString(R.plurals.clinic_instructions_with_account, accounts.length, accounts.length));
 			}
-			mButton.setText(R.string.finish);
-			mStep = FINISH;
-			mStepText.setVisibility(View.GONE);
+			mButton.setText(R.string.setup_clinic);
+			mStep = SETUP_CLINIC;
+			mStepText.setText(String.valueOf(SETUP_CLINIC));
 			break;
 		default:
 			break;
@@ -267,10 +250,12 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		startActivityForResult(i, SET_PWD);
 	}
 
-	private void setProvider() {
-		Intent i = new Intent(mContext, SetProviderId.class);
-		i.putExtra(Constants.NEW_INSTALL, false);
-		startActivityForResult(i, SET_PROVIDER);
+	private void setupClinic() {
+		Intent i = new Intent();
+		i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.ClinicLauncherActivity"));
+		i.putExtra("device_admin_setup", true);
+		startActivityForResult(i, SETUP_CLINIC);
+		finish();
 	}
 
 	private void setAccount() {

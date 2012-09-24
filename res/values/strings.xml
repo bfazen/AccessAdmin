@@ -44,8 +44,7 @@
     <string name="max_pwd_setting_second_warning">A value below 10 may lead to accidental deletion of ALL DATA, for example, if a child is playing with the lockscreen.  \n \n Are you absolutely sure you want erase ALL DATA after %d incorrect password attempts?</string>
     <string name="max_pwd_setting_ok_button">Yes, Set at %d Errors</string>
     <string name="max_pwd_setting_cancel_button">Cancel</string>
-    
-    
+
     <!-- Device Settings List -->
     <!-- full menu with long names -->
     <string name="list_admin_password">Update Admin Password</string>
@@ -59,7 +58,7 @@
     <string name="list_short_sms">SMS</string>
 
     <!-- Password Settings -->
-    <string name="change_password">Change Password</string>
+    <string name="change_password">Change Pin</string>
     <string name="device_admin">Device Administration</string>
     <string name="updating_data">Updating Data</string>
     <string name="please_wait">Please Wait</string>
@@ -99,7 +98,7 @@
     <string name="sms_reset_divider_description">If the password or unique device id are lost, the device codes may be reset by SMS. New codes will be sent to the number:</string>
     <string name="reset_sms_line">Reset SMS Line</string>
     <string name="reset_admin_id">Reset Unique ID</string>
-    
+
     <!-- lock the device -->
     <string name="sms_title_lock">Lock Device</string>
     <string name="sms_description_lock">Lock the device with the existing password. Use in case of lost device when password is still secure.</string>
@@ -139,37 +138,30 @@
     <string name="set_admin">Enable Device</string>
 
     <!-- Set Password -->
-    <string name="pwd_instructions">Please set up a password for this device.</string>
-    <string name="update_password">Update Password</string>
-    <string name="password_not_allowed">Current password is not allowed.  You must update your password to use this device.</string>
+    <string name="pwd_instructions">Please set up a pin to unlock the device. You must enter this pin every time you use the phone. You may change this pin at anytime.</string>
+    <string name="update_password">Update Pin</string>
+    <string name="password_not_allowed">Current pin is not allowed.  You must update your pin to use this device.</string>
     <string name="exit">Exit</string>
-    <string name="password_allowed">Current password is allowed.  Device is protected.</string>
-    <string name="pwd_requirement">You must use a password with this device. Please choose a password that conforms to the requirements.</string>
-    <string name="set_pwd">Create Password</string>
-    <string name="view_policy_instruction">Password Requirements:</string>
+    <string name="password_allowed">Current pin is allowed.  Device is protected.</string>
+    <string name="pwd_requirement">You must use a pin with this device. Please choose a pin that conforms to the requirements.</string>
+    <string name="set_pwd">Create Pin</string>
+    <string name="view_policy_instruction">Pin Requirements:</string>
     <string name="view_password_quality">Characters:</string>
     <string name="view_password_length">Minimum Length:</string>
     <string name="view_password_lockout">Permanent Lock:</string>
 
-    <!-- Provider ID -->
-    <string name="provider_id">Enter Your Provider ID:</string>
-    <string name="confirm_id">Please Re-Enter Provider ID:</string>
-    <string name="btn_confirm">Confirm</string>
-    <string name="provider_instructions">Please enter your provider identification number.</string>
-    <string name="provider_requirement">You must be a provider to use this device.  Please enter your assigned provider ID.</string>
-    <string name="set_provider">Set Provider ID</string>
-
     <!-- Account Setup -->
     <string name="account_instructions">Please set up an account for your phone numbers and calendars.</string>
-    <string name="account_notset">You have chosen not to setup an account for synchronizing calendars and phone numbers. You may do this at a later time by clicking on the calendar. </string>
     <string name="set_account">Create Account</string>
 
-    <!-- Finish -->
-    <string name="finish">Finish</string>
+    <!-- Clinic Setup -->
+    <string name="clinic_instructions_account_notset">Click on calendar to setup an account later. Please set a password for confidential client data. You must enter this password when the phone turns on.</string>
 
-    <plurals name="congrats">
-        <item quantity="one">Congratulations!  An account is currently setup for your calendar and phone numbers. You are now ready to use the device.</item>
-        <item quantity="other">Congratulations!  %d accounts are currently setup for your calendar and phone numbers. You are now ready to use the device.</item>
+    <plurals name="clinic_instructions_with_account">
+        <item quantity="one">An account is setup! Please set a password for confidential client data. You must enter this password when the phone turns on.</item>
+        <item quantity="other">%d accounts are setup! Please set a password for confidential client data. You must enter this password when the phone turns on.</item>
     </plurals>
+
+    <string name="setup_clinic">Setup Password</string>
 
 </resources>
