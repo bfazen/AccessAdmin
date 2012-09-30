@@ -2,9 +2,7 @@ package com.alphabetbloc.chvsettings.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.Policy;
 
 public class SetUserPassword extends DeviceHoldActivity {
@@ -26,33 +23,13 @@ public class SetUserPassword extends DeviceHoldActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		mPolicy = new Policy(this);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean newInstall = settings.getBoolean(Constants.NEW_INSTALL, true);
-		if (newInstall) {
-			launchInitialSetupActivity();
-		} else {
-			mPolicy = new Policy(this);
-//			if (!mPolicy.isDeviceSecured()) {
-//				Log.e("SetUserPassword", "Something went drastically wrong!  Lost device setup after install!");
-//				launchInitialSetupActivity();
-//			}
-			//Device Admin is successfully setup, so continue
-			refreshView();
-		}
-
-	}
-
-	private void launchInitialSetupActivity() {
-		Intent i = new Intent(this, InitialSetupActivity.class);
-		startActivity(i);
-		finish();
+		refreshView();
 	}
 
 	// Initialize policy viewing screen.

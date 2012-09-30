@@ -26,6 +26,7 @@ public class SetAppPreferences extends SherlockActivity{
 	/** Called when the activity is first created. */
 	private static final String SHOW_SETTINGS_MENU = "show_settings_menu";
 	private static final String ENABLE_ACTIVITY_LOG = "enable_activity_log";
+	private static final String CLINIC_PACKAGE = "com.alphabetbloc.clinic";
 	private Button collectButton;
 	private Button clinicButton;
 	private Button adwButton;
@@ -73,7 +74,7 @@ public class SetAppPreferences extends SherlockActivity{
 		clinicButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.PreferencesActivity"));
+				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.PreferencesActivity"));
 				startActivity(i);
 			}
 		});
@@ -128,7 +129,7 @@ public class SetAppPreferences extends SherlockActivity{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.DeviceAdminPreference"));
+				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.DeviceAdminPreference"));
 				if (clinicToggle.isChecked()) {
 					clinicToggle.setChecked(true);
 					i.putExtra(SHOW_SETTINGS_MENU, true);
@@ -186,7 +187,7 @@ public class SetAppPreferences extends SherlockActivity{
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.DeviceAdminPreference"));
+				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.DeviceAdminPreference"));
 				if (clinicLogToggle.isChecked()) {
 					clinicLogToggle.setChecked(true);
 					i.putExtra(ENABLE_ACTIVITY_LOG, true);

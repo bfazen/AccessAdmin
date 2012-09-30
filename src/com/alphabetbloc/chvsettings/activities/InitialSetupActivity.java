@@ -147,7 +147,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			}
 			break;
 		case SET_ACCOUNT:
-			Account[] accounts = AccountManager.get(this).getAccounts();
+			Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
 			if (accounts.length <= 0) {
 				mInstructionText.setText(R.string.clinic_instructions_account_notset);
 			} else {
@@ -252,7 +252,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 
 	private void setupClinic() {
 		Intent i = new Intent();
-		i.setComponent(new ComponentName("org.odk.clinic.android", "org.odk.clinic.android.activities.ClinicLauncherActivity"));
+		i.setComponent(new ComponentName("com.alphabetbloc.clinic", "com.alphabetbloc.clinic.ui.admin.ClinicLauncherActivity"));
 		i.putExtra("device_admin_setup", true);
 		startActivityForResult(i, SETUP_CLINIC);
 		finish();
