@@ -99,7 +99,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 					setPassword();
 					break;
 				case SET_ACCOUNT:
-					setAccount();
+					setupGoogleAccount();
 					break;
 				case SETUP_CLINIC:
 					setupClinic();
@@ -179,7 +179,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			mStepText.setText(String.valueOf(SET_PWD));
 			break;
 		case SET_ACCOUNT:
-			Account[] accounts = AccountManager.get(this).getAccounts();
+			Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
 			if (accounts.length <= 0) {
 				mInstructionText.setText(R.string.clinic_instructions_account_notset);
 			} else {
@@ -258,7 +258,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		finish();
 	}
 
-	private void setAccount() {
+	private void setupGoogleAccount() {
 		Intent i = new Intent(Settings.ACTION_ADD_ACCOUNT);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
 		startActivityForResult(i, SET_ACCOUNT);

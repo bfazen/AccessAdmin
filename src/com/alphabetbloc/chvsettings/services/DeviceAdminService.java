@@ -326,10 +326,11 @@ public class DeviceAdminService extends WakefulIntentService {
 	 */
 	public void cancelAdminAlarms() {
 		cancelAlarms(mContext);
+		
 		if (!isAdminAlarmActive())
 			sendSingleSMS("All device admin alarms have been cancelled.");
 		else
-			Log.d(TAG, "Something went wrong... alarms are not cancelling");
+			Log.d(TAG, "Something went wrong... alarms are not canceling");
 	}
 
 	/**
