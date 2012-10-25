@@ -35,7 +35,7 @@ public class ViewSmsSettings extends SherlockActivity {
 
 	public enum SmsCode {
 
-		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_HOLD, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
+		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_HOLD, SMS_CODE_STOP_HOLD, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
 
 	}
 
@@ -65,6 +65,7 @@ public class ViewSmsSettings extends SherlockActivity {
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_LOCK));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_GPS));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_HOLD));
+		smsGroup.addView(getItemView(SmsCode.SMS_CODE_STOP_HOLD));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_RESET_PWD_DEFAULT));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_ODK));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_DATA));
@@ -138,6 +139,12 @@ public class ViewSmsSettings extends SherlockActivity {
 			title = getString(R.string.sms_title_hold);
 			description = getString(R.string.sms_description_hold);
 			code = Constants.SMS_CODE_HOLD;
+			example = mAdminId + code;
+			break;
+		case SMS_CODE_STOP_HOLD:
+			title = getString(R.string.sms_title_stop_hold);
+			description = getString(R.string.sms_description_stop_hold);
+			code = Constants.SMS_CODE_STOP_HOLD;
 			example = mAdminId + code;
 			break;
 		case SMS_CODE_RESET_PWD_DEFAULT:

@@ -20,7 +20,6 @@ import android.util.Log;
 
 import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
-import com.alphabetbloc.chvsettings.data.StringGenerator;
 
 /**
  * Do NOT call on its own, should only be called with a repeating
@@ -45,6 +44,7 @@ public class SendSMSService extends Service {
 	private int mDeletedSMS;
 	private long mPendingTime;
 	private long mDeleteTime;
+	private SMSSentReceiver mSMSSentReceiver;
 	private static long mWait;
 	private static long mStopTime;
 	private static final long WAIT_FOR_DELETE = 1000 * 45;
@@ -79,9 +79,9 @@ public class SendSMSService extends Service {
 
 		// SETUP RECEIVE
 		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-		SMSSentReceiver sendingSMS = new SMSSentReceiver();
-		sendingSMS.addSMS(smsBroadcast, phoneNumber, body);
-		registerReceiver(sendingSMS, new IntentFilter(SENT));
+		mSMSSentReceiver = new SMSSentReceiver();
+		mSMSSentReceiver.addSMS(smsBroadcast, phoneNumber, body);
+		registerReceiver(mSMSSentReceiver, new IntentFilter(SENT));
 
 		// SETUP DELETE
 		SentObserver sentObserver = new SentObserver();
@@ -125,7 +125,8 @@ public class SendSMSService extends Service {
 				mSentSMS++;
 				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
 				pref.edit().putString(String.valueOf(sentSmsType), sentMessage).commit();
-
+				
+				
 				// If no SMS ever deleted after send, then kill service
 				new Handler().postDelayed(new Runnable() {
 					@Override
@@ -136,6 +137,13 @@ public class SendSMSService extends Service {
 				}, WAIT_FOR_DELETE);
 			}
 		}
+	}
+
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(mSMSSentReceiver);
 	}
 
 	// Need observer b/c delay between receive and move to outbox

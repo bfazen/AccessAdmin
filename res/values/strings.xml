@@ -95,7 +95,7 @@
     <string name="sms_admin_divider_title">SMS Device Administration</string>
     <string name="sms_admin_divider_description">This device may be managed by SMS. For security, SMS must include the following unique device ID in order to take effect:</string>
     <string name="sms_reset_divider_title">SMS Device Reset</string>
-    <string name="sms_reset_divider_description">If the password or unique device id are lost, the device codes may be reset by SMS. New codes will be sent to the number:</string>
+    <string name="sms_reset_divider_description">If the Unique Device ID is lost, the ID may be reset by SMS. New codes will be sent to the number:</string>
     <string name="reset_sms_line">Reset SMS Line</string>
     <string name="reset_admin_id">Reset Unique ID</string>
 
@@ -107,10 +107,13 @@
     <string name="sms_description_gps">Retreive the current location of the device by GPS if possible, or through network tower coverage otherwise. SMS will report the Latitude, Longitude, Altitude, and Accuracy where available.</string>
     <!-- hold the device -->
     <string name="sms_title_hold">Hold Device with Message</string>
-    <string name="sms_description_hold">Present a new screen to the user asking user to Please Wait, with the body of the SMS message presented to the user as a dialog box. The user will not be able to readily exit this screen, so it may, for example, be used to communicate to the user while wiping data in the background.</string>
+    <string name="sms_description_hold">Interrupt and hold device with message. Any message following the code \'-hold:\' will be presented to the user on a screen that is difficult to exit without shutdown. This may be used, for example, to communicate to the user while remotely wiping data in the background.</string>
+    <!-- stop holding the device -->
+    <string name="sms_title_stop_hold">Stop Holding the Device</string>
+    <string name="sms_description_stop_hold">Cancel the current SMS \'-hold\' message. Remove the SMS message from view and allow user to interact with the device again.</string>
     <!-- reset password to default -->
     <string name="sms_title_pwd_default">Reset Password to Default</string>
-    <string name="sms_description_pwd_default">Resets the device password to a default password of 0. Given that this will not conform to the device policy, the user will be requested to change the password on next unlock.</string>
+    <string name="sms_description_pwd_default">Lock device with a default password. Any message following the code \'-reset-pwd:\' will be used as the new device password if more than 5 characters. If \'-reset-pwd\' code is used without colon and text, password will be set to \'12345\'.  User will be requested to change the password on next unlock.</string>
     <!-- wipe data -->
     <string name="sms_title_wipe_data">Factory Reset</string>
     <string name="sms_description_wipe_data">Performs a wipe of all Patient Data before conducting a full wipe of internal memory and factory reset. The device will reboot and guide user through the initial device setup instructions again.</string>
@@ -121,17 +124,18 @@
     <string name="sms_title_cancel_alarm">Cancel Device Admin Alarms</string>
     <string name="sms_description_cancel_alarm">Be default, all SMS codes sent to the device will repeat until they are complete. This message will cancel the current alarms.</string>
     <!-- reset admin id -->
-    <string name="sms_title_reset_admin">Reset SMS Code</string>
-    <string name="sms_description_reset_admin">Reset the administration code used for all SMS messages.  This will be sent to the phone number registered on the device as the administrator. This phone number can be changed under Device Administration section.</string>
+    <string name="sms_title_reset_admin">Reset Unique Device ID</string>
+    <string name="sms_description_reset_admin">Reset the administration code used for all SMS messages.  A new ID will be sent via SMS to the device administrator phone number. For security, this phone number can only be changed with physical access to the device.  This SMS may be useful if the Unique Device ID has been lost.</string>
     <!-- reset password to secret -->
     <string name="sms_title_pwd_secret">Lock with Secure Password</string>
-    <string name="sms_description_pwd_secret">Lock the device with a new secure password that conforms to the device policy.  This password is randomly generated and saved by the device itself.  The only method of resetting this password is to send another SMS requesting password be reset to a default of 0.</string>
+    <string name="sms_description_pwd_secret">Lock device with a secure, randomly generated password.  The new password will be sent via SMS to the device administrator. This SMS may be used to securely lock the device when Unique Device ID has been lost and user has no credit to reply with a new Unique Device ID.</string>
 
     <!-- USER STRINGS -->
     <!-- Intro -->
     <string name="initial_instructions">Welcome to Android! Please take a moment to set up your device. Begin by enabling the device policies.</string>
     <string name="start">Start</string>
     <string name="setup_error">Sorry, something has gone wrong with the device setup. Please setup the device again.</string>
+    <string name="please_wait">Please Wait &#8230;</string>
 
     <!-- Device Admin -->
     <string name="admin_requirement">You must accept the device policy to use this device. Please accept the policy or return the device.</string>

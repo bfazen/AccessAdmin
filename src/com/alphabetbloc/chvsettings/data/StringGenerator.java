@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class StringGenerator {
 
-	private final Random random = new Random();
-	private final char[] buf;
+	private Random random;
+	private int mPwdLength;
 	private static final char[] symbols = new char[36];
 	static {
 		for (int idx = 0; idx < 10; ++idx)
@@ -29,49 +29,28 @@ public class StringGenerator {
 	public StringGenerator(int length) {
 		if (length < 1)
 			throw new IllegalArgumentException("length < 1: " + length);
-		buf = new char[length];
+		mPwdLength = length;
+		random = new Random();
 	}
-
+	
 	public String getRandomAlphaNumericString() {
-		for (int idx = 0; idx < buf.length; ++idx)
+		int randomPwdLength = mPwdLength < 15 ? 15 : mPwdLength;
+		char[] buf = new char[randomPwdLength];
+		for (int idx = 0; idx < buf.length; ++idx) {
 			buf[idx] = symbols[random.nextInt(symbols.length)];
-		return new String(buf);
-	}
-
-	public String getRandomNumericString() {
-		for (int idx = 0; idx < buf.length; ++idx)
-			buf[idx] = digits[random.nextInt(digits.length)];
-		return new String(buf);
-	}
-
-	public String getRandomAlphaString() {
-		for (int idx = 0; idx < buf.length; ++idx)
-			buf[idx] = characters[random.nextInt(characters.length)];
-		return new String(buf);
-	}
-
-	public String getDefaultAlphaNumericString() {
-		for (int idx = 0; idx < buf.length; ++idx){
-			buf[idx] = (char) ('a');
 		}
-		for (int idx = 0; idx < buf.length; ++idx){
-			buf[idx] = (char) ('0');
-		}
-		return new String(buf);
-	}
-	
-	public String getDefaultAlphaString() {
-		for (int idx = 0; idx < buf.length; ++idx){
-			buf[idx] = (char) ('a');
-		}
-		return new String(buf);
-	}
-	
-	public String getDefaultNumericString() {
-		for (int idx = 0; idx < buf.length; ++idx){
-			buf[idx] = (char) ('0');
-		}
-		return new String(buf);
-	}
 
+		boolean alpha = false;
+		boolean num = false;
+		for (char c : buf) {
+			if (Character.isLetter(c))
+				alpha = true;
+			if (Character.isDigit(c))
+				num = true;
+		}
+		if (alpha && num)
+			return new String(buf);
+		else
+			return getRandomAlphaNumericString();
+	}
 }

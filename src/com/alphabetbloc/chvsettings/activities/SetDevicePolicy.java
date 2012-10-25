@@ -24,7 +24,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -53,7 +52,7 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNavigationListener {
 	private static final int SET_ADMIN = 1;
-	private static final String TAG = "SetDevicePolicy";
+//	private static final String TAG = "SetDevicePolicy";
 	private Context mContext;
 	private Policy mPolicy;
 	private CheckBox mAdminCheckBox;
@@ -62,6 +61,9 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 	private Spinner mPasswordQuality;
 	final static int mPasswordQualityValues[] = Policy.PASSWORD_QUALITY_VALUES;
+	private static final int MINIMUM_PWD_LENGTH = 5;
+	private static final int MINIMUM_LOCK_TIME = 10;
+	private static final int MINIMUM_PWD_TO_WIPE = 1;
 
 	private SeekBar mPasswordLength;
 	private SeekBar mMaxPwdToWipe;
@@ -72,7 +74,7 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 	private TextView mMaxTimeToLockText;
 	private int mMaxPwds;
 	private Resources mRes;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,14 +98,13 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.password_types, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mPasswordQuality.setAdapter(adapter);
-		Log.e(TAG, "passwordQuality is" + mPolicy.getPasswordQuality());
 		mPasswordQuality.setSelection(mPolicy.getPasswordQuality());
 		mPasswordQuality.setOnItemSelectedListener(mPasswordQualityListener);
 
 		// PasswordLength
 		mPasswordLength = (SeekBar) findViewById(R.id.seek_pwd_length);
 		mPasswordLength.setMax(25);
-		mPasswordLength.setProgress(mPolicy.getPasswordLength());
+		mPasswordLength.setProgress(mPolicy.getPasswordLength() - MINIMUM_PWD_LENGTH);
 		mPasswordLength.setOnSeekBarChangeListener(mPasswordLengthListener);
 		mPasswordLengthText = (TextView) findViewById(R.id.text_pwd_length);
 		String pwdlength = String.valueOf(mPolicy.getPasswordLength());
@@ -111,17 +112,18 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 		// Passwords Before Wipe
 		mMaxPwdToWipe = (SeekBar) findViewById(R.id.seek_pwd_to_wipe);
-		mMaxPwdToWipe.setProgress(mPolicy.getMaxFailedPwd());
+		mMaxPwdToWipe.setMax(100 - MINIMUM_PWD_TO_WIPE);
+		mMaxPwdToWipe.setProgress(mPolicy.getMaxFailedPwd() - MINIMUM_PWD_TO_WIPE);
 		mMaxPwdToWipe.setOnSeekBarChangeListener(mMaxPwdToWipeListener);
 		mMaxPwdToWipeText = (TextView) findViewById(R.id.text_pwd_to_wipe);
 		String pwds = String.valueOf(mPolicy.getMaxFailedPwd());
 		mMaxPwdToWipeText.setText("Reset device after " + pwds + " wrong passwords");
 		mMaxPwds = mPolicy.getMaxFailedPwd();
-		
+
 		// Time before screen lock
 		mMaxTimeToLock = (SeekBar) findViewById(R.id.seek_time_to_lock);
-		mMaxTimeToLock.setMax(1800);
-		mMaxTimeToLock.setProgress((int) (mPolicy.getMaxTimeToLock() / 1000));
+		mMaxTimeToLock.setMax(1800 - MINIMUM_LOCK_TIME);
+		mMaxTimeToLock.setProgress((int) ((mPolicy.getMaxTimeToLock() - MINIMUM_LOCK_TIME) / 1000));
 		mMaxTimeToLock.setOnSeekBarChangeListener(mMaxTimeToLockListener);
 		mMaxTimeToLockText = (TextView) findViewById(R.id.text_time_to_lock);
 		String time;
@@ -142,35 +144,6 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 		super.onResume();
 		refreshView();
 	}
-
-	/*
-	 * private void initPolicySetupScreen() { mPasswordQualityInputField =
-	 * (Spinner) findViewById(R.id.policy_password_quality);
-	 * ArrayAdapter<CharSequence> adapter =
-	 * ArrayAdapter.createFromResource(this, R.array.password_types,
-	 * android.R.layout.simple_spinner_item);
-	 * adapter.setDropDownViewResource(android
-	 * .R.layout.simple_spinner_dropdown_item);
-	 * mPasswordQualityInputField.setAdapter(adapter);
-	 * mPasswordQualityInputField.setOnItemSelectedListener(
-	 * 
-	 * // Read previously saved policy and populate on the UI.
-	 * mPasswordQualityInputField.setSelection(mPolicy.getPasswordQuality()); if
-	 * (mPolicy.getPasswordLength() > 0) {
-	 * mPasswordLengthInputField.setText(String
-	 * .valueOf(mPolicy.getPasswordLength())); } else {
-	 * mPasswordLengthInputField.setText(""); }
-	 * 
-	 * TextView passwordQualityView = (TextView)
-	 * findViewById(R.id.policy_password_quality); TextView passwordLengthView =
-	 * (TextView) findViewById(R.id.policy_password_length); int
-	 * passwordQualitySelection = mPolicy.getPasswordQuality();
-	 * passwordQualityView
-	 * .setText(getResources().getStringArray(R.array.password_types
-	 * )[passwordQualitySelection]);
-	 * passwordLengthView.setText(String.valueOf(mPolicy.getPasswordLength()));
-	 * }
-	 */
 
 	private void refreshView() {
 		if (mPolicy.isAdminActive())
@@ -293,7 +266,8 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 	private OnItemSelectedListener mPasswordQualityListener = new OnItemSelectedListener() {
 		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-			 mPolicy.setPasswordQuality(position);
+			mPolicy.setPasswordQuality(position);
+
 		}
 
 		public void onNothingSelected(AdapterView<?> parent) {
@@ -302,13 +276,12 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 	};
 
 	private OnSeekBarChangeListener mMaxPwdToWipeListener = new OnSeekBarChangeListener() {
-		
 
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			if (mMaxPwds < 50) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(SetDevicePolicy.this);
-				
+
 				builder.setTitle(R.string.alert_title_first_warning);
 				builder.setMessage(String.format(mRes.getString(R.string.max_pwd_setting_first_warning), mMaxPwds));
 				builder.setIcon(R.drawable.priority);
@@ -325,7 +298,13 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 									mPolicy.setMaxFailedPw(mMaxPwds);
 								}
 							});
-							builder.setNegativeButton(R.string.max_pwd_setting_cancel_button, null);
+							builder.setNegativeButton(R.string.max_pwd_setting_cancel_button, new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									mMaxPwdToWipe.setProgress(mPolicy.getMaxFailedPwd() - MINIMUM_PWD_TO_WIPE);
+								}
+							});
 							builder.show();
 						} else {
 							mPolicy.setMaxFailedPw(mMaxPwds);
@@ -334,7 +313,13 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 				});
 
-				builder.setNegativeButton(R.string.max_pwd_setting_cancel_button, null);
+				builder.setNegativeButton(R.string.max_pwd_setting_cancel_button, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						mMaxPwdToWipe.setProgress(mPolicy.getMaxFailedPwd() - MINIMUM_PWD_TO_WIPE);
+					}
+				});
 				builder.show();
 
 			} else {
@@ -350,6 +335,7 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			progress = progress + MINIMUM_PWD_TO_WIPE;
 			mMaxPwds = progress;
 			mMaxPwdToWipeText.setText("Reset device after " + progress + " wrong passwords");
 		}
@@ -372,6 +358,7 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int sec, boolean fromUser) {
 			String time;
+			sec = sec + MINIMUM_LOCK_TIME;
 			int min = sec / 60;
 			if (min > 0 && (sec % 60) != 0)
 				time = String.valueOf(min) + " min, " + String.valueOf((sec % 60)) + " sec";
@@ -403,6 +390,7 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			progress = progress + MINIMUM_PWD_LENGTH;
 			mPasswordLengthText.setText(progress + " characters");
 			mPolicy.setPasswordLength(progress);
 

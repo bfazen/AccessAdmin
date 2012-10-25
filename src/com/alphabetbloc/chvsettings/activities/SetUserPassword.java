@@ -2,7 +2,10 @@ package com.alphabetbloc.chvsettings.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,19 +14,37 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alphabetbloc.chvsettings.R;
+import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.Policy;
 
 public class SetUserPassword extends DeviceHoldActivity {
 
 	private static final int SET_PASSWORD = 0;
-	private Policy mPolicy;
+	public static final String FORCE_RESET_PASSWORD = "force_reset_password";
 	private Button mExitBtn;
 	private Button mPwdBtn;
+	private boolean mForceResetPwd;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPolicy = new Policy(this);
+		// If First Run, then run the setup Wizard
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean newInstall = prefs.getBoolean(Constants.NEW_INSTALL, true);
+		if (newInstall) {
+			Intent i = new Intent(this, InitialSetupActivity.class);
+			startActivity(i);
+			finish();
+		}
+
+		// Detect if password needs to be reset
+		mForceResetPwd = getIntent().getBooleanExtra(FORCE_RESET_PASSWORD, false);
+		Policy policy = new Policy(this);
+		if (!policy.isActivePasswordSufficient())
+			mForceResetPwd = true;
+
+		if (mForceResetPwd)
+			startAirplaneMode();
 	}
 
 	@Override
@@ -34,24 +55,25 @@ public class SetUserPassword extends DeviceHoldActivity {
 
 	// Initialize policy viewing screen.
 	private void refreshView() {
+		Policy policy = new Policy(this);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.setup_password);
 		TextView setupMessage = (TextView) findViewById(R.id.setup_message);
 		ImageView exclaim = (ImageView) findViewById(R.id.exclamation);
 		exclaim.setVisibility(View.VISIBLE);
-
+		
 		// Minimum Password Length
 		TextView pwdLength = (TextView) findViewById(R.id.policy_password_length);
-		pwdLength.setText(String.valueOf(mPolicy.getPasswordLength()));
+		pwdLength.setText(String.valueOf(policy.getPasswordLength()));
 
 		// Password Type/Quality
-		int pwdType = mPolicy.getPasswordQuality();
+		int pwdType = policy.getPasswordQuality();
 		TextView pwdTypeText = (TextView) findViewById(R.id.policy_password_quality);
 		pwdTypeText.setText(getResources().getStringArray(R.array.password_types)[pwdType]);
 
 		// Password Case
 		TextView pwdLock = (TextView) findViewById(R.id.policy_password_lockout);
-		pwdLock.setText(String.valueOf(mPolicy.getMaxFailedPwd()));
+		pwdLock.setText(String.valueOf(policy.getMaxFailedPwd()));
 
 		mPwdBtn = (Button) findViewById(R.id.setup_action_btn);
 		mPwdBtn.setText(R.string.change_password);
@@ -62,7 +84,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 			}
 		});
 
-		if (!mPolicy.isActivePasswordSufficient()) {
+		if (!policy.isActivePasswordSufficient() || mForceResetPwd) {
 			// Launches password set-up screen in Settings.
 			exclaim.setVisibility(View.VISIBLE);
 			setupMessage.setText(R.string.password_not_allowed);
@@ -83,6 +105,29 @@ public class SetUserPassword extends DeviceHoldActivity {
 				}
 			});
 		}
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean showMenu = prefs.getBoolean(Constants.SHOW_MENU, false);
+		Policy policy = new Policy(this);
+		if (!policy.isAdminActive() || !showMenu || mForceResetPwd || !policy.isActivePasswordSufficient())
+			return false;
+		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		Policy policy = new Policy(this);
+
+		if (policy.isActivePasswordSufficient() && mForceResetPwd) {
+			stopAirplaneMode();
+			mForceResetPwd = false;
+			refreshView();
+		}
+
 	}
 
 	// /Override which buttons to allow through DeviceHold by setting

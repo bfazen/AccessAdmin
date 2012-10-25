@@ -19,7 +19,9 @@ package com.alphabetbloc.chvsettings.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,13 +41,11 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	protected static final int DEVICE_ADMIN = 1;
 	private static final String TAG = "DeviceHoldActivity";
-	Policy mPolicy;
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mPolicy = new Policy(this);
 	}
 
 	private static AirplaneReceiver mAirplaneReceiver;
@@ -86,8 +86,10 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-
-		if (!mPolicy.isAdminActive())
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean showMenu = prefs.getBoolean(Constants.SHOW_MENU, false);
+		Policy policy = new Policy(this);
+		if (!policy.isAdminActive() || !showMenu)
 			return false;
 		return super.onPrepareOptionsMenu(menu);
 	}

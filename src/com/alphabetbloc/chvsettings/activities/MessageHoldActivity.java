@@ -16,51 +16,43 @@
 
 package com.alphabetbloc.chvsettings.activities;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.alphabetbloc.chvsettings.R;
 import com.alphabetbloc.chvsettings.data.Constants;
 
 public class MessageHoldActivity extends DeviceHoldActivity {
 
-	private static final int PROGRESS_DIALOG = 1;
+	public static final String STOP_HOLD = "stop_hold";
 	private String mToast = "";
+	public static boolean sMessageHoldActive = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		boolean stopHold = getIntent().getBooleanExtra(STOP_HOLD, false);
+		if(stopHold)
+			finish();
+		setContentView(R.layout.message_hold);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onPause() {
-		dismissDialog(PROGRESS_DIALOG);
 		super.onPause();
+		sMessageHoldActive = false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mToast = getIntent().getStringExtra(Constants.TOAST_MESSAGE);
-		showDialog(PROGRESS_DIALOG);
+		sMessageHoldActive = true;
+		refreshView();
 	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case PROGRESS_DIALOG:
-			ProgressDialog progressDialog;
-			progressDialog = new ProgressDialog(this);
-			progressDialog.setIcon(android.R.drawable.ic_dialog_info);
-			progressDialog.setMessage(mToast);
-			progressDialog.setTitle(getString(R.string.please_wait));
-			progressDialog.setIndeterminate(true);
-			progressDialog.setCancelable(false);
-			return progressDialog;
-		}
-		return null;
+	
+	private void refreshView(){
+		mToast = getIntent().getStringExtra(Constants.TOAST_MESSAGE);
+		TextView tv = (TextView) findViewById(R.id.message);
+		tv.setText(mToast);
 	}
 }

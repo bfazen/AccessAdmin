@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.util.Log;
 
 import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
@@ -26,7 +25,7 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class SmsReceiver extends BroadcastReceiver {
 
-	private static final String TAG = "SmsReceiver";
+//	private static final String TAG = "SmsReceiver";
 
 	private static String Imei;
 	private static String lockDevice;
@@ -34,11 +33,14 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String wipeData;
 	private static String wipeSdOdk;
 	private static String resetPwdToDefault;
+	private static String smsAdminId;
+	private static String resetPwdToSmsPwd;
 	private static String lockSecretPwd;
 	private static String resetAdminId;
 	private static String holdScreen;
+	private static String stopHoldScreen;
 	private static String cancelAlarm;
-	private static String mToast = null;
+	private static String mSmsMessage = null;
 	private Context mContext;
 	private SmsMessage[] mSms;
 	private int mExtra;
@@ -50,7 +52,6 @@ public class SmsReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		mContext = context;
-		Log.e("SmsReceiver", "Sms Receiver is receiving!");
 		Policy policy = new Policy(context);
 		if (intent.getAction().equals(Constants.SMS_RECEIVED) && policy.isAdminActive()) {
 			Bundle bundle = intent.getExtras();
@@ -83,8 +84,8 @@ public class SmsReceiver extends BroadcastReceiver {
 			abortBroadcast();
 			Intent i = new Intent(mContext, DeviceAdminService.class);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, mExtra);
-			if (mToast != null)
-				i.putExtra(Constants.SMS_MESSAGE, mToast);
+			if (mSmsMessage != null)
+				i.putExtra(Constants.SMS_MESSAGE, mSmsMessage);
 			WakefulIntentService.sendWakefulWork(mContext, i);
 		}
 
@@ -92,7 +93,7 @@ public class SmsReceiver extends BroadcastReceiver {
 
 	private void createSmsStrings() {
 		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		String smsAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
+		smsAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
 
 		// REQUIRE smsAdminId:
 		lockDevice = smsAdminId + Constants.SMS_CODE_LOCK;
@@ -100,9 +101,11 @@ public class SmsReceiver extends BroadcastReceiver {
 		wipeData = smsAdminId + Constants.SMS_CODE_WIPE_DATA;
 		wipeSdOdk = smsAdminId + Constants.SMS_CODE_WIPE_ODK;
 		holdScreen = smsAdminId + Constants.SMS_CODE_HOLD;
+		stopHoldScreen = smsAdminId + Constants.SMS_CODE_STOP_HOLD;
 		cancelAlarm = smsAdminId + Constants.SMS_CODE_CANCEL_ALARM;
 		resetPwdToDefault = smsAdminId + Constants.SMS_CODE_RESET_PWD_DEFAULT;
-
+		resetPwdToSmsPwd = smsAdminId + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
+		
 		// DO NOT REQUIRE smsAdminId:
 		lockSecretPwd = Constants.SMS_CODE_RESET_PWD_SECRET;
 		resetAdminId = Constants.SMS_CODE_RESET_ADMIN_ID;
@@ -129,16 +132,24 @@ public class SmsReceiver extends BroadcastReceiver {
 		} else if (mSms[0].getMessageBody().equals(resetAdminId)) {
 			mExtra = Constants.RESET_ADMIN_ID;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(resetPwdToDefault)) {
-			mExtra = Constants.RESET_TO_DEFAULT_PWD;
-			return true;
 		} else if (mSms[0].getMessageBody().equals(cancelAlarm)) {
 			mExtra = Constants.CANCEL_ALARMS;
 			return true;
+		} else if (mSms[0].getMessageBody().equals(stopHoldScreen)) {
+			mExtra = Constants.STOP_HOLD_DEVICE;
+			return true;
+		} else if (mSms[0].getMessageBody().equals(resetPwdToDefault)) {
+			mExtra = Constants.RESET_TO_DEFAULT_PWD;
+			return true;
+		} else if (mSms[0].getMessageBody().contains(resetPwdToSmsPwd)) {
+			mExtra = Constants.RESET_PWD_TO_SMS_PWD;
+			int message = mSms[0].getMessageBody().indexOf(":");
+			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
+			return true;
 		} else if (mSms[0].getMessageBody().contains(holdScreen)) {
 			mExtra = Constants.HOLD_DEVICE;
-			int toast = mSms[0].getMessageBody().indexOf(":");
-			mToast = mSms[0].getMessageBody().substring(toast + 1, mSms.length);
+			int message = mSms[0].getMessageBody().indexOf(":");
+			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
 			return true;
 		} else {
 			return false;

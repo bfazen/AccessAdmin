@@ -45,27 +45,31 @@ public class Constants {
 	//SMS CODES
 	public static final String SMS_CODE_LOCK = "-lock";
 	public static final String SMS_CODE_GPS = "-gps";
-	public static final String SMS_CODE_WIPE_DATA = "-wipe-reset";
+	public static final String SMS_CODE_WIPE_DATA = "-reset-device";
 	public static final String SMS_CODE_WIPE_ODK = "-wipe-data";
 	public static final String SMS_CODE_HOLD = "-hold:"; 
-	public static final String SMS_CODE_CANCEL_ALARM = "-cancel-alarm";
+	public static final String SMS_CODE_STOP_HOLD = "-stop-hold"; 
+	public static final String SMS_CODE_CANCEL_ALARM = "-cancel";
 	public static final String SMS_CODE_RESET_PWD_SECRET = "create.new.password.and.sms.to.admin";
 	public static final String SMS_CODE_RESET_PWD_DEFAULT = "-reset-pwd";
 	public static final String SMS_CODE_RESET_ADMIN_ID = "create.new.admin.id.and.sms.to.admin";
+	public static final String SMS_CODE_RESET_PWD_TO_SMS_PWD = "-reset-pwd:";
 	
 	//DEVICE ADMIN ACTIONS: IN ORDER OF PRIORITY
 	public static final int LOCK_SCREEN = 1;
 	public static final int HOLD_DEVICE = 2;
-	public static final int RESET_TO_DEFAULT_PWD = 3;
-	public static final int SEND_SMS = 4;
-	public static final int SEND_GPS = 5;
-	public static final int LOCK_SECRET_PWD = 6;
-	public static final int RESET_ADMIN_ID = 7;
-	public static final int SEND_SIM = 8;
-	public static final int WIPE_ODK_DATA = 9;
-	public static final int WIPE_DATA = 10;
-	public static final int FACTORY_RESET = 11;
-	public static final int CANCEL_ALARMS = 12;
+	public static final int STOP_HOLD_DEVICE = 3;
+	public static final int RESET_TO_DEFAULT_PWD = 4;
+	public static final int RESET_PWD_TO_SMS_PWD = 5;
+	public static final int SEND_SMS = 6;
+	public static final int SEND_GPS = 7;
+	public static final int LOCK_SECRET_PWD = 8;
+	public static final int RESET_ADMIN_ID = 9;
+	public static final int SEND_SIM = 10;
+	public static final int WIPE_ODK_DATA = 11;
+	public static final int WIPE_DATA = 12;
+	public static final int FACTORY_RESET = 13;
+	public static final int CANCEL_ALARMS = 14;
 
 	
 	//ALARM PREFERENCES
@@ -81,7 +85,6 @@ public class Constants {
 	public static final String ALARM_WIPE_DATA = "ALARM_WIPE_DATA";
 	public static final String ALARM_CANCEL_ALARMS = "ALARM_CANCEL_ALARMS";
 	public static final String ALARM_FACTORY_RESET = "ALARM_FACTORY_RESET";
-	
 	
 	public static final Long ALARM_INTERVAL_SHORT = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 20; //45 seconds
 	public static final Long ALARM_INTERVAL_MEDIUM = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 3; // 5 minutes
@@ -109,6 +112,9 @@ public class Constants {
 	//ADMIN LOGINS
 	public static final String LAST_ADMIN_PWD_ATTEMPT = "last_admin_pwd_attempt";
 	public static final String ADMIN_PWD_COUNT = "last_pwd_count";
+
+	public static final String SHOW_MENU = "show_admin_menu";
+
 	
 }
 

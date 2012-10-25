@@ -7,13 +7,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,6 +58,9 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		mContext = this;
 		mPolicy = new Policy(mContext);
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+		settings.edit().putBoolean(Constants.NEW_INSTALL, false).commit();
+
 		startAirplaneMode();
 		initializeSIM();
 		createUniqueDeviceAdminCode();
@@ -202,10 +203,8 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		String line = tm.getLine1Number();
 		String serial = tm.getSimSerialNumber();
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-		Editor editor = settings.edit();
-		editor.putString(Constants.SIM_SERIAL, serial);
-		editor.putString(Constants.SIM_LINE, line);
-		editor.commit();
+		settings.edit().putString(Constants.SIM_SERIAL, serial).commit();
+		settings.edit().putString(Constants.SIM_LINE, line).commit();
 	}
 
 	/**
@@ -244,13 +243,14 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	}
 
 	private void setPassword() {
-		Log.e("louis.fazen", "setPassword is called!");
 		Intent i = new Intent(mContext, SetUserPassword.class);
 		i.putExtra(Constants.NEW_INSTALL, false);
 		startActivityForResult(i, SET_PWD);
 	}
 
 	private void setupClinic() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
 		Intent i = new Intent();
 		i.setComponent(new ComponentName("com.alphabetbloc.clinic", "com.alphabetbloc.clinic.ui.admin.ClinicLauncherActivity"));
 		i.putExtra("device_admin_setup", true);

@@ -30,7 +30,7 @@ import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
  * @author Louis Fazen (louis.fazen@gmail.com)
  */
 public class Policy {
-	
+
 	public static final int REQUEST_ADD_DEVICE_ADMIN = 1;
 	public static final String SHARED_PREF = "SHARED_PREF";
 	public static final String KEY_PASSWORD_LENGTH = "PW_LENGTH";
@@ -52,7 +52,6 @@ public class Policy {
 	private int mPasswordLength;
 	private int mMaxPwdToWipe;
 	private long mMaxTimeToLock;
-	private int mProviderId;
 
 	public Policy(Context context) {
 		mContext = context;
@@ -63,14 +62,13 @@ public class Policy {
 		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, 50);
 		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, 600);
 
-		mProviderId = mPrefs.getInt(PROVIDER_ID, 0);
 		mDPM = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mPolicyAdmin = new ComponentName(context, DeviceAdmin.class);
-		
+
 		Log.e(TAG, "Policy passwordQuality is" + getPasswordQuality());
 	}
-	
-	public void initializeDefaultPolicy(){
+
+	public void initializeDefaultPolicy() {
 		setPasswordQuality(mPasswordQuality);
 		setPasswordLength(mPasswordLength);
 		setMaxFailedPw(mMaxPwdToWipe);
@@ -84,9 +82,8 @@ public class Policy {
 	 */
 	public void setPasswordQuality(int quality) {
 		mPrefs.edit().putInt(KEY_PASSWORD_QUALITY, quality).commit();
+		mPasswordQuality = mPrefs.getInt(KEY_PASSWORD_QUALITY, 3);
 		mDPM.setPasswordQuality(mPolicyAdmin, PASSWORD_QUALITY_VALUES[quality]);
-		updateDefaultPassword();
-		Log.e(TAG, "Set passwordQuality =" + getPasswordQuality());
 	}
 
 	/**
@@ -94,9 +91,8 @@ public class Policy {
 	 */
 	public void setPasswordLength(int length) {
 		mPrefs.edit().putInt(KEY_PASSWORD_LENGTH, length).commit();
+		mPasswordLength = mPrefs.getInt(KEY_PASSWORD_LENGTH, 5);
 		mDPM.setPasswordMinimumLength(mPolicyAdmin, length);
-		updateDefaultPassword();
-		Log.e(TAG, "password length set to:" + length);
 	}
 
 	/**
@@ -104,8 +100,8 @@ public class Policy {
 	 */
 	public void setMaxFailedPw(int attempts) {
 		mPrefs.edit().putInt(KEY_MAX_FAILED_PW, attempts).commit();
+		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, 50);
 		mDPM.setMaximumFailedPasswordsForWipe(mPolicyAdmin, attempts);
-		Log.e(TAG, "max failed password before lock set to:" + attempts);
 	}
 
 	/**
@@ -114,47 +110,9 @@ public class Policy {
 	 */
 	public void setMaxTimeToLock(long time) {
 		mPrefs.edit().putLong(KEY_MAX_TIME_TO_LOCK, time).commit();
+		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, 600);
 		mDPM.setMaximumTimeToLock(mPolicyAdmin, time);
 		Log.e(TAG, "max time to screen lock set to:" + time);
-	}
-
-	private void updateDefaultPassword() {
-
-		int quality = -1;
-		for (int i = 0; i < PASSWORD_QUALITY_VALUES.length; i++) {
-			if (i == mPasswordQuality) {
-				quality = PASSWORD_QUALITY_VALUES[i];
-			}
-		}
-
-		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		switch (quality) {
-		case DevicePolicyManager.PASSWORD_QUALITY_ALPHANUMERIC:
-			String rAlphaNum = (new StringGenerator(mPasswordLength)).getRandomAlphaNumericString();
-			prefs.edit().putString(Constants.SECRET_PASSWORD, rAlphaNum).commit();
-			String dAlphaNum = (new StringGenerator(mPasswordLength)).getDefaultAlphaNumericString();
-			prefs.edit().putString(Constants.DEFAULT_PASSWORD, dAlphaNum).commit();
-			break;
-		case DevicePolicyManager.PASSWORD_QUALITY_ALPHABETIC:
-			String rAlpha = (new StringGenerator(mPasswordLength)).getRandomAlphaString();
-			prefs.edit().putString(Constants.SECRET_PASSWORD, rAlpha).commit();
-			String dAlpha = (new StringGenerator(mPasswordLength)).getDefaultAlphaString();
-			prefs.edit().putString(Constants.DEFAULT_PASSWORD, dAlpha).commit();
-			break;
-		case DevicePolicyManager.PASSWORD_QUALITY_SOMETHING:
-		case DevicePolicyManager.PASSWORD_QUALITY_NUMERIC:
-			String rNum = (new StringGenerator(mPasswordLength)).getRandomNumericString();
-			prefs.edit().putString(Constants.SECRET_PASSWORD, rNum).commit();
-			String dNum = (new StringGenerator(mPasswordLength)).getRandomNumericString();
-			prefs.edit().putString(Constants.DEFAULT_PASSWORD, dNum).commit();
-			break;
-		case DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED:
-		default:
-			prefs.edit().remove(Constants.SECRET_PASSWORD).commit();
-			prefs.edit().remove(Constants.DEFAULT_PASSWORD).commit();
-			break;
-		}
-
 	}
 
 	/**
@@ -163,19 +121,10 @@ public class Policy {
 	 * @return
 	 */
 	public boolean createNewSecretPwd() {
-
-		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		String oldRandomPwd = prefs.getString(Constants.SECRET_PASSWORD, "");
-		updateDefaultPassword();
-		String newRandomPwd = prefs.getString(Constants.SECRET_PASSWORD, "");
-
-		if (newRandomPwd.equals(oldRandomPwd))
-			return true;
-		else
-			return false;
+		String rAlphaNum = (new StringGenerator(mPasswordLength)).getRandomAlphaNumericString();
+		return mDPM.resetPassword(rAlphaNum, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY);
 	}
-	
-	
+
 	/**
 	 * Resets the device unlock password and forces re-entry
 	 * 
@@ -237,11 +186,11 @@ public class Policy {
 	 * @return
 	 */
 	public boolean isAdminActive() {
-		if (mDPM.isAdminActive(mPolicyAdmin)) {
-			Log.e("POLICY", "admin is active");
-		} else {
-			Log.e("POLICY", "admin is NOT active");
-		}
+		if (mDPM.isAdminActive(mPolicyAdmin))
+			Log.e(TAG, "admin is active");
+		else
+			Log.e(TAG, "admin is NOT active");
+
 		return mDPM.isAdminActive(mPolicyAdmin);
 	}
 
@@ -251,9 +200,9 @@ public class Policy {
 	 * @return
 	 */
 	public boolean isActivePasswordSufficient() {
-		if (mDPM.isActivePasswordSufficient()) {
-			Log.e("POLICY", "password is sufficient");
-		}
+		if (mDPM.isActivePasswordSufficient())
+			Log.e(TAG, "password is sufficient");
+
 		return mDPM.isActivePasswordSufficient();
 
 	}
@@ -273,7 +222,7 @@ public class Policy {
 	 * 
 	 */
 	public void removeActiveAdmin() {
-		Log.e("POLICY", "remove active admin");
+		Log.e(TAG, "remove active admin");
 		mDPM.removeActiveAdmin(mPolicyAdmin);
 	}
 

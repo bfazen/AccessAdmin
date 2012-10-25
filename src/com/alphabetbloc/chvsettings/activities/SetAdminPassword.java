@@ -35,7 +35,6 @@ public class SetAdminPassword extends SherlockActivity {
 	private EditText mPasswordField;
 	private String mFirstPassword;
 	private boolean mAdminVerified;
-	private Context mContext;
 	private String mCurrentPassword;
 
 	@Override
@@ -43,7 +42,6 @@ public class SetAdminPassword extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mAdminVerified = false;
 		mFirstPassword = "";
-		mContext = this;
 	}
 
 	@Override
