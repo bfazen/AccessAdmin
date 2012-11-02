@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
@@ -41,16 +40,15 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	protected static final int DEVICE_ADMIN = 1;
 	private static final String TAG = "DeviceHoldActivity";
-	
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
+	private boolean mAirplaneMode = false;
+	private AirplaneReceiver mAirplaneReceiver;
 
-	private static AirplaneReceiver mAirplaneReceiver;
 	// slightly added security, prevent exiting activity via calling into device
 	protected void startAirplaneMode() {
+		mAirplaneMode = true;
+	}
+
+	private void registerAirplaneReceiver() {
 		mAirplaneReceiver = new AirplaneReceiver();
 		IntentFilter airplaneFilter = new IntentFilter(Constants.AIRPLANE_MODE);
 		registerReceiver(mAirplaneReceiver, airplaneFilter);
@@ -65,17 +63,41 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 	}
 
 	protected void stopAirplaneMode() {
+		if (mAirplaneMode) {
+			mAirplaneMode = false;
+
+			unregisterReceiver(mAirplaneReceiver);
+			Log.e(TAG, "unregistering airplane receiver");
+			boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
+			if (enabled) {
+				Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
+				Intent i = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+				i.putExtra("state", 0);
+				sendBroadcast(i);
+			}
+		}
+		// else we must have already stopped airplane mode
+	}
+
+	private void unregisterAirplaneReceiver() {
 		unregisterReceiver(mAirplaneReceiver);
 		Log.e(TAG, "unregistering airplane receiver");
-		boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
-		if (enabled) {
-			Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
-			Intent i = new Intent(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-			i.putExtra("state", 0);
-			sendBroadcast(i);
-		}
 	}
-	
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (mAirplaneMode)
+			unregisterAirplaneReceiver();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mAirplaneMode)
+			registerAirplaneReceiver();
+	}
+
 	// ////// CONSUMES ALL UI EVENTS ////////
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,7 +105,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 		menu.add(0, DEVICE_ADMIN, 0, getString(R.string.device_admin)).setIcon(android.R.drawable.ic_menu_preferences);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

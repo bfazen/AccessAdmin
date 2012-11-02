@@ -1,17 +1,16 @@
 package com.alphabetbloc.chvsettings.activities;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,22 +39,22 @@ import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
  */
 public class InitialSetupActivity extends DeviceHoldActivity {
 	// private static final String TAG = "InitialSetUpService";
-	private static final int START = 6;
+	private static final int START = 0;
 	private static final int SET_ADMIN = 1;
 	private static final int SET_PWD = 2;
-	private static final int SET_ACCOUNT = 3;
-	private static final int SETUP_CLINIC = 4;
+	private static final int SETUP_CLINIC = 3;
+	private static final String TAG = InitialSetupActivity.class.getSimpleName();
 	private int mStep;
 	private Context mContext;
 	private TextView mInstructionText;
 	private TextView mStepText;
 	private Button mButton;
 	private int mRequestCode;
-	private int mResultCode;
 	private Policy mPolicy;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		Log.e(TAG, "InitialSetupActivity is called");
 		mContext = this;
 		mPolicy = new Policy(mContext);
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -68,16 +67,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		saveDefaultReportingLine();
 		initializeView();
 		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		if (mResultCode == RESULT_OK)
-			stepForward();
-		else
-			stepBack();
 	}
 
 	private void initializeView() {
@@ -99,9 +88,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 				case SET_PWD:
 					setPassword();
 					break;
-				case SET_ACCOUNT:
-					setupGoogleAccount();
-					break;
 				case SETUP_CLINIC:
 					setupClinic();
 					break;
@@ -114,14 +100,14 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		});
 
 		mRequestCode = START;
-		mResultCode = RESULT_OK;
+		stepForward();
 	}
 
 	private void stepForward() {
 		switch (mRequestCode) {
 		case START:
 			mInstructionText.setText(R.string.initial_instructions);
-			mStep = 1;
+			mStep = SET_ADMIN;
 			mStepText.setVisibility(View.GONE);
 			mButton.setText(R.string.start);
 			break;
@@ -136,28 +122,16 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		case SET_PWD:
 			if (mPolicy.isDeviceSecured()) {
 				stopAirplaneMode();
-				mInstructionText.setText(R.string.account_instructions);
-				mButton.setText(R.string.set_account);
-				mStep = SET_ACCOUNT;
-				mStepText.setText(String.valueOf(SET_ACCOUNT));
+				mInstructionText.setText(R.string.access_mrs_instructions);
+				mButton.setText(R.string.setup_access_mrs);
+				mStep = SETUP_CLINIC;
+				mStepText.setText(String.valueOf(SETUP_CLINIC));
 			} else {
 				mInstructionText.setText(R.string.setup_error);
-				mStep = 1;
+				mStep = SET_ADMIN;
 				mStepText.setVisibility(View.GONE);
 				mButton.setText(R.string.start);
 			}
-			break;
-		case SET_ACCOUNT:
-			Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
-			if (accounts.length <= 0) {
-				mInstructionText.setText(R.string.clinic_instructions_account_notset);
-			} else {
-				Resources res = getResources();
-				mInstructionText.setText(res.getQuantityString(R.plurals.clinic_instructions_with_account, accounts.length, accounts.length));
-			}
-			mButton.setText(R.string.setup_clinic);
-			mStep = SETUP_CLINIC;
-			mStepText.setText(String.valueOf(SETUP_CLINIC));
 			break;
 		default:
 			break;
@@ -178,18 +152,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			mButton.setText(R.string.set_pwd);
 			mStep = SET_PWD;
 			mStepText.setText(String.valueOf(SET_PWD));
-			break;
-		case SET_ACCOUNT:
-			Account[] accounts = AccountManager.get(this).getAccountsByType("com.google");
-			if (accounts.length <= 0) {
-				mInstructionText.setText(R.string.clinic_instructions_account_notset);
-			} else {
-				Resources res = getResources();
-				mInstructionText.setText(res.getQuantityString(R.plurals.clinic_instructions_with_account, accounts.length, accounts.length));
-			}
-			mButton.setText(R.string.setup_clinic);
-			mStep = SETUP_CLINIC;
-			mStepText.setText(String.valueOf(SETUP_CLINIC));
 			break;
 		default:
 			break;
@@ -249,25 +211,36 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	}
 
 	private void setupClinic() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-		prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
-		Intent i = new Intent();
-		i.setComponent(new ComponentName("com.alphabetbloc.clinic", "com.alphabetbloc.clinic.ui.admin.ClinicLauncherActivity"));
-		i.putExtra("device_admin_setup", true);
-		startActivityForResult(i, SETUP_CLINIC);
+		if (isClinicInstalled()) {
+			Log.e(TAG, "InitialSetupActivity is calling setupClinic");
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+			prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
+			Intent i = new Intent();
+			i.setComponent(new ComponentName("com.alphabetbloc.clinic", "com.alphabetbloc.clinic.ui.admin.ClinicLauncherActivity"));
+			i.putExtra("device_admin_setup", true);
+			startActivityForResult(i, SETUP_CLINIC);
+		}
 		finish();
 	}
 
-	private void setupGoogleAccount() {
-		Intent i = new Intent(Settings.ACTION_ADD_ACCOUNT);
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-		startActivityForResult(i, SET_ACCOUNT);
+	private boolean isClinicInstalled() {
+		Log.e(TAG, "isClinicInstalled");
+		try {
+			getPackageManager().getPackageInfo("com.alphabetbloc.clinic", PackageManager.GET_META_DATA);
+		} catch (NameNotFoundException e) {
+			Log.e(TAG, "Clinic is not installed, so skipping setup.");
+			return false;
+		}
+		return true;
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		mRequestCode = requestCode;
-		mResultCode = resultCode;
+		if (resultCode == RESULT_OK)
+			stepForward();
+		else
+			stepBack();
 	}
 
 	// /Override which buttons to allow through DeviceHold by not consuming

@@ -1,5 +1,10 @@
 package com.alphabetbloc.chvsettings.services;
 
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,7 +17,6 @@ import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
@@ -22,14 +26,13 @@ import com.alphabetbloc.chvsettings.data.Constants;
 import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
 
 /**
- * Do NOT call on its own, should only be called with a repeating
- * wakelock alarm through the Device Admin Service (e.g. with SEND_SMS intent
- * extra). <br>
+ * Do NOT call on its own, should only be called with a repeating wakelock alarm
+ * through the Device Admin Service (e.g. with SEND_SMS intent extra). <br>
  * <br>
  * Service sends SMS, checks for it being sent, waits for it to be logged in the
  * outbox, and then deletes the SMS. Can be called more than once, will wait for
- * a default time before killing itself, but no longer than 6x the default
- * time after the last pending SMS has been registered with the service. Intent
+ * a default time before killing itself, but no longer than 6x the default time
+ * after the last pending SMS has been registered with the service. Intent
  * requires default of smsType, smsLine, and smsMessage Intent Extras.
  * 
  * @author Louis Fazen (louis.fazen@gmail.com)
@@ -38,16 +41,18 @@ import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
 public class SendSMSService extends Service {
 
 	public static final String TAG = "SendSMSService";
+	private static final String SMS_SENT = "SMS_SENT";
+
 	private Context mContext;
-	private int mSentSMS;
-	private int mPendingSMS;
-	private int mDeletedSMS;
-	private long mPendingTime;
-	private long mDeleteTime;
-	private SMSSentReceiver mSMSSentReceiver;
-	private static long mWait;
-	private static long mStopTime;
-	private static final long WAIT_FOR_DELETE = 1000 * 45;
+	private ArrayList<SMS> mPendingSms = new ArrayList<SMS>();
+	private SMSSentReceiver mSmsSentReceiver;
+	private ScheduledExecutorService mExecutor = Executors.newScheduledThreadPool(5);
+
+	private SMS mCurrentSms;
+	private boolean mSentSms;
+	private boolean mDeletedSms;
+	private int mMessageCount;
+	private int mDeleteCount;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -59,110 +64,145 @@ public class SendSMSService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		mContext = this;
-		mPendingSMS = 0;
-		mSentSMS = 0;
-		mDeletedSMS = 0;
+		mMessageCount = 0;
+		mDeleteCount = 0;
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		int smsBroadcast = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
+		mMessageCount++;
+		int broadcast = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
 		String phoneNumber = intent.getStringExtra(Constants.SMS_LINE);
 		String message = intent.getStringExtra(Constants.SMS_MESSAGE);
-		sendSMS(smsBroadcast, phoneNumber, message);
+		SMS sms = new SMS(mMessageCount, broadcast, phoneNumber, message);
+		mPendingSms.add(sms);
+
+		if (mMessageCount == 1){
+			setupReceivers();
+			sendNextSms();
+		}
+		
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	private void sendSMS(int smsBroadcast, String phoneNumber, String message) {
-		String body = "!Reply!: " + message;
-		String SENT = "SMS_SENT";
+	private void setupReceivers() {
 
-		// SETUP RECEIVE
-		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-		mSMSSentReceiver = new SMSSentReceiver();
-		mSMSSentReceiver.addSMS(smsBroadcast, phoneNumber, body);
-		registerReceiver(mSMSSentReceiver, new IntentFilter(SENT));
+		// Receive notification when message sends
+		mSmsSentReceiver = new SMSSentReceiver();
+		registerReceiver(mSmsSentReceiver, new IntentFilter(SMS_SENT));
 
-		// SETUP DELETE
-		SentObserver sentObserver = new SentObserver();
+		// Receive notification when message is deleted
+		SentOutboxObserver sentObserver = new SentOutboxObserver();
 		ContentResolver contentResolver = mContext.getContentResolver();
 		contentResolver.registerContentObserver(Uri.parse("content://sms/out"), true, sentObserver);
+	}
 
-		// SEND SMS
-		SmsManager sms = SmsManager.getDefault();
-		sms.sendTextMessage(phoneNumber, null, body, sentPI, null);
+	public void sendNextSms() {
+		mCurrentSms = mPendingSms.get(0);
+		mSentSms = false;
+		mDeletedSms = false;
 
-		// SETUP STOP SERVICE
-		mPendingSMS++;
-		mPendingTime = System.currentTimeMillis();
+		mSmsSentReceiver.addSMS(mCurrentSms);
 
-		// If no SMS sent, kill service to allow for Wakeful Alarm resend
-		new Handler().postDelayed(new Runnable() {
-			@Override
+		// Send Sms
+		SmsManager smsManager = SmsManager.getDefault();
+		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SMS_SENT), 0);
+		smsManager.sendTextMessage(mCurrentSms.getNumber(), null, mCurrentSms.getMessage(), sentPI, null);
+
+		// Monitor Delivery
+		updateSmsDelivery();
+	}
+
+	private void updateSmsDelivery() {
+
+		mExecutor.schedule(new Runnable() {
+			int count = 0;
+
 			public void run() {
-				if (mSentSMS == 0)
-					stopSelf();
+				boolean completedSms = mSentSms & mDeletedSms; // don't
+																// short-circuit
+				if (!completedSms && count < 60) {
+					mExecutor.schedule(this, 3000, TimeUnit.MILLISECONDS);
+					count++;
+				} else {
+					// Log errors
+					if (completedSms)
+						Log.i(TAG, "SMS has been successfully sent and deleted from outbox");
+					else if (!mSentSms)
+						Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to send");
+					else if (!mDeletedSms)
+						Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to delete");
+
+					// delete the SMS if haven't done so
+					if (!mSentSms && mPendingSms.size() > 0)
+						mPendingSms.remove(0);
+
+					// send next SMS, if there is one
+					if (mPendingSms.size() > 0)
+						sendNextSms();
+					else
+						stopService();
+
+				}
+
 			}
-		}, WAIT_FOR_DELETE);
+		}, 0, TimeUnit.MILLISECONDS);
 	}
 
 	public class SMSSentReceiver extends BroadcastReceiver {
-		int sentSmsType;
-		String sentNumber = "";
-		String sentMessage = "";
+		SMS sms = null;
 
-		public void addSMS(int smsBroadcast, String phoneNumber, String message) {
-			sentSmsType = smsBroadcast;
-			sentNumber = phoneNumber;
-			sentMessage = message;
+		public void addSMS(SMS currentSms) {
+			sms = currentSms;
 		}
 
 		@Override
 		public void onReceive(Context ctxt, Intent intent) {
 			int result = getResultCode();
 			if (result == Activity.RESULT_OK) {
-				// log a successfully sent message
-				mSentSMS++;
+				// log last successfully sent message
+				mSentSms = true;
 				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-				pref.edit().putString(String.valueOf(sentSmsType), sentMessage).commit();
-				
-				
-				// If no SMS ever deleted after send, then kill service
-				new Handler().postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						if (mDeletedSMS == 0)
-							stopSelf();
+				pref.edit().putString(String.valueOf(sms.getBroadcast()), sms.getMessage()).commit();
+
+				for (SMS currentSms : mPendingSms) {
+					if (sms.getId() == currentSms.getId()) {
+						int oldtotal = mPendingSms.size();
+						mPendingSms.remove(currentSms);
+						Log.i(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
+						break;
 					}
-				}, WAIT_FOR_DELETE);
+				}
 			}
 		}
 	}
 
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		unregisterReceiver(mSMSSentReceiver);
-	}
-
 	// Need observer b/c delay between receive and move to outbox
-	class SentObserver extends ContentObserver {
+	class SentOutboxObserver extends ContentObserver {
 
-		public SentObserver() {
+		public SentOutboxObserver() {
 			super(null);
 		}
 
 		@Override
 		public void onChange(boolean selfChange) {
-			deleteSMS();
+			deleteSmsFromOutbox(false);
 			super.onChange(selfChange);
 		}
 	}
 
-	public void deleteSMS() {
+	public void deleteSmsFromOutbox(boolean deleteAll) {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		String line = prefs.getString(Constants.SMS_REPLY_LINE, "");
+		String line = null;
+		String message = null;
+		if (deleteAll) {
+			line = prefs.getString(Constants.SMS_REPLY_LINE, "");
+			message = "!Reply!:";
+		} else {
+			line = mCurrentSms.getNumber();
+			message = mCurrentSms.getMessage();
+		}
+
 		try {
 			Uri uriSms = Uri.parse("content://sms/out");
 			Cursor c = mContext.getContentResolver().query(uriSms, new String[] { "_id", "address", "body" }, "address =? ", new String[] { line }, null);
@@ -173,10 +213,11 @@ public class SendSMSService extends Service {
 					String address = c.getString(c.getColumnIndex("address"));
 					String body = c.getString(c.getColumnIndex("body"));
 
-					if (body.contains("!Reply!:") && address.equals(line)) {
-						mContext.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
-						mDeletedSMS++;
-						mDeleteTime = System.currentTimeMillis();
+					if (body.contains(message) && address.equalsIgnoreCase(line)) {
+						int rows = mContext.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
+						mDeletedSms = true;
+						mDeleteCount++;
+						Log.e(TAG, "Successfully deleted " + rows + " sms from the outbox");
 					}
 				} while (c.moveToNext());
 			}
@@ -186,37 +227,53 @@ public class SendSMSService extends Service {
 			Log.e(TAG, "Could not delete SMS from inbox: " + e.getMessage());
 		}
 
-		stopService();
 	}
 
 	private void stopService() {
+		if (mMessageCount >= mDeleteCount)
+			deleteSmsFromOutbox(true);
 
-		if (mPendingSMS <= mDeletedSMS) {
-			stopSelf();
-		} else {
-			// Kill service after 30s inactivity (between pending and delete)
-			// or else just kill after 5 minutes of sending SMS
-			new Thread(new Runnable() {
-				public void run() {
-					mWait = Math.abs(mDeleteTime - mPendingTime);
-
-					while ((mWait < WAIT_FOR_DELETE) || mStopTime < (WAIT_FOR_DELETE * 6)) {
-
-						try {
-							mWait = Math.abs(mDeleteTime - mPendingTime);
-							mStopTime = System.currentTimeMillis() - mPendingTime;
-							Thread.sleep(2000);
-						} catch (InterruptedException e) {
-							// Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					stopSelf();
-				}
-			}).start();
-		}
+		stopSelf();
 	}
 
+	@Override
+	public void onDestroy() {
+		Log.i(TAG, "Ending the SendSmsService");
+		unregisterReceiver(mSmsSentReceiver);
+		mSmsSentReceiver = null;
+		super.onDestroy();
+	}
+
+	private class SMS {
+		private int smsBroadcast;
+		private int smsId;
+		private String smsNumber;
+		private String smsMessage;
+
+		public SMS(int id, int broadcast, String phoneNumber, String message) {
+			smsBroadcast = broadcast;
+			smsNumber = phoneNumber;
+			smsMessage = "!Reply!: " + message;
+			smsId = id;
+		}
+
+		public int getBroadcast() {
+			return smsBroadcast;
+		}
+
+		public String getNumber() {
+			return smsNumber;
+		}
+
+		public String getMessage() {
+			return smsMessage;
+		}
+
+		public int getId() {
+			return smsId;
+		}
+
+	}
 	// SEND SMS METHOD
 	// ---when the SMS has been delivered---
 	// Delivery intent: could add later, but does not add much purpose

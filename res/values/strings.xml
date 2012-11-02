@@ -155,6 +155,9 @@
     <string name="view_password_lockout">Permanent Lock:</string>
 
     <!-- Account Setup -->
+    <string name="access_mrs_instructions">Please set up AccessMRS. Please set a secure password for accessing confidential data when the phone turns on.</string>
+    <string name="setup_access_mrs">Setup AccessMRS</string>
+    
     <string name="account_instructions">Please set up an account for your phone numbers and calendars.</string>
     <string name="set_account">Create Account</string>
 

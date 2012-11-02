@@ -120,9 +120,8 @@ public class Policy {
 	 * 
 	 * @return
 	 */
-	public boolean createNewSecretPwd() {
-		String rAlphaNum = (new StringGenerator(mPasswordLength)).getRandomAlphaNumericString();
-		return mDPM.resetPassword(rAlphaNum, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY);
+	public String createNewSecretPwd() {
+		return (new StringGenerator(mPasswordLength)).getRandomAlphaNumericString();
 	}
 
 	/**

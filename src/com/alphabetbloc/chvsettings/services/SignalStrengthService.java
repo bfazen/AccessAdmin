@@ -86,7 +86,6 @@ public class SignalStrengthService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	
 	private void showNotification() {
 
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -155,10 +154,6 @@ public class SignalStrengthService extends Service {
 
 	}
 
-	
-
-	
-
 	@Override
 	public void onDestroy() {
 		Log.d(TAG, "Shutting down the Service" + TAG);
@@ -174,8 +169,6 @@ public class SignalStrengthService extends Service {
 		}
 		super.onDestroy();
 	}
-
-	
 
 	private void createWakeLock() {
 		// first call:
@@ -201,5 +194,36 @@ public class SignalStrengthService extends Service {
 		}
 
 	}
+
+	// TODO! NO LONGER NEEDED IN CLINIC.... we dont need this method anymore,
+	// because sync is
+	// automated?!
+	// private boolean isSyncNeeded(SyncResult syncResult) {
+	//
+	// // establish threshold for syncing (i.e. do not sync continuously)
+	// long recentDownload = Db.open().fetchMostRecentDownload();
+	// long timeSinceRefresh = System.currentTimeMillis() - recentDownload;
+	// SharedPreferences prefs =
+	// PreferenceManager.getDefaultSharedPreferences(App.getApp());
+	// String maxRefreshSeconds =
+	// prefs.getString(App.getApp().getString(R.string.key_max_refresh_seconds),
+	// App.getApp().getString(R.string.default_max_refresh_seconds));
+	// long maxRefreshMs = 1000L * Long.valueOf(maxRefreshSeconds);
+	//
+	// Log.e(TAG, "Minutes since last refresh: " + timeSinceRefresh / (1000 *
+	// 60));
+	// if (timeSinceRefresh < maxRefreshMs) {
+	//
+	// long timeToNextSync = maxRefreshMs - timeSinceRefresh;
+	// syncResult.delayUntil = timeToNextSync;
+	// Log.e(TAG, "Synced recently... lets delay the sync until ! timetosync=" +
+	// timeToNextSync);
+	// return false;
+	//
+	// } else {
+	// return true;
+	// }
+	//
+	// }
 
 }

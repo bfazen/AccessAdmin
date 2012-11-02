@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +22,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 
 	private static final int SET_PASSWORD = 0;
 	public static final String FORCE_RESET_PASSWORD = "force_reset_password";
+	private static final String TAG = SetUserPassword.class.getSimpleName();
 	private Button mExitBtn;
 	private Button mPwdBtn;
 	private boolean mForceResetPwd;
@@ -32,19 +34,23 @@ public class SetUserPassword extends DeviceHoldActivity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean newInstall = prefs.getBoolean(Constants.NEW_INSTALL, true);
 		if (newInstall) {
+			Log.e(TAG, "new install is true... loading InitialSetupActivity");
 			Intent i = new Intent(this, InitialSetupActivity.class);
 			startActivity(i);
 			finish();
+		} else {
+			Log.e(TAG, "new install is false... ");
+			// Detect if password needs to be reset
+			mForceResetPwd = getIntent().getBooleanExtra(FORCE_RESET_PASSWORD, false);
+			Policy policy = new Policy(this);
+			if (!policy.isActivePasswordSufficient())
+				mForceResetPwd = true;
+
+			if (mForceResetPwd)
+				startAirplaneMode();
+			
+			Log.e(TAG, "new install is false... and mForceResetPwd=" + mForceResetPwd);
 		}
-
-		// Detect if password needs to be reset
-		mForceResetPwd = getIntent().getBooleanExtra(FORCE_RESET_PASSWORD, false);
-		Policy policy = new Policy(this);
-		if (!policy.isActivePasswordSufficient())
-			mForceResetPwd = true;
-
-		if (mForceResetPwd)
-			startAirplaneMode();
 	}
 
 	@Override
@@ -61,7 +67,7 @@ public class SetUserPassword extends DeviceHoldActivity {
 		TextView setupMessage = (TextView) findViewById(R.id.setup_message);
 		ImageView exclaim = (ImageView) findViewById(R.id.exclamation);
 		exclaim.setVisibility(View.VISIBLE);
-		
+
 		// Minimum Password Length
 		TextView pwdLength = (TextView) findViewById(R.id.policy_password_length);
 		pwdLength.setText(String.valueOf(policy.getPasswordLength()));
@@ -104,7 +110,9 @@ public class SetUserPassword extends DeviceHoldActivity {
 					finish();
 				}
 			});
+			stopAirplaneMode();
 		}
+		
 	}
 
 	@Override
@@ -122,11 +130,9 @@ public class SetUserPassword extends DeviceHoldActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		Policy policy = new Policy(this);
 
-		if (policy.isActivePasswordSufficient() && mForceResetPwd) {
-			stopAirplaneMode();
+		if (policy.isActivePasswordSufficient() && mForceResetPwd) 
 			mForceResetPwd = false;
-			refreshView();
-		}
+		
 
 	}
 

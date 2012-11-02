@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -42,15 +41,10 @@ public class SetAdminPassword extends SherlockActivity {
 		super.onCreate(savedInstanceState);
 		mAdminVerified = false;
 		mFirstPassword = "";
+		createView();
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		refreshView();
-	}
-
-	private void refreshView() {
+	private void createView() {
 
 		setContentView(R.layout.admin_login);
 
@@ -142,13 +136,6 @@ public class SetAdminPassword extends SherlockActivity {
 			mAdminVerified = false;
 		}
 		return mAdminVerified;
-	}
-
-	@Override
-	protected void onPause() {
-		// Auto-generated method stub
-		super.onPause();
-		Log.e(TAG, "onPause called");
 	}
 
 	@Override

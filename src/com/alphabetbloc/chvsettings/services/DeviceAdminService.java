@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
@@ -90,8 +89,8 @@ public class DeviceAdminService extends WakefulIntentService {
 
 	@Override
 	protected void doWakefulWork(Intent intent) {
-		
-		mContext = this;
+
+		mContext = getApplicationContext();
 		mDPM = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mDeviceAdmin = new ComponentName(DeviceAdminService.this, DeviceAdmin.class);
 		mPolicy = new Policy(mContext);
@@ -137,7 +136,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			smsLine = mPrefs.getString(Constants.SAVED_SMS_LINE, "");
 			smsMessage = mPrefs.getString(Constants.SAVED_SMS_MESSAGE, "");
 		}
-		
+
 		switch (smsIntent) {
 		case Constants.SEND_SMS:
 			sendRepeatingSMS(smsIntent, smsLine, smsMessage);
@@ -147,7 +146,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			break;
 		case Constants.SEND_SIM:
 			sendSIMCode();
-			lockSecretPassword();
+			lockSecretPassword(false);
 			break;
 		case Constants.LOCK_SCREEN:
 			lockDevice();
@@ -168,7 +167,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			resetSmsAdminId();
 			break;
 		case Constants.LOCK_SECRET_PWD:
-			lockSecretPassword();
+			lockSecretPassword(true);
 			break;
 		case Constants.HOLD_DEVICE:
 			holdDevice(smsMessage);
@@ -196,39 +195,33 @@ public class DeviceAdminService extends WakefulIntentService {
 	private void holdDevice(String toast) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		prefs.edit().putBoolean(Constants.SHOW_MENU, false).commit();
-		
+
 		Intent i = new Intent(mContext, MessageHoldActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		i.putExtra(Constants.TOAST_MESSAGE, toast);
 		mContext.startActivity(i);
-		
-		//confirm that this worked before canceling the alarm
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if(MessageHoldActivity.sMessageHoldActive)
-					cancelAlarms(mContext);
-			}
-		}, 1000);
+
+		// confirm that this worked before canceling the alarm
+
+		android.os.SystemClock.sleep(1000 * 10);
+		if (MessageHoldActivity.sMessageHoldActive)
+			cancelAlarms(mContext);
+
 	}
-	
+
 	private void stopHoldDevice() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
-		
+
 		Intent i = new Intent(mContext, MessageHoldActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		i.putExtra(MessageHoldActivity.STOP_HOLD, true);
 		mContext.startActivity(i);
-		
-		//confirm that this worked before canceling the alarm
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if(!MessageHoldActivity.sMessageHoldActive)
-					cancelAlarms(mContext);
-			}
-		}, 1000);
+
+		// confirm that this worked before canceling the alarm
+		android.os.SystemClock.sleep(1000 * 10);
+		if (!MessageHoldActivity.sMessageHoldActive)
+			cancelAlarms(mContext);
 	}
 
 	/**
@@ -272,12 +265,8 @@ public class DeviceAdminService extends WakefulIntentService {
 			sendSingleSMS("Performing a Factory Reset");
 
 			// wait a minute for SMS to send, then perform factory reset
-			new Handler().postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					mDPM.wipeData(0);
-				}
-			}, 1000 * 60);
+			android.os.SystemClock.sleep(1000 * 60);
+			mDPM.wipeData(0);
 		}
 	}
 
@@ -302,6 +291,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		sendSingleSMS("Wiping Client Data");
 
 		Intent i = new Intent(Constants.WIPE_DATA_SERVICE);
+		i.putExtra(Constants.WIPE_DATA_FROM_ADMIN_SMS_REQUEST, true);
 		sendBroadcast(i);
 
 		cancelAdminAlarms();
@@ -328,13 +318,16 @@ public class DeviceAdminService extends WakefulIntentService {
 	}
 
 	public void resetPassword() {
-		//TODO!: allow admin to edit this default value
-//		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-//		String defaultPwd = prefs.getString(Constants.DEFAULT_PASSWORD, "12345");
+		// TODO!: allow admin to edit this default value
+		// final SharedPreferences prefs = new EncryptedPreferences(this,
+		// this.getSharedPreferences(Constants.ENCRYPTED_PREFS,
+		// Context.MODE_PRIVATE));
+		// String defaultPwd = prefs.getString(Constants.DEFAULT_PASSWORD,
+		// "12345");
 		String defaultPwd = "12345";
 		resetPassword(defaultPwd);
 	}
-	
+
 	/**
 	 * Resets the password to a default string that follows the device admin
 	 * policy, and sends an SMS confirmation to the reporting line.
@@ -342,8 +335,8 @@ public class DeviceAdminService extends WakefulIntentService {
 	public void resetPassword(String tempPassword) {
 		int pwdLength = mPolicy.getPasswordLength();
 		int pwdQuality = mPolicy.getPasswordQuality();
-		
-		//Set to Temporary Password
+
+		// Set to Temporary Password
 		mPolicy.setPasswordLength(5);
 		mPolicy.setPasswordQuality(2);
 		if (mDPM.resetPassword(tempPassword, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY)) {
@@ -353,11 +346,11 @@ public class DeviceAdminService extends WakefulIntentService {
 			sendSingleSMS("Unable to lock device and reset to default password");
 		}
 		mDPM.lockNow();
-		
-		//Reset Policy to force pwd change (IF stronger than tempPassword)
+
+		// Reset Policy to force pwd change (IF stronger than tempPassword)
 		mPolicy.setPasswordLength(pwdLength);
 		mPolicy.setPasswordQuality(pwdQuality);
-		
+
 		Intent i = new Intent(mContext, SetUserPassword.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		i.putExtra(SetUserPassword.FORCE_RESET_PASSWORD, true);
@@ -369,16 +362,21 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * The only way to unlock device is through sending an sms to reset the
 	 * password to default. Also sends an SMS to the reporting line.
 	 */
-	public void lockSecretPassword() {
+	public void lockSecretPassword(boolean sendPassword) {
 		Policy policy = new Policy(mContext);
-		if (policy.createNewSecretPwd()) {
+		String pwd = policy.createNewSecretPwd();
+		if (policy.resetPassword(pwd)) {
+			if (sendPassword)
+				sendSingleSMS("Device successfully locked with new password=" + pwd);
+			else 
+				sendSingleSMS("Device successfully locked with new random password.");
+			
 			cancelAdminAlarms();
-			sendSingleSMS("Device successfully locked with new random password");
 		} else {
 			sendSingleSMS("Unable to lock device and reset to new random password");
 		}
 		mDPM.lockNow();
-		
+
 		Intent i = new Intent(mContext, SetUserPassword.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		i.putExtra(SetUserPassword.FORCE_RESET_PASSWORD, true);
@@ -391,7 +389,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 */
 	public void cancelAdminAlarms() {
 		cancelAlarms(mContext);
-		
+
 		if (!isAdminAlarmActive())
 			sendSingleSMS("All device admin alarms have been cancelled.");
 		else
