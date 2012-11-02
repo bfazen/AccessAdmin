@@ -206,7 +206,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 
 	private void setPassword() {
 		Intent i = new Intent(mContext, SetUserPassword.class);
-		i.putExtra(Constants.NEW_INSTALL, false);
+		i.putExtra(SetUserPassword.INITIAL_SETUP, true);
 		startActivityForResult(i, SET_PWD);
 	}
 

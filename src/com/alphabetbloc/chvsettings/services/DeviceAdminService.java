@@ -353,7 +353,7 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		Intent i = new Intent(mContext, SetUserPassword.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		i.putExtra(SetUserPassword.FORCE_RESET_PASSWORD, true);
+		i.putExtra(SetUserPassword.SUGGEST_RESET_PASSWORD, true);
 		mContext.startActivity(i);
 	}
 
@@ -379,7 +379,7 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		Intent i = new Intent(mContext, SetUserPassword.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		i.putExtra(SetUserPassword.FORCE_RESET_PASSWORD, true);
+		i.putExtra(SetUserPassword.SUGGEST_RESET_PASSWORD, true);
 		mContext.startActivity(i);
 	}
 

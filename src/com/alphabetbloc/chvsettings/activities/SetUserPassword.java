@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,8 +20,9 @@ import com.alphabetbloc.chvsettings.data.Policy;
 public class SetUserPassword extends DeviceHoldActivity {
 
 	private static final int SET_PASSWORD = 0;
-	public static final String FORCE_RESET_PASSWORD = "force_reset_password";
-	private static final String TAG = SetUserPassword.class.getSimpleName();
+	public static final String SUGGEST_RESET_PASSWORD = "suggest_reset_password";
+	// private static final String TAG = SetUserPassword.class.getSimpleName();
+	public static final String INITIAL_SETUP = "initial_setup";
 	private Button mExitBtn;
 	private Button mPwdBtn;
 	private boolean mForceResetPwd;
@@ -34,22 +34,21 @@ public class SetUserPassword extends DeviceHoldActivity {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean newInstall = prefs.getBoolean(Constants.NEW_INSTALL, true);
 		if (newInstall) {
-			Log.e(TAG, "new install is true... loading InitialSetupActivity");
+
 			Intent i = new Intent(this, InitialSetupActivity.class);
 			startActivity(i);
 			finish();
 		} else {
-			Log.e(TAG, "new install is false... ");
-			// Detect if password needs to be reset
-			mForceResetPwd = getIntent().getBooleanExtra(FORCE_RESET_PASSWORD, false);
+
+			// Detect if password needs to be reset (hide exit button)
+			mForceResetPwd = getIntent().getBooleanExtra(SUGGEST_RESET_PASSWORD, false);
 			Policy policy = new Policy(this);
 			if (!policy.isActivePasswordSufficient())
 				mForceResetPwd = true;
 
-			if (mForceResetPwd)
+			boolean initialSetup = getIntent().getBooleanExtra(INITIAL_SETUP, false);
+			if (initialSetup)
 				startAirplaneMode();
-			
-			Log.e(TAG, "new install is false... and mForceResetPwd=" + mForceResetPwd);
 		}
 	}
 
@@ -90,17 +89,19 @@ public class SetUserPassword extends DeviceHoldActivity {
 			}
 		});
 
+		mExitBtn = (Button) findViewById(R.id.exit);
+
 		if (!policy.isActivePasswordSufficient() || mForceResetPwd) {
 			// Launches password set-up screen in Settings.
-			exclaim.setVisibility(View.VISIBLE);
 			setupMessage.setText(R.string.password_not_allowed);
+			exclaim.setVisibility(View.VISIBLE);
+			mExitBtn.setVisibility(View.GONE);
 			Intent data = new Intent();
 			setResult(RESULT_CANCELED, data);
 		} else {
 			// Can exit
 			setupMessage.setText(R.string.password_allowed);
 			exclaim.setVisibility(View.GONE);
-			mExitBtn = (Button) findViewById(R.id.exit);
 			mExitBtn.setText(R.string.exit);
 			mExitBtn.setVisibility(View.VISIBLE);
 			Intent data = new Intent();
@@ -112,7 +113,6 @@ public class SetUserPassword extends DeviceHoldActivity {
 			});
 			stopAirplaneMode();
 		}
-		
 	}
 
 	@Override
@@ -130,9 +130,8 @@ public class SetUserPassword extends DeviceHoldActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		Policy policy = new Policy(this);
 
-		if (policy.isActivePasswordSufficient() && mForceResetPwd) 
+		if (policy.isActivePasswordSufficient() && mForceResetPwd)
 			mForceResetPwd = false;
-		
 
 	}
 
