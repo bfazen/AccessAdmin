@@ -26,16 +26,16 @@ public class SetAppPreferences extends SherlockActivity{
 	/** Called when the activity is first created. */
 	private static final String SHOW_SETTINGS_MENU = "show_settings_menu";
 	private static final String ENABLE_ACTIVITY_LOG = "enable_activity_log";
-	private static final String CLINIC_PACKAGE = "com.alphabetbloc.clinic";
+	private static final String ACCESS_MRS_PACKAGE = "com.alphabetbloc.accessmrs";
 	private Button collectButton;
-	private Button clinicButton;
+	private Button accessMrsButton;
 	private Button adwButton;
 	private Button ushahidiButton;
 	private SharedPreferences.Editor editor;
 	private CheckBox collectMenuToggle;
-	private CheckBox clinicLogToggle;
+	private CheckBox accessMrsLogToggle;
 	private CheckBox ushahidiToggle;
-	private CheckBox clinicToggle;
+	private CheckBox accessMrsToggle;
 	private CheckBox adwToggle;
 
 	//TODO!: check if the packages exist before showing the buttons... if don't exist, set to GONE...
@@ -70,11 +70,11 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		clinicButton = (Button) findViewById(R.id.clinicButton);
-		clinicButton.setOnClickListener(new OnClickListener() {
+		accessMrsButton = (Button) findViewById(R.id.access_mrs_button);
+		accessMrsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.PreferencesActivity"));
+				i.setComponent(new ComponentName(ACCESS_MRS_PACKAGE, ACCESS_MRS_PACKAGE + ".ui.admin.PreferencesActivity"));
 				startActivity(i);
 			}
 		});
@@ -119,27 +119,27 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		clinicToggle = (CheckBox) findViewById(R.id.clinic_checkbox);
-		if (settings.getBoolean("ClinicMenuEnabled", false)) {
-			clinicToggle.setChecked(true);
+		accessMrsToggle = (CheckBox) findViewById(R.id.access_mrs_checkbox);
+		if (settings.getBoolean("AccessMRSMenuEnabled", false)) {
+			accessMrsToggle.setChecked(true);
 		}
 
-		clinicToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		accessMrsToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.DeviceAdminPreference"));
-				if (clinicToggle.isChecked()) {
-					clinicToggle.setChecked(true);
+				i.setComponent(new ComponentName(ACCESS_MRS_PACKAGE, ACCESS_MRS_PACKAGE + ".ui.admin.DeviceAdminPreference"));
+				if (accessMrsToggle.isChecked()) {
+					accessMrsToggle.setChecked(true);
 					i.putExtra(SHOW_SETTINGS_MENU, true);
 
-					editor.putBoolean("ClinicMenuEnabled", true);
+					editor.putBoolean("AccessMRSMenuEnabled", true);
 
 				} else {
-					clinicToggle.setChecked(false);
+					accessMrsToggle.setChecked(false);
 					i.putExtra(SHOW_SETTINGS_MENU, false);
-					editor.putBoolean("ClinicMenuEnabled", false);
+					editor.putBoolean("AccessMRSMenuEnabled", false);
 
 				}
 				editor.commit();
@@ -177,26 +177,26 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		clinicLogToggle = (CheckBox) findViewById(R.id.clinic_log_checkbox);
-		if (settings.getBoolean("ClinicLogEnabled", false)) {
-			clinicLogToggle.setChecked(true);
+		accessMrsLogToggle = (CheckBox) findViewById(R.id.access_mrs_log_checkbox);
+		if (settings.getBoolean("AccessMRSLogEnabled", false)) {
+			accessMrsLogToggle.setChecked(true);
 		}
 
-		clinicLogToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		accessMrsLogToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName(CLINIC_PACKAGE, CLINIC_PACKAGE + ".ui.admin.DeviceAdminPreference"));
-				if (clinicLogToggle.isChecked()) {
-					clinicLogToggle.setChecked(true);
+				i.setComponent(new ComponentName(ACCESS_MRS_PACKAGE, ACCESS_MRS_PACKAGE + ".ui.admin.DeviceAdminPreference"));
+				if (accessMrsLogToggle.isChecked()) {
+					accessMrsLogToggle.setChecked(true);
 					i.putExtra(ENABLE_ACTIVITY_LOG, true);
-					editor.putBoolean("ClinicLogEnabled", true);
+					editor.putBoolean("AccessMRSLogEnabled", true);
 
 				} else {
-					clinicLogToggle.setChecked(false);
+					accessMrsLogToggle.setChecked(false);
 					i.putExtra(ENABLE_ACTIVITY_LOG, false);
-					editor.putBoolean("ClinicLogEnabled", false);
+					editor.putBoolean("AccessMRSLogEnabled", false);
 				}
 				editor.commit();
 				startActivity(i);

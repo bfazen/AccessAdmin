@@ -26,6 +26,6 @@
 		android:checkable="true" android:checked="false" android:title="@string/collectEdit" />
 
 	<item android:id="@+id/menu_text" android:showAsAction="never"
-		android:checkable="true" android:checked="false" android:title="@string/clinicEdit" />
+		android:checkable="true" android:checked="false" android:title="@string/access_mrs_edit" />
 	
 </menu>

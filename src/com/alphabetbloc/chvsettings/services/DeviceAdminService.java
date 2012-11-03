@@ -81,10 +81,10 @@ public class DeviceAdminService extends WakefulIntentService {
 	private Context mContext;
 	private static final String TAG = "DeviceAdminService";
 	private static final String PERFORM_FACTORY_RESET = "perform_factory_reset";
+	private boolean mResetAlarm;
 
 	public DeviceAdminService() {
 		super("AppService");
-
 	}
 
 	@Override
@@ -119,12 +119,16 @@ public class DeviceAdminService extends WakefulIntentService {
 				// kill any old alarms so only 1 active device admin process
 				// (all alarms should have same simple pi)
 				cancelAlarms(mContext);
-
+				
 				// schedule new alarm to continue after kill or reboot
 				mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, smsIntent).commit();
 				mPrefs.edit().putString(Constants.SAVED_SMS_LINE, smsLine).commit();
 				mPrefs.edit().putString(Constants.SAVED_SMS_MESSAGE, smsMessage).commit();
 				scheduleAlarms(new WakelockWorkListener(), mContext, true);
+				mResetAlarm = true;
+			} else {
+				//Don't delete existing alarms of higher order intents
+				mResetAlarm = false;
 			}
 
 		} else {
@@ -202,11 +206,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		mContext.startActivity(i);
 
 		// confirm that this worked before canceling the alarm
-
-		android.os.SystemClock.sleep(1000 * 10);
+		android.os.SystemClock.sleep(1000 * 5);
 		if (MessageHoldActivity.sMessageHoldActive)
-			cancelAlarms(mContext);
-
+			cancelAdminAlarms();
 	}
 
 	private void stopHoldDevice() {
@@ -219,9 +221,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		mContext.startActivity(i);
 
 		// confirm that this worked before canceling the alarm
-		android.os.SystemClock.sleep(1000 * 10);
+		android.os.SystemClock.sleep(1000 * 5);
 		if (!MessageHoldActivity.sMessageHoldActive)
-			cancelAlarms(mContext);
+			cancelAdminAlarms();
 	}
 
 	/**
@@ -232,6 +234,8 @@ public class DeviceAdminService extends WakefulIntentService {
 		Log.d(TAG, "locking the device");
 		mDPM.lockNow();
 
+		// confirm that this worked before canceling the alarm
+		android.os.SystemClock.sleep(1000 * 5);
 		if (isDeviceLocked()) {
 			cancelAdminAlarms();
 			sendSingleSMS("Device locked");
@@ -270,10 +274,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 	}
 
-	// TODO! fix this.
 	public void wipeDevice() {
 		// NB. we don't monitor this, we simply clear Client data. On completion
-		// client data will be wiped (managed by Clinic). On receipt of
+		// client data will be wiped (managed by AccessMRS). On receipt of
 		// a broadcast to wipe data and if preference is set, then this process
 		// will resume and the factoryReset() method will be called.
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -283,7 +286,6 @@ public class DeviceAdminService extends WakefulIntentService {
 		wipeOdkData();
 	}
 
-	// TODO! fix this.
 	public void wipeOdkData() {
 		// we don't check this one, because we dont manage the process
 		// instead we wait for a broadcast to tell us to send a message
@@ -339,6 +341,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		// Set to Temporary Password
 		mPolicy.setPasswordLength(5);
 		mPolicy.setPasswordQuality(2);
+
+		// confirm that this worked before canceling the alarm
+		android.os.SystemClock.sleep(1000 * 5);
 		if (mDPM.resetPassword(tempPassword, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY)) {
 			cancelAdminAlarms();
 			sendSingleSMS("Device successfully locked with default password");
@@ -368,9 +373,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (policy.resetPassword(pwd)) {
 			if (sendPassword)
 				sendSingleSMS("Device successfully locked with new password=" + pwd);
-			else 
+			else
 				sendSingleSMS("Device successfully locked with new random password.");
-			
+
 			cancelAdminAlarms();
 		} else {
 			sendSingleSMS("Unable to lock device and reset to new random password");
@@ -388,8 +393,11 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * reporting line when complete.
 	 */
 	public void cancelAdminAlarms() {
-		cancelAlarms(mContext);
+		if (mResetAlarm)
+			cancelAlarms(mContext);
 
+		// confirm that this worked before asking about alarms
+		android.os.SystemClock.sleep(1000 * 10);
 		if (!isAdminAlarmActive())
 			sendSingleSMS("All device admin alarms have been cancelled.");
 		else
@@ -522,8 +530,8 @@ public class DeviceAdminService extends WakefulIntentService {
 	 *            characters).
 	 */
 	public void sendRepeatingSMS(int smstype, String line, String message) {
-		String lastMessage = mPrefs.getString(String.valueOf(smstype), "");
-		if (message.equals(lastMessage)) {
+		String lastSentAdminMessage = mPrefs.getString(String.valueOf(smstype), "");
+		if (message.equals(lastSentAdminMessage)) {
 			cancelAdminAlarms();
 			Log.d(TAG, "Message has already been sent. Alarm Cancelled.");
 		} else {

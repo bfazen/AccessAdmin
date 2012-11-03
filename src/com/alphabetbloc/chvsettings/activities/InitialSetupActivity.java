@@ -29,7 +29,7 @@ import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
 /**
  * Activity that steps through the process of enabling the Device Policy,
  * setting up a password that follows the policy, and establishing a provider ID
- * for Clinic for CHWs in a secure way. Uses full screen view and airplane mode
+ * for AccessMRS in a secure way. Uses full screen view and airplane mode
  * to prevent leaving activity via a call or SMS and interrupting the activity
  * via notifications bar. Also leads the user to setup an account on the device
  * if they wish.
@@ -42,7 +42,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	private static final int START = 0;
 	private static final int SET_ADMIN = 1;
 	private static final int SET_PWD = 2;
-	private static final int SETUP_CLINIC = 3;
+	private static final int SETUP_ACCESS_MRS = 3;
 	private static final String TAG = InitialSetupActivity.class.getSimpleName();
 	private int mStep;
 	private Context mContext;
@@ -89,8 +89,8 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 				case SET_PWD:
 					setPassword();
 					break;
-				case SETUP_CLINIC:
-					setupClinic();
+				case SETUP_ACCESS_MRS:
+					setupAccessMRS();
 					break;
 				default:
 					break;
@@ -136,8 +136,8 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 				stopAirplaneMode();
 				mInstructionText.setText(R.string.access_mrs_instructions);
 				mButton.setText(R.string.setup_access_mrs);
-				mStep = SETUP_CLINIC;
-				mStepText.setText(String.valueOf(SETUP_CLINIC));
+				mStep = SETUP_ACCESS_MRS;
+				mStepText.setText(String.valueOf(SETUP_ACCESS_MRS));
 			} else {
 				mInstructionText.setText(R.string.setup_error);
 				mStep = SET_ADMIN;
@@ -222,23 +222,23 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		startActivityForResult(i, SET_PWD);
 	}
 
-	private void setupClinic() {
-		if (isClinicInstalled()) {
+	private void setupAccessMRS() {
+		if (isAccessMRSInstalled()) {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
 			Intent i = new Intent();
-			i.setComponent(new ComponentName("com.alphabetbloc.clinic", "com.alphabetbloc.clinic.ui.admin.ClinicLauncherActivity"));
+			i.setComponent(new ComponentName("com.alphabetbloc.accessmrs", "com.alphabetbloc.accessmrs.ui.admin.AccessMrsLauncherActivity"));
 			i.putExtra("device_admin_setup", true);
-			startActivityForResult(i, SETUP_CLINIC);
+			startActivityForResult(i, SETUP_ACCESS_MRS);
 		}
 		finish();
 	}
 
-	private boolean isClinicInstalled() {
+	private boolean isAccessMRSInstalled() {
 		try {
-			getPackageManager().getPackageInfo("com.alphabetbloc.clinic", PackageManager.GET_META_DATA);
+			getPackageManager().getPackageInfo("com.alphabetbloc.accessmrs", PackageManager.GET_META_DATA);
 		} catch (NameNotFoundException e) {
-			Log.v(TAG, "Clinic is not installed, so skipping setup.");
+			Log.v(TAG, "AccessMRS is not installed, so skipping setup.");
 			return false;
 		}
 		return true;

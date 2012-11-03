@@ -30,7 +30,7 @@ import com.alphabetbloc.chvsettings.activities.AdminLoginActivity;
 public class SignalStrengthService extends Service {
 
 	private static volatile PowerManager.WakeLock lockStatic = null;
-	static final String NAME = "com.alphabetbloc.clinic.android.RefreshDataActivity";
+	static final String NAME = "com.alphabetbloc.accessmrs.android.RefreshDataActivity";
 
 	private NotificationManager mNM;
 	private int NOTIFICATION = 1;
@@ -39,7 +39,7 @@ public class SignalStrengthService extends Service {
 	private TelephonyManager mTelephonyManager;
 	private PhoneStateListener mPhoneStateListener;
 	private static final String TAG = "SignalStrengthService";
-	public static final String REFRESH_BROADCAST = "com.alphabetbloc.clinic.services.SignalStrengthService";
+	public static final String REFRESH_BROADCAST = "com.alphabetbloc.accessmrs.services.SignalStrengthService";
 	// CM7
 	public static final String MOBILE_DATA_CHANGED = "com.alphabetbloc.android.telephony.MOBILE_DATA_CHANGED";
 
@@ -195,7 +195,7 @@ public class SignalStrengthService extends Service {
 
 	}
 
-	// TODO! NO LONGER NEEDED IN CLINIC.... we dont need this method anymore,
+	// TODO! NO LONGER NEEDED IN ACCESSMRS.... we dont need this method anymore,
 	// because sync is
 	// automated?!
 	// private boolean isSyncNeeded(SyncResult syncResult) {

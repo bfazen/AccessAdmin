@@ -26,8 +26,8 @@ public class Constants {
 	public static final String BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 	public static final String AIRPLANE_MODE = "android.intent.action.AIRPLANE_MODE";
 	public static final String WIPE_DATA_COMPLETE = "com.alphabetbloc.android.settings.WIPE_DATA_SERVICE_COMPLETE";
-	public static final String WIPE_DATA_SERVICE = "com.alphabetbloc.clinic.WIPE_DATA_SERVICE";
-	public static final String WIPE_DATA_FROM_ADMIN_SMS_REQUEST = "com.alphabetbloc.clinic.WIPE_DATA_FROM_ADMIN_SMS_REQUEST";
+	public static final String WIPE_DATA_SERVICE = "com.alphabetbloc.accessmrs.WIPE_DATA_SERVICE";
+	public static final String WIPE_DATA_FROM_ADMIN_SMS_REQUEST = "com.alphabetbloc.accessmrs.WIPE_DATA_FROM_ADMIN_SMS_REQUEST";
 	
 	//INTENTS
 	public static final String DEVICE_ADMIN_WORK = "device_admin_work";

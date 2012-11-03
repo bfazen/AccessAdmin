@@ -24,7 +24,6 @@
         android:layout_toLeftOf="@+id/submit_button"
         android:inputType="textPassword" >
 
-        <requestFocus />
     </EditText>
 
     <Button

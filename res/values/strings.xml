@@ -69,8 +69,8 @@
     <string name="odk_collect">ODK Collect</string>
     <string name="enable_log">Log Activities</string>
     <string name="collectEdit">Edit</string>
-    <string name="odk_clinic">ODK Clinic</string>
-    <string name="clinicEdit">Edit</string>
+    <string name="access_mrs">AccessMRS</string>
+    <string name="access_mrs_edit">Edit</string>
     <string name="adw_launcher">ADW Launcher</string>
     <string name="ushahidi">Ushahidi</string>
     <string name="adwEdit">Edit</string>
@@ -161,14 +161,14 @@
     <string name="account_instructions">Please set up an account for your phone numbers and calendars.</string>
     <string name="set_account">Create Account</string>
 
-    <!-- Clinic Setup -->
-    <string name="clinic_instructions_account_notset">Click on calendar to setup an account later. Please set a password for confidential client data. You must enter this password when the phone turns on.</string>
+    <!-- AccessMRS Setup -->
+    <string name="access_mrs_instructions_account_notset">Click on calendar to setup an account later. Please set a password for confidential client data. You must enter this password when the phone turns on.</string>
 
-    <plurals name="clinic_instructions_with_account">
+    <plurals name="access_mrs_instructions_with_account">
         <item quantity="one">An account is setup! Please set a password for confidential client data. You must enter this password when the phone turns on.</item>
         <item quantity="other">%d accounts are setup! Please set a password for confidential client data. You must enter this password when the phone turns on.</item>
     </plurals>
 
-    <string name="setup_clinic">Setup Password</string>
+    <string name="setup_access_mrs">Setup Password</string>
 
 </resources>

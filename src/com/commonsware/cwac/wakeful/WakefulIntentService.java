@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.PowerManager;
+import android.util.Log;
 
 abstract public class WakefulIntentService extends IntentService {
 	abstract protected void doWakefulWork(Intent intent);
@@ -73,6 +74,11 @@ abstract public class WakefulIntentService extends IntentService {
 
 		mgr.cancel(pi);
 		pi.cancel();
+		
+		if(PendingIntent.getBroadcast(ctxt, 0, i, PendingIntent.FLAG_NO_CREATE) != null)
+			Log.v("WakefulIntentService", "Alarm successfully cancelled: " + i.getComponent());
+		else
+			Log.v("WakefulIntentService", "Alarm was not successfully canceled and remains active: " + i.getComponent());
 	}
 	
 	public WakefulIntentService(String name) {
