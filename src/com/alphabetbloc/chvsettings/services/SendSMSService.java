@@ -238,7 +238,7 @@ public class SendSMSService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Log.i(TAG, "Ending the SendSmsService");
+		Log.v(TAG, "Ending the SendSmsService");
 		unregisterReceiver(mSmsSentReceiver);
 		mSmsSentReceiver = null;
 		super.onDestroy();

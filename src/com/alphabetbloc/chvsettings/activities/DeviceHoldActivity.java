@@ -52,7 +52,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 		mAirplaneReceiver = new AirplaneReceiver();
 		IntentFilter airplaneFilter = new IntentFilter(Constants.AIRPLANE_MODE);
 		registerReceiver(mAirplaneReceiver, airplaneFilter);
-		Log.e(TAG, "registering airplane receiver");
+		Log.v(TAG, "registering airplane receiver");
 		boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
 		if (!enabled) {
 			Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 1);
@@ -67,7 +67,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 			mAirplaneMode = false;
 
 			unregisterReceiver(mAirplaneReceiver);
-			Log.e(TAG, "unregistering airplane receiver");
+			Log.v(TAG, "unregistering airplane receiver");
 			boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
 			if (enabled) {
 				Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
@@ -81,7 +81,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	private void unregisterAirplaneReceiver() {
 		unregisterReceiver(mAirplaneReceiver);
-		Log.e(TAG, "unregistering airplane receiver");
+		Log.v(TAG, "unregistering airplane receiver");
 	}
 
 	@Override

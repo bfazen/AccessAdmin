@@ -39,7 +39,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		if (Constants.BOOT_COMPLETED.equals(intent.getAction())) {
 			// always check clock...
 			mContext.startService(new Intent(mContext, UpdateClockService.class));
-			Log.e("BootReceiver", "Boot Receiver is receiving!");
+			Log.v("BootReceiver", "Boot Receiver is receiving!");
 			// check security...
 			Policy policy = new Policy(mContext);
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -109,7 +109,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 			}
 
 			simChanged = true;
-			Log.e(TAG, "SIM has been changed from the initial registered SIM");
+			Log.w(TAG, "SIM has been changed from the initial registered SIM");
 		}
 
 		return simChanged;

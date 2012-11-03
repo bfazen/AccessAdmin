@@ -50,11 +50,12 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	private TextView mStepText;
 	private Button mButton;
 	private int mRequestCode;
+	private int mResultCode;
 	private Policy mPolicy;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Log.e(TAG, "InitialSetupActivity is called");
+		Log.v(TAG, "InitialSetupActivity is called");
 		mContext = this;
 		mPolicy = new Policy(mContext);
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -100,7 +101,18 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		});
 
 		mRequestCode = START;
-		stepForward();
+		mResultCode = RESULT_OK;
+	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mResultCode == RESULT_OK)
+			stepForward();
+		else
+			stepBack();
 	}
 
 	private void stepForward() {
@@ -212,7 +224,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 
 	private void setupClinic() {
 		if (isClinicInstalled()) {
-			Log.e(TAG, "InitialSetupActivity is calling setupClinic");
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
 			Intent i = new Intent();
@@ -224,11 +235,10 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	}
 
 	private boolean isClinicInstalled() {
-		Log.e(TAG, "isClinicInstalled");
 		try {
 			getPackageManager().getPackageInfo("com.alphabetbloc.clinic", PackageManager.GET_META_DATA);
 		} catch (NameNotFoundException e) {
-			Log.e(TAG, "Clinic is not installed, so skipping setup.");
+			Log.v(TAG, "Clinic is not installed, so skipping setup.");
 			return false;
 		}
 		return true;
@@ -237,10 +247,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		mRequestCode = requestCode;
-		if (resultCode == RESULT_OK)
-			stepForward();
-		else
-			stepBack();
+		mResultCode = resultCode;
 	}
 
 	// /Override which buttons to allow through DeviceHold by not consuming

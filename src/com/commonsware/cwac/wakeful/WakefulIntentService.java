@@ -72,6 +72,7 @@ abstract public class WakefulIntentService extends IntentService {
 		PendingIntent pi = PendingIntent.getBroadcast(ctxt, 0, i, 0);
 
 		mgr.cancel(pi);
+		pi.cancel();
 	}
 	
 	public WakefulIntentService(String name) {

@@ -65,7 +65,7 @@ public class Policy {
 		mDPM = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mPolicyAdmin = new ComponentName(context, DeviceAdmin.class);
 
-		Log.e(TAG, "Policy passwordQuality is" + getPasswordQuality());
+//		Log.e(TAG, "Policy passwordQuality is" + getPasswordQuality());
 	}
 
 	public void initializeDefaultPolicy() {
@@ -73,7 +73,7 @@ public class Policy {
 		setPasswordLength(mPasswordLength);
 		setMaxFailedPw(mMaxPwdToWipe);
 		setMaxTimeToLock(mMaxTimeToLock);
-		Log.e(TAG, "Initializing passwordQuality is" + getPasswordQuality());
+//		Log.e(TAG, "Initializing passwordQuality is" + getPasswordQuality());
 	}
 
 	// 4 Policy Setters for Android 2.3
@@ -112,7 +112,7 @@ public class Policy {
 		mPrefs.edit().putLong(KEY_MAX_TIME_TO_LOCK, time).commit();
 		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, 600);
 		mDPM.setMaximumTimeToLock(mPolicyAdmin, time);
-		Log.e(TAG, "max time to screen lock set to:" + time);
+//		Log.e(TAG, "max time to screen lock set to:" + time);
 	}
 
 	/**
@@ -186,9 +186,9 @@ public class Policy {
 	 */
 	public boolean isAdminActive() {
 		if (mDPM.isAdminActive(mPolicyAdmin))
-			Log.e(TAG, "admin is active");
+			Log.v(TAG, "Device Admin is active");
 		else
-			Log.e(TAG, "admin is NOT active");
+			Log.v(TAG, "Device Admin is NOT active");
 
 		return mDPM.isAdminActive(mPolicyAdmin);
 	}
@@ -200,7 +200,7 @@ public class Policy {
 	 */
 	public boolean isActivePasswordSufficient() {
 		if (mDPM.isActivePasswordSufficient())
-			Log.e(TAG, "password is sufficient");
+			Log.v(TAG, "password is sufficient");
 
 		return mDPM.isActivePasswordSufficient();
 
@@ -221,7 +221,7 @@ public class Policy {
 	 * 
 	 */
 	public void removeActiveAdmin() {
-		Log.e(TAG, "remove active admin");
+		Log.v(TAG, "Removing active Device Admin");
 		mDPM.removeActiveAdmin(mPolicyAdmin);
 	}
 
