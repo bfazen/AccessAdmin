@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alphabetbloc.chvsettings.data;
+package com.alphabetbloc.accessadmin.data;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -22,7 +22,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
+import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
 
 /**
  * Monitors and manages changes in the DeviceAdminPolicy

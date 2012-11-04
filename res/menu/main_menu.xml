@@ -23,7 +23,7 @@
 
     
 	<item android:id="@+id/menu_logo" android:showAsAction="never"
-		android:checkable="true" android:checked="false" android:title="@string/collectEdit" />
+		android:checkable="true" android:checked="false" android:title="@string/access_forms_edit" />
 
 	<item android:id="@+id/menu_text" android:showAsAction="never"
 		android:checkable="true" android:checked="false" android:title="@string/access_mrs_edit" />

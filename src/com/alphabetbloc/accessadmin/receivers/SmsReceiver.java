@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphabetbloc.chvsettings.receivers;
+package com.alphabetbloc.accessadmin.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,10 +10,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.services.DeviceAdminService;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 /**

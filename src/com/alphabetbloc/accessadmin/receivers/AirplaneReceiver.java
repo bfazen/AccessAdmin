@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphabetbloc.chvsettings.receivers;
+package com.alphabetbloc.accessadmin.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.data.Policy;
+import com.alphabetbloc.accessadmin.data.Policy;
 
 /**
  * Used only to turn airplane mode on during device installation if someone

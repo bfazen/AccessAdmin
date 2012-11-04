@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -31,10 +31,10 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.receivers.AirplaneReceiver;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.receivers.AirplaneReceiver;
 
 public class DeviceHoldActivity extends Activity implements OnTouchListener {
 

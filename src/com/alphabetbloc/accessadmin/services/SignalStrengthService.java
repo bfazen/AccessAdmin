@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.services;
+package com.alphabetbloc.accessadmin.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -16,8 +16,8 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.activities.AdminLoginActivity;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.activities.AdminLoginActivity;
 
 /**
  * 

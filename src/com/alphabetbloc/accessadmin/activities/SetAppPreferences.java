@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-import com.alphabetbloc.chvsettings.R;
+import com.alphabetbloc.accessadmin.R;
 
 /**
  * @author Louis Fazen (louis.fazen@gmail.com)
@@ -27,12 +27,12 @@ public class SetAppPreferences extends SherlockActivity{
 	private static final String SHOW_SETTINGS_MENU = "show_settings_menu";
 	private static final String ENABLE_ACTIVITY_LOG = "enable_activity_log";
 	private static final String ACCESS_MRS_PACKAGE = "com.alphabetbloc.accessmrs";
-	private Button collectButton;
+	private Button accessFormsButton;
 	private Button accessMrsButton;
 	private Button adwButton;
 	private Button ushahidiButton;
 	private SharedPreferences.Editor editor;
-	private CheckBox collectMenuToggle;
+	private CheckBox accessFormsMenuToggle;
 	private CheckBox accessMrsLogToggle;
 	private CheckBox ushahidiToggle;
 	private CheckBox accessMrsToggle;
@@ -61,8 +61,8 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		collectButton = (Button) findViewById(R.id.collectButton);
-		collectButton.setOnClickListener(new OnClickListener() {
+		accessFormsButton = (Button) findViewById(R.id.access_forms_button);
+		accessFormsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
 				i.setComponent(new ComponentName("org.odk.collect.android", "org.odk.collect.android.preferences.PreferencesActivity"));
@@ -148,27 +148,27 @@ public class SetAppPreferences extends SherlockActivity{
 			}
 		});
 
-		collectMenuToggle = (CheckBox) findViewById(R.id.collect_checkbox);
-		if (settings.getBoolean("CollectMenuEnabled", false)) {
-			collectMenuToggle.setChecked(true);
+		accessFormsMenuToggle = (CheckBox) findViewById(R.id.access_forms_checkbox);
+		if (settings.getBoolean("AccessFormsMenuEnabled", false)) {
+			accessFormsMenuToggle.setChecked(true);
 		}
 
-		collectMenuToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		accessFormsMenuToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
 				i.setComponent(new ComponentName("org.odk.collect.android", "org.odk.collect.android.activities.DeviceAdminPreference"));
-				if (collectMenuToggle.isChecked()) {
-					collectMenuToggle.setChecked(true);
+				if (accessFormsMenuToggle.isChecked()) {
+					accessFormsMenuToggle.setChecked(true);
 					i.putExtra(SHOW_SETTINGS_MENU, true);
 
-					editor.putBoolean("CollectMenuEnabled", true);
+					editor.putBoolean("AccessFormsMenuEnabled", true);
 
 				} else {
-					collectMenuToggle.setChecked(false);
+					accessFormsMenuToggle.setChecked(false);
 					i.putExtra(SHOW_SETTINGS_MENU, false);
-					editor.putBoolean("CollectMenuEnabled", false);
+					editor.putBoolean("AccessFormsMenuEnabled", false);
 
 				}
 				editor.commit();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alphabetbloc.chvsettings.receivers;
+package com.alphabetbloc.accessadmin.receivers;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;
@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
-import com.alphabetbloc.chvsettings.data.Policy;
+import com.alphabetbloc.accessadmin.data.Policy;
 
 /**
  * Android DeviceAdminReceiver class.  When enabled, it lets you control

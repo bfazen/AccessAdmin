@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Intent;
@@ -13,9 +13,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.Policy;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.Policy;
 
 public class SetUserPassword extends DeviceHoldActivity {
 

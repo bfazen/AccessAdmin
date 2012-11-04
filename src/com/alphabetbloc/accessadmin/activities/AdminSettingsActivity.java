@@ -1,5 +1,5 @@
 
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import com.actionbarsherlock.app.SherlockListActivity;
-import com.alphabetbloc.chvsettings.R;
+import com.alphabetbloc.accessadmin.R;
 
 public class AdminSettingsActivity extends SherlockListActivity {
     List<Map<String, Object>> mList;

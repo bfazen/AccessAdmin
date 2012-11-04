@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -19,12 +19,12 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.data.StringGenerator;
-import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.data.StringGenerator;
+import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
 
 /**
  * Activity that steps through the process of enabling the Device Policy,
@@ -58,8 +58,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		Log.v(TAG, "InitialSetupActivity is called");
 		mContext = this;
 		mPolicy = new Policy(mContext);
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-		settings.edit().putBoolean(Constants.NEW_INSTALL, false).commit();
 
 		startAirplaneMode();
 		initializeSIM();
@@ -104,8 +102,6 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		mResultCode = RESULT_OK;
 	}
 	
-	
-
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -125,6 +121,8 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			break;
 		case SET_ADMIN:
 			mPolicy.initializeDefaultPolicy();
+			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+			settings.edit().putBoolean(Constants.NEW_INSTALL, false).commit();
 			mInstructionText.setText(R.string.pwd_instructions);
 			mButton.setText(R.string.set_pwd);
 			mStep = SET_PWD;

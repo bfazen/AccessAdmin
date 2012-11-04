@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,10 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
-import com.alphabetbloc.chvsettings.services.DeviceAdminService;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class AdminLoginActivity extends SherlockActivity {

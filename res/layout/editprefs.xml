@@ -88,7 +88,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:text="@string/odk_collect"
+                android:text="@string/access_forms"
                 android:textColor="#dfdfdf"
                 android:textSize="16sp" />
         </TableRow>
@@ -109,7 +109,7 @@
                 android:textSize="20sp" />
 
             <CheckBox
-                android:id="@+id/collect_checkbox"
+                android:id="@+id/access_forms_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal" />
@@ -131,11 +131,11 @@
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/collectButton"
+                android:id="@+id/access_forms_button"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
-                android:text="@string/collectEdit"
+                android:text="@string/access_forms_edit"
                 android:textSize="16sp" />
         </TableRow>
 

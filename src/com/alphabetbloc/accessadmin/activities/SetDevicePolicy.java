@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alphabetbloc.chvsettings.activities;
+package com.alphabetbloc.accessadmin.activities;
 
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
@@ -43,11 +43,11 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
-import com.alphabetbloc.chvsettings.services.DeviceAdminService;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNavigationListener {

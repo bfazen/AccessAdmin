@@ -21,8 +21,8 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.services.DeviceAdminService;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
 
 public class WakelockWorkListener implements WakefulIntentService.AlarmListener {
 	public void scheduleAlarms(AlarmManager mgr, PendingIntent pi, Context ctxt) {

@@ -66,9 +66,9 @@
     <string name="btn_submit">Submit</string>
 
     <!-- Application Settings -->
-    <string name="odk_collect">ODK Collect</string>
+    <string name="access_forms">ODK Collect</string>
     <string name="enable_log">Log Activities</string>
-    <string name="collectEdit">Edit</string>
+    <string name="access_forms_edit">Edit</string>
     <string name="access_mrs">AccessMRS</string>
     <string name="access_mrs_edit">Edit</string>
     <string name="adw_launcher">ADW Launcher</string>

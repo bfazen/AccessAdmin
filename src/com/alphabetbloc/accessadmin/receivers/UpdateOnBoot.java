@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.receivers;
+package com.alphabetbloc.accessadmin.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,11 +8,11 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.activities.InitialSetupActivity;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.services.DeviceAdminService;
-import com.alphabetbloc.chvsettings.services.UpdateClockService;
+import com.alphabetbloc.accessadmin.activities.InitialSetupActivity;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
+import com.alphabetbloc.accessadmin.services.UpdateClockService;
 
 /**
  * Checks for a new install, a change in the SIM code, and device security

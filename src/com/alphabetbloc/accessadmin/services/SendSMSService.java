@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.services;
+package com.alphabetbloc.accessadmin.services;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -22,8 +22,8 @@ import android.preference.PreferenceManager;
 import android.telephony.SmsManager;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 
 /**
  * Do NOT call on its own, should only be called with a repeating wakelock alarm

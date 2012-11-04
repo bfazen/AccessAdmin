@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.services;
+package com.alphabetbloc.accessadmin.services;
 
 /*
  * Copyright (C) 2008 The Android Open Source Project
@@ -38,9 +38,9 @@ import android.util.Config;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.activities.SetUserPassword;
-import com.alphabetbloc.chvsettings.services.UpdateClockService.ExecShell.SHELL_CMD;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.activities.SetUserPassword;
+import com.alphabetbloc.accessadmin.services.UpdateClockService.ExecShell.SHELL_CMD;
 
 public class UpdateClockService extends IntentService {
 

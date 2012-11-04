@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alphabetbloc.chvsettings.data;
+package com.alphabetbloc.accessadmin.data;
 
 import android.app.AlarmManager;
 

@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.services;
+package com.alphabetbloc.accessadmin.services;
 
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
@@ -15,14 +15,14 @@ import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.alphabetbloc.chvsettings.R;
-import com.alphabetbloc.chvsettings.activities.MessageHoldActivity;
-import com.alphabetbloc.chvsettings.activities.SetUserPassword;
-import com.alphabetbloc.chvsettings.data.Constants;
-import com.alphabetbloc.chvsettings.data.EncryptedPreferences;
-import com.alphabetbloc.chvsettings.data.Policy;
-import com.alphabetbloc.chvsettings.data.StringGenerator;
-import com.alphabetbloc.chvsettings.receivers.DeviceAdmin;
+import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.activities.MessageHoldActivity;
+import com.alphabetbloc.accessadmin.activities.SetUserPassword;
+import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
+import com.alphabetbloc.accessadmin.data.Policy;
+import com.alphabetbloc.accessadmin.data.StringGenerator;
+import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.commonsware.cwac.wakeful.WakelockWorkListener;
 import com.commonsware.cwac.wakeful.WakelockWorkReceiver;
@@ -115,6 +115,8 @@ public class DeviceAdminService extends WakefulIntentService {
 			// if new intent is a priority intent, set up alarms in case process
 			// is killed...
 			int standingIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
+			Log.v(TAG, "StandingIntent=" + standingIntent + " NewSMSIntent=" + smsIntent);
+			
 			if (smsIntent >= standingIntent) {
 				// kill any old alarms so only 1 active device admin process
 				// (all alarms should have same simple pi)

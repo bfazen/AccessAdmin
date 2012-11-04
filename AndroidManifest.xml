@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.alphabetbloc.chvsettings"
+    package="com.alphabetbloc.accessadmin"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -101,14 +101,14 @@
             android:name=".services.UpdateClockService"
             android:label="UpdateClockService" >
             <intent-filter>
-                <action android:name="com.alphabetbloc.chvsettings.services.UpdateClockService" />
+                <action android:name="com.alphabetbloc.accessadmin.services.UpdateClockService" />
             </intent-filter>
         </service>
         <service
             android:name=".services.DeviceAdminService"
             android:label="DeviceAdminService" >
             <intent-filter>
-                <action android:name="com.alphabetbloc.chvsettings.services.DeviceAdminService" />
+                <action android:name="com.alphabetbloc.accessadmin.services.DeviceAdminService" />
             </intent-filter>
         </service>
         <service
@@ -119,7 +119,7 @@
         <!--
         Receivers
         <receiver
-            android:name="com.alphabetbloc.chvsettings.receivers.Policy$PolicyAdmin"
+            android:name="com.alphabetbloc.accessadmin.receivers.Policy$PolicyAdmin"
             android:label="@string/app_policy_admin_name"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <meta-data
@@ -132,12 +132,12 @@
         </receiver>
         -->
         <receiver
-            android:name="com.alphabetbloc.chvsettings.receivers.AirplaneReceiver"
+            android:name="com.alphabetbloc.accessadmin.receivers.AirplaneReceiver"
             android:enabled="true"
             android:label="AirplaneReceiver" >
         </receiver>
         <receiver
-            android:name="com.alphabetbloc.chvsettings.receivers.DeviceAdmin"
+            android:name="com.alphabetbloc.accessadmin.receivers.DeviceAdmin"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <meta-data
                 android:name="android.app.device_admin"

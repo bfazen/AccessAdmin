@@ -1,4 +1,4 @@
-package com.alphabetbloc.chvsettings.data;
+package com.alphabetbloc.accessadmin.data;
 
 import java.util.Map;
 import java.util.Set;

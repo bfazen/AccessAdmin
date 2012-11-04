@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphabetbloc.chvsettings.receivers;
+package com.alphabetbloc.accessadmin.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
