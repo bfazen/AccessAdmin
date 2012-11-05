@@ -40,6 +40,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String holdScreen;
 	private static String stopHoldScreen;
 	private static String cancelAlarm;
+	private static String editAccessMrsPreference;
 	private static String mSmsMessage = null;
 	private Context mContext;
 	private SmsMessage[] mSms;
@@ -105,6 +106,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		cancelAlarm = smsAdminId + Constants.SMS_CODE_CANCEL_ALARM;
 		resetPwdToDefault = smsAdminId + Constants.SMS_CODE_RESET_PWD_DEFAULT;
 		resetPwdToSmsPwd = smsAdminId + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
+		editAccessMrsPreference = smsAdminId + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
 		
 		// DO NOT REQUIRE smsAdminId:
 		lockSecretPwd = Constants.SMS_CODE_RESET_PWD_SECRET;
@@ -140,6 +142,11 @@ public class SmsReceiver extends BroadcastReceiver {
 			return true;
 		} else if (mSms[0].getMessageBody().equals(resetPwdToDefault)) {
 			mExtra = Constants.RESET_TO_DEFAULT_PWD;
+			return true;
+		} else if (mSms[0].getMessageBody().contains(editAccessMrsPreference)) {
+			mExtra = Constants.EDIT_ACCESS_MRS_PREF;
+			int message = mSms[0].getMessageBody().indexOf(":");
+			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
 			return true;
 		} else if (mSms[0].getMessageBody().contains(resetPwdToSmsPwd)) {
 			mExtra = Constants.RESET_PWD_TO_SMS_PWD;

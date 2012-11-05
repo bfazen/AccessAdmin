@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.activities.MessageHoldActivity;
+import com.alphabetbloc.accessadmin.activities.SetAppPreferences;
 import com.alphabetbloc.accessadmin.activities.SetUserPassword;
 import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
@@ -94,13 +95,17 @@ public class DeviceAdminService extends WakefulIntentService {
 		mDPM = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mDeviceAdmin = new ComponentName(DeviceAdminService.this, DeviceAdmin.class);
 		mPolicy = new Policy(mContext);
-
-		// May be new Intent or called from BOOT... so resolve intent:
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+		resolveIntent(intent);
+	}
+
+	private void resolveIntent(Intent intent) {
 		String smsLine;
 		String smsMessage;
 		int smsIntent;
 
+		// May be new Intent or called from BOOT... so resolve intent:
 		if (intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0) != 0) {
 			// we have a new intent from SMS
 			smsIntent = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
@@ -116,12 +121,12 @@ public class DeviceAdminService extends WakefulIntentService {
 			// is killed...
 			int standingIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
 			Log.v(TAG, "StandingIntent=" + standingIntent + " NewSMSIntent=" + smsIntent);
-			
+
 			if (smsIntent >= standingIntent) {
 				// kill any old alarms so only 1 active device admin process
 				// (all alarms should have same simple pi)
 				cancelAlarms(mContext);
-				
+
 				// schedule new alarm to continue after kill or reboot
 				mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, smsIntent).commit();
 				mPrefs.edit().putString(Constants.SAVED_SMS_LINE, smsLine).commit();
@@ -129,7 +134,7 @@ public class DeviceAdminService extends WakefulIntentService {
 				scheduleAlarms(new WakelockWorkListener(), mContext, true);
 				mResetAlarm = true;
 			} else {
-				//Don't delete existing alarms of higher order intents
+				// Don't delete existing alarms of higher order intents
 				mResetAlarm = false;
 			}
 
@@ -181,6 +186,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		case Constants.STOP_HOLD_DEVICE:
 			stopHoldDevice();
 			break;
+		case Constants.EDIT_ACCESS_MRS_PREF:
+			editAccessMrsPreference(smsMessage);
+			break;
 		case Constants.FACTORY_RESET:
 			factoryReset();
 			break;
@@ -192,12 +200,25 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 	}
 
+	private void editAccessMrsPreference(String smsMessage) {
+
+		int equals = smsMessage.indexOf("=");
+		String preferenceKey = smsMessage.substring(0, equals);
+		String preferenceValue = smsMessage.substring(equals + 1);
+
+		Intent i = new Intent(SetAppPreferences.ACCESS_MRS_SET_PREFERENCE);
+		i.putExtra(SetAppPreferences.PREFERENCE_KEY, preferenceKey);
+		i.putExtra(SetAppPreferences.PREFERENCE_VALUE, preferenceValue);
+		sendBroadcast(i);
+		
+		cancelAdminAlarms();
+	}
+
 	/**
 	 * Holds the device in an activity the user can not leave, and posts a wait
 	 * message to the user in a dialog box.
 	 * 
 	 */
-	// TODO! check this
 	private void holdDevice(String toast) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 		prefs.edit().putBoolean(Constants.SHOW_MENU, false).commit();
@@ -395,8 +416,10 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * reporting line when complete.
 	 */
 	public void cancelAdminAlarms() {
-		if (mResetAlarm)
+		if (mResetAlarm) {
 			cancelAlarms(mContext);
+			mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0).commit();
+		}
 
 		// confirm that this worked before asking about alarms
 		android.os.SystemClock.sleep(1000 * 10);

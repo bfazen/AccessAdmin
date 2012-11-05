@@ -169,7 +169,7 @@ public class SendSMSService extends Service {
 					if (sms.getId() == currentSms.getId()) {
 						int oldtotal = mPendingSms.size();
 						mPendingSms.remove(currentSms);
-						Log.i(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
+						Log.v(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
 						break;
 					}
 				}

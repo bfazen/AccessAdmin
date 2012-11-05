@@ -35,7 +35,7 @@ public class ViewSmsSettings extends SherlockActivity {
 
 	public enum SmsCode {
 
-		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_HOLD, SMS_CODE_STOP_HOLD, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
+		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_HOLD, SMS_CODE_STOP_HOLD, SMS_CODE_EDIT_ACCESS_MRS_PREF, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
 
 	}
 
@@ -66,6 +66,7 @@ public class ViewSmsSettings extends SherlockActivity {
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_GPS));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_HOLD));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_STOP_HOLD));
+		smsGroup.addView(getItemView(SmsCode.SMS_CODE_EDIT_ACCESS_MRS_PREF));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_RESET_PWD_DEFAULT));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_ODK));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_DATA));
@@ -139,7 +140,7 @@ public class ViewSmsSettings extends SherlockActivity {
 			title = getString(R.string.sms_title_hold);
 			description = getString(R.string.sms_description_hold);
 			code = Constants.SMS_CODE_HOLD;
-			example = mAdminId + code;
+			example = mAdminId + code + getString(R.string.sms_description_hold_example);
 			break;
 		case SMS_CODE_STOP_HOLD:
 			title = getString(R.string.sms_title_stop_hold);
@@ -147,11 +148,17 @@ public class ViewSmsSettings extends SherlockActivity {
 			code = Constants.SMS_CODE_STOP_HOLD;
 			example = mAdminId + code;
 			break;
+		case SMS_CODE_EDIT_ACCESS_MRS_PREF:
+			title = getString(R.string.sms_title_edit_access_mrs_pref);
+			description = getString(R.string.sms_description_edit_access_mrs_pref);
+			code = Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
+			example = mAdminId + code + getString(R.string.sms_description_edit_access_mrs_pref_example);
+			break;
 		case SMS_CODE_RESET_PWD_DEFAULT:
 			title = getString(R.string.sms_title_pwd_default);
 			description = getString(R.string.sms_description_pwd_default);
 			code = Constants.SMS_CODE_RESET_PWD_DEFAULT;
-			example = mAdminId + code;
+			example = mAdminId + code + getString(R.string.sms_description_pwd_default_example);
 			break;
 		case SMS_CODE_WIPE_ODK:
 			title = getString(R.string.sms_title_wipe_odk);

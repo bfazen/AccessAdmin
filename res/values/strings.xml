@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">CHV Application Settings</string>
+    <string name="app_name">AccessAdmin</string>
     <!-- ADMIN STRINGS -->
     <string name="device_settings">Device Settings</string>
 
@@ -66,7 +66,7 @@
     <string name="btn_submit">Submit</string>
 
     <!-- Application Settings -->
-    <string name="access_forms">ODK Collect</string>
+    <string name="access_forms">AccessForms</string>
     <string name="enable_log">Log Activities</string>
     <string name="access_forms_edit">Edit</string>
     <string name="access_mrs">AccessMRS</string>
@@ -76,6 +76,15 @@
     <string name="adwEdit">Edit</string>
     <string name="view_settings">Show Menu in App</string>
     <string name="edit_settings">Preferences</string>
+
+    <!-- Application SharedPreferences -->
+    <string name="adw_menu_enabled">adw_menu_enabled</string>
+    <string name="ushahidi_menu_enabled">ushahidi_menu_enabled</string>
+    <string name="access_forms_menu_enabled">access_forms_menu_enabled</string>
+    <string name="access_mrs_menu_enabled">access_mrs_menu_enabled</string>
+    <string name="access_mrs_log_enabled">access_mrs_log_enabled</string>
+    <string name="show_menu_preference">show_settings_menu</string>
+    <string name="enable_activity_log_preference">enable_activity_log</string>
 
     <!-- Clock Service -->
     <string name="clock_service_start">Starting Clock Check</string>
@@ -108,12 +117,24 @@
     <!-- hold the device -->
     <string name="sms_title_hold">Hold Device with Message</string>
     <string name="sms_description_hold">Interrupt and hold device with message. Any message following the code \'-hold:\' will be presented to the user on a screen that is difficult to exit without shutdown. This may be used, for example, to communicate to the user while remotely wiping data in the background.</string>
+    <string name="sms_description_hold_example">Please Return Phone Immediately.</string>
     <!-- stop holding the device -->
     <string name="sms_title_stop_hold">Stop Holding the Device</string>
     <string name="sms_description_stop_hold">Cancel the current SMS \'-hold\' message. Remove the SMS message from view and allow user to interact with the device again.</string>
+    <!-- edit AccessMRS preferences -->
+    <string name="sms_title_edit_access_mrs_pref">Edit AccessMRS Preferences</string>
+    <string name="sms_description_edit_access_mrs_pref">Edit any AccessMRS preference by adding \'preference_name=value\' after a \'-accessmrs-pref:\' code. Use only lowercase and do not include spaces.
+        \nPreferences include: 
+        \n 
+        \nText: server
+        \nNumbers: saved_search, program, provider, maximum_refresh_time
+        \nTrue/False: show_settings_menu, use_saved_searches, client_authentication</string>
+    <string name="sms_description_edit_access_mrs_pref_example">server=https://server.org</string>
     <!-- reset password to default -->
     <string name="sms_title_pwd_default">Reset Password to Default</string>
     <string name="sms_description_pwd_default">Lock device with a default password. Any message following the code \'-reset-pwd:\' will be used as the new device password if more than 5 characters. If \'-reset-pwd\' code is used without colon and text, password will be set to \'12345\'.  User will be requested to change the password on next unlock.</string>
+    <string name="sms_description_pwd_default_example">:p@ssword123</string>
+
     <!-- wipe data -->
     <string name="sms_title_wipe_data">Factory Reset</string>
     <string name="sms_description_wipe_data">Performs a wipe of all Patient Data before conducting a full wipe of internal memory and factory reset. The device will reboot and guide user through the initial device setup instructions again.</string>
@@ -157,7 +178,6 @@
     <!-- Account Setup -->
     <string name="access_mrs_instructions">Please set up AccessMRS. Please set a secure password for accessing confidential data when the phone turns on.</string>
     <string name="setup_access_mrs">Setup AccessMRS</string>
-    
     <string name="account_instructions">Please set up an account for your phone numbers and calendars.</string>
     <string name="set_account">Create Account</string>
 

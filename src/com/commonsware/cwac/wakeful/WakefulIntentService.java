@@ -72,15 +72,20 @@ abstract public class WakefulIntentService extends IntentService {
 		Intent i = new Intent(ctxt, WakelockWorkReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(ctxt, 0, i, 0);
 
-		mgr.cancel(pi);
-		pi.cancel();
+		try {
+			mgr.cancel(pi);
+			pi.cancel();
+		} catch (Exception e) {
+			Log.v("WakefulIntentService", "AlarmManager update was not canceled. " + e.toString());
+			e.printStackTrace();
+		}
 		
-		if(PendingIntent.getBroadcast(ctxt, 0, i, PendingIntent.FLAG_NO_CREATE) != null)
-			Log.v("WakefulIntentService", "Alarm successfully cancelled: " + i.getComponent());
-		else
+		if (PendingIntent.getBroadcast(ctxt, 0, i, PendingIntent.FLAG_NO_CREATE) != null)
 			Log.v("WakefulIntentService", "Alarm was not successfully canceled and remains active: " + i.getComponent());
+		else
+			Log.v("WakefulIntentService", "Alarm successfully cancelled: " + i.getComponent());
 	}
-	
+
 	public WakefulIntentService(String name) {
 		super(name);
 		setIntentRedelivery(true);
