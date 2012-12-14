@@ -99,10 +99,10 @@
     <string name="app_policy_admin_name">Policy Admin Receiver</string>
 
     <!-- SMS SETTINGS -->
-    <string name="sms_example">Example SMS</string>
+    <string name="sms_example">Example</string>
     <string name="sms_code">Code</string>
     <string name="sms_admin_divider_title">SMS Device Administration</string>
-    <string name="sms_admin_divider_description">This device may be managed by SMS. For security, SMS must include the following unique device ID in order to take effect:</string>
+    <string name="sms_admin_divider_description">This device may be managed by SMS. For security, SMS must include \' %s\' followed the unique device ID:</string>
     <string name="sms_reset_divider_title">SMS Device Reset</string>
     <string name="sms_reset_divider_description">If the Unique Device ID is lost, the ID may be reset by SMS. New codes will be sent to the number:</string>
     <string name="reset_sms_line">Reset SMS Line</string>

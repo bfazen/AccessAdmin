@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.util.Log;
 
 import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
@@ -33,7 +34,6 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String wipeData;
 	private static String wipeSdOdk;
 	private static String resetPwdToDefault;
-	private static String smsAdminId;
 	private static String resetPwdToSmsPwd;
 	private static String lockSecretPwd;
 	private static String resetAdminId;
@@ -43,7 +43,6 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String editAccessMrsPreference;
 	private static String mSmsMessage = null;
 	private Context mContext;
-	private SmsMessage[] mSms;
 	private int mExtra;
 
 	public SmsReceiver() {
@@ -59,16 +58,19 @@ public class SmsReceiver extends BroadcastReceiver {
 
 			if (bundle != null) {
 				Object[] pdus = (Object[]) bundle.get("pdus");
-				mSms = new SmsMessage[pdus.length];
+				SmsMessage[] smsMessage = new SmsMessage[pdus.length];
 				for (int i = 0; i < pdus.length; i++) {
-					mSms[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+					smsMessage[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 				}
-
-				if (mSms.length > -1) {
-					readSMS();
+				
+				if (smsMessage.length > -1) {
+					String message = smsMessage[0].getMessageBody();
+					String substring = message.substring(0, Constants.SMS_CODE_ADMIN_PREFIX.length());
+					if(substring.equalsIgnoreCase(Constants.SMS_CODE_ADMIN_PREFIX))
+						readSMS(message);
 				}
-
 			}
+			
 		} else if (intent.getAction().equals(Constants.WIPE_DATA_COMPLETE)) {
 			Intent i = new Intent(mContext, DeviceAdminService.class);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.FACTORY_RESET);
@@ -76,12 +78,11 @@ public class SmsReceiver extends BroadcastReceiver {
 		}
 	}
 
-	// TODO! does this receiver need to be a wakelock receover, or do all
-	// receivers have a wakelock for the duration of their onReceive?
-	private void readSMS() {
+
+	private void readSMS(String sms) {
 		if (Imei == null)
 			createSmsStrings();
-		if (matchingSmsString()) {
+		if (matchingSmsString(sms)) {
 			abortBroadcast();
 			Intent i = new Intent(mContext, DeviceAdminService.class);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, mExtra);
@@ -94,69 +95,69 @@ public class SmsReceiver extends BroadcastReceiver {
 
 	private void createSmsStrings() {
 		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		smsAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
-
-		// REQUIRE smsAdminId:
-		lockDevice = smsAdminId + Constants.SMS_CODE_LOCK;
-		sendGPS = smsAdminId + Constants.SMS_CODE_GPS;
-		wipeData = smsAdminId + Constants.SMS_CODE_WIPE_DATA;
-		wipeSdOdk = smsAdminId + Constants.SMS_CODE_WIPE_ODK;
-		holdScreen = smsAdminId + Constants.SMS_CODE_HOLD;
-		stopHoldScreen = smsAdminId + Constants.SMS_CODE_STOP_HOLD;
-		cancelAlarm = smsAdminId + Constants.SMS_CODE_CANCEL_ALARM;
-		resetPwdToDefault = smsAdminId + Constants.SMS_CODE_RESET_PWD_DEFAULT;
-		resetPwdToSmsPwd = smsAdminId + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
-		editAccessMrsPreference = smsAdminId + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
+		String smsAdminCode = Constants.SMS_CODE_ADMIN_PREFIX + prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
+		Log.e("CODE", "smsCode=" + smsAdminCode);
+		// REQUIRE smsAdminCode:
+		lockDevice = smsAdminCode + Constants.SMS_CODE_LOCK;
+		sendGPS = smsAdminCode + Constants.SMS_CODE_GPS;
+		wipeData = smsAdminCode + Constants.SMS_CODE_WIPE_DATA;
+		wipeSdOdk = smsAdminCode + Constants.SMS_CODE_WIPE_ODK;
+		holdScreen = smsAdminCode + Constants.SMS_CODE_HOLD;
+		stopHoldScreen = smsAdminCode + Constants.SMS_CODE_STOP_HOLD;
+		cancelAlarm = smsAdminCode + Constants.SMS_CODE_CANCEL_ALARM;
+		resetPwdToDefault = smsAdminCode + Constants.SMS_CODE_RESET_PWD_DEFAULT;
+		resetPwdToSmsPwd = smsAdminCode + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
+		editAccessMrsPreference = smsAdminCode + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
 		
-		// DO NOT REQUIRE smsAdminId:
-		lockSecretPwd = Constants.SMS_CODE_RESET_PWD_SECRET;
-		resetAdminId = Constants.SMS_CODE_RESET_ADMIN_ID;
+		// DO NOT REQUIRE smsAdminCode:
+		lockSecretPwd = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_PWD_SECRET;
+		resetAdminId = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_ADMIN_ID;
 
 	}
 
-	private boolean matchingSmsString() {
+	private boolean matchingSmsString(String sms) {
 
-		if (mSms[0].getMessageBody().equals(lockDevice)) {
+		if (sms.equals(lockDevice)) {
 			mExtra = Constants.LOCK_SCREEN;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(sendGPS)) {
+		} else if (sms.equals(sendGPS)) {
 			mExtra = Constants.SEND_GPS;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(wipeData)) {
+		} else if (sms.equals(wipeData)) {
 			mExtra = Constants.WIPE_DATA;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(wipeSdOdk)) {
+		} else if (sms.equals(wipeSdOdk)) {
 			mExtra = Constants.WIPE_ODK_DATA;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(lockSecretPwd)) {
+		} else if (sms.equals(lockSecretPwd)) {
 			mExtra = Constants.LOCK_SECRET_PWD;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(resetAdminId)) {
+		} else if (sms.equals(resetAdminId)) {
 			mExtra = Constants.RESET_ADMIN_ID;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(cancelAlarm)) {
+		} else if (sms.equals(cancelAlarm)) {
 			mExtra = Constants.CANCEL_ALARMS;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(stopHoldScreen)) {
+		} else if (sms.equals(stopHoldScreen)) {
 			mExtra = Constants.STOP_HOLD_DEVICE;
 			return true;
-		} else if (mSms[0].getMessageBody().equals(resetPwdToDefault)) {
+		} else if (sms.equals(resetPwdToDefault)) {
 			mExtra = Constants.RESET_TO_DEFAULT_PWD;
 			return true;
-		} else if (mSms[0].getMessageBody().contains(editAccessMrsPreference)) {
+		} else if (sms.contains(editAccessMrsPreference)) {
 			mExtra = Constants.EDIT_ACCESS_MRS_PREF;
-			int message = mSms[0].getMessageBody().indexOf(":");
-			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
+			int message = sms.indexOf(":");
+			mSmsMessage = sms.substring(message + 1);
 			return true;
-		} else if (mSms[0].getMessageBody().contains(resetPwdToSmsPwd)) {
+		} else if (sms.contains(resetPwdToSmsPwd)) {
 			mExtra = Constants.RESET_PWD_TO_SMS_PWD;
-			int message = mSms[0].getMessageBody().indexOf(":");
-			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
+			int message = sms.indexOf(":");
+			mSmsMessage = sms.substring(message + 1);
 			return true;
-		} else if (mSms[0].getMessageBody().contains(holdScreen)) {
+		} else if (sms.contains(holdScreen)) {
 			mExtra = Constants.HOLD_DEVICE;
-			int message = mSms[0].getMessageBody().indexOf(":");
-			mSmsMessage = mSms[0].getMessageBody().substring(message + 1);
+			int message = sms.indexOf(":");
+			mSmsMessage = sms.substring(message + 1);
 			return true;
 		} else {
 			return false;

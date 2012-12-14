@@ -44,6 +44,7 @@ public class Constants {
 	public static final String LAST_SENT_SIM_MESSAGE = "last_sent_sim_message";
 	
 	//SMS CODES
+	public static final String SMS_CODE_ADMIN_PREFIX = "AdminCode=";
 	public static final String SMS_CODE_LOCK = "-lock";
 	public static final String SMS_CODE_GPS = "-gps";
 	public static final String SMS_CODE_WIPE_DATA = "-reset-device";
@@ -116,6 +117,7 @@ public class Constants {
 	public static final String ADMIN_PWD_COUNT = "last_pwd_count";
 
 	public static final String SHOW_MENU = "show_admin_menu";
+	
 	
 
 

@@ -95,7 +95,7 @@ public class ViewSmsSettings extends SherlockActivity {
 		switch (divider) {
 		case SMS_ADMIN:
 			title = getString(R.string.sms_admin_divider_title);
-			description = getString(R.string.sms_admin_divider_description);
+			description = getString((R.string.sms_admin_divider_description), Constants.SMS_CODE_ADMIN_PREFIX);
 			code = mAdminId;
 			image.setBackgroundResource(R.drawable.id_icon_inverse);
 			break;
@@ -128,67 +128,67 @@ public class ViewSmsSettings extends SherlockActivity {
 			title = getString(R.string.sms_title_lock);
 			description = getString(R.string.sms_description_lock);
 			code = Constants.SMS_CODE_LOCK;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_GPS:
 			title = getString(R.string.sms_title_gps);
 			description = getString(R.string.sms_description_gps);
 			code = Constants.SMS_CODE_GPS;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_HOLD:
 			title = getString(R.string.sms_title_hold);
 			description = getString(R.string.sms_description_hold);
 			code = Constants.SMS_CODE_HOLD;
-			example = mAdminId + code + getString(R.string.sms_description_hold_example);
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code + getString(R.string.sms_description_hold_example);
 			break;
 		case SMS_CODE_STOP_HOLD:
 			title = getString(R.string.sms_title_stop_hold);
 			description = getString(R.string.sms_description_stop_hold);
 			code = Constants.SMS_CODE_STOP_HOLD;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_EDIT_ACCESS_MRS_PREF:
 			title = getString(R.string.sms_title_edit_access_mrs_pref);
 			description = getString(R.string.sms_description_edit_access_mrs_pref);
 			code = Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
-			example = mAdminId + code + getString(R.string.sms_description_edit_access_mrs_pref_example);
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code + getString(R.string.sms_description_edit_access_mrs_pref_example);
 			break;
 		case SMS_CODE_RESET_PWD_DEFAULT:
 			title = getString(R.string.sms_title_pwd_default);
 			description = getString(R.string.sms_description_pwd_default);
 			code = Constants.SMS_CODE_RESET_PWD_DEFAULT;
-			example = mAdminId + code + getString(R.string.sms_description_pwd_default_example);
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code + getString(R.string.sms_description_pwd_default_example);
 			break;
 		case SMS_CODE_WIPE_ODK:
 			title = getString(R.string.sms_title_wipe_odk);
 			description = getString(R.string.sms_description_wipe_odk);
 			code = Constants.SMS_CODE_WIPE_ODK;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_WIPE_DATA:
 			title = getString(R.string.sms_title_wipe_data);
 			description = getString(R.string.sms_description_wipe_data);
 			code = Constants.SMS_CODE_WIPE_DATA;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_CANCEL_ALARM:
 			title = getString(R.string.sms_title_cancel_alarm);
 			description = getString(R.string.sms_description_cancel_alarm);
 			code = Constants.SMS_CODE_CANCEL_ALARM;
-			example = mAdminId + code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_RESET_ADMIN_ID:
 			title = getString(R.string.sms_title_reset_admin);
 			description = getString(R.string.sms_description_reset_admin);
 			code = Constants.SMS_CODE_RESET_ADMIN_ID;
-			example = code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + code;
 			break;
 		case SMS_CODE_RESET_PWD_SECRET:
 			title = getString(R.string.sms_title_pwd_secret);
 			description = getString(R.string.sms_description_pwd_secret);
 			code = Constants.SMS_CODE_RESET_PWD_SECRET;
-			example = code;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + code;
 			break;
 		default:
 			break;

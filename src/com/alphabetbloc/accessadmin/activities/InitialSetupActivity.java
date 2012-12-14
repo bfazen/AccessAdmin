@@ -225,7 +225,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 			prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
 			Intent i = new Intent();
-			i.setComponent(new ComponentName("com.alphabetbloc.accessmrs", "com.alphabetbloc.accessmrs.ui.admin.AccessMrsLauncherActivity"));
+			i.setComponent(new ComponentName("com.alphabetbloc.accessmrs", "com.alphabetbloc.accessmrs.ui.admin.LauncherActivity"));
 			i.putExtra("device_admin_setup", true);
 			startActivityForResult(i, SETUP_ACCESS_MRS);
 		}
