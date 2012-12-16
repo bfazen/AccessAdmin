@@ -127,11 +127,11 @@ public class SendSMSService extends Service {
 				} else {
 					// Log errors
 					if (completedSms)
-						Log.i(TAG, "SMS has been successfully sent and deleted from outbox");
+						if(Constants.DEBUG) Log.i(TAG, "SMS has been successfully sent and deleted from outbox");
 					else if (!mSentSms)
-						Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to send");
+						if(Constants.DEBUG) Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to send");
 					else if (!mDeletedSms)
-						Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to delete");
+						if(Constants.DEBUG)Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to delete");
 
 					// delete the SMS if haven't done so
 					if (!mSentSms && mPendingSms.size() > 0)
@@ -169,7 +169,7 @@ public class SendSMSService extends Service {
 					if (sms.getId() == currentSms.getId()) {
 						int oldtotal = mPendingSms.size();
 						mPendingSms.remove(currentSms);
-						Log.v(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
+						if(Constants.DEBUG) Log.v(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
 						break;
 					}
 				}
@@ -217,14 +217,14 @@ public class SendSMSService extends Service {
 						int rows = mContext.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
 						mDeletedSms = true;
 						mDeleteCount++;
-						Log.e(TAG, "Successfully deleted " + rows + " sms from the outbox");
+						if(Constants.DEBUG) Log.e(TAG, "Successfully deleted " + rows + " sms from the outbox");
 					}
 				} while (c.moveToNext());
 			}
 
 			c.close();
 		} catch (Exception e) {
-			Log.e(TAG, "Could not delete SMS from inbox: " + e.getMessage());
+			if(Constants.DEBUG) Log.e(TAG, "Could not delete SMS from inbox: " + e.getMessage());
 		}
 
 	}
@@ -238,7 +238,7 @@ public class SendSMSService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Log.v(TAG, "Ending the SendSmsService");
+		if(Constants.DEBUG) Log.v(TAG, "Ending the SendSmsService");
 		unregisterReceiver(mSmsSentReceiver);
 		mSmsSentReceiver = null;
 		super.onDestroy();

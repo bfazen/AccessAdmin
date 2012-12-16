@@ -34,12 +34,12 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Config;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.activities.SetUserPassword;
+import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.services.UpdateClockService.ExecShell.SHELL_CMD;
 
 public class UpdateClockService extends IntentService {
@@ -50,10 +50,10 @@ public class UpdateClockService extends IntentService {
 	private boolean needNtpComparison;
 	private boolean clockUpdated;
 
-//	private Exception exception;
+	// private Exception exception;
 	private static final String TAG = "UpdateClockService";
 
-//	private static final int REFERENCE_TIME_OFFSET = 16;
+	// private static final int REFERENCE_TIME_OFFSET = 16;
 	private static final int ORIGINATE_TIME_OFFSET = 24;
 	private static final int RECEIVE_TIME_OFFSET = 32;
 	private static final int TRANSMIT_TIME_OFFSET = 40;
@@ -78,13 +78,12 @@ public class UpdateClockService extends IntentService {
 	private long mNtpTimeReference;
 
 	// round trip time in milliseconds
-//	private long mRoundTripTime;
-//	private Handler mNtpHandler;
+	// private long mRoundTripTime;
+	// private Handler mNtpHandler;
 	private int timeout = 10000;
 	private String host = "pool.ntp.org";
 
 	private Handler mToastHandler;
-
 
 	/**
 	 * A constructor is required, and must call the super IntentService(String)
@@ -93,7 +92,7 @@ public class UpdateClockService extends IntentService {
 	public UpdateClockService() {
 		super("UpdateClockService");
 		mToastHandler = new Handler();
-//		mNtpHandler = new Handler();
+		// mNtpHandler = new Handler();
 	}
 
 	/**
@@ -103,7 +102,7 @@ public class UpdateClockService extends IntentService {
 	 */
 	@Override
 	protected void onHandleIntent(Intent intent) {
-	
+
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		showNotification();
 		needNtpComparison = false;
@@ -112,32 +111,49 @@ public class UpdateClockService extends IntentService {
 		try {
 			checkSystemTime();
 			if (needNtpComparison) {
-//				Log.e(TAG, "We are about to requestNtpTime() :  needNtpComparison = " + needNtpComparison);
+				// Log.e(TAG,
+				// "We are about to requestNtpTime() :  needNtpComparison = " +
+				// needNtpComparison);
 				synchronized (this) {
 					try {
-//						NB: can't use AsyncTask for this because AsyncTask can only be initiation from the Main UI thread, and here we are inside of IntentService Thread.
-//						TODO! use ScheduledExecutorService to run this more than once...
-//						TODO! take this away from the submit password and just run on boot... need to test that as well
-//						TODO! also need to test all of this on a rooted device, and specifically on CM7.2!!!
-//						TODO! remove the isDeviceRooted function and just make it public! ... this could also be used to test to see if there is 3G vs. 2G and change it automatically
-//						TODO! also would need to receive intent callers to see if the network is very good, or what networks are available prior to switching on... I dont know if this is a broadcast receiver already?
-//						TODO! updateSystemClock will probably throw exceptions because it gets called even if NTPComparison is true... though maybe NOT?! based on the logic below?
-						
-						 Thread requestNtp = new Thread(mRequestNtpTime, "RequestNtpTimeThread");
-						 requestNtp.start();
-						 try{
-							 requestNtp.join();			 
-						 }
-						 catch(Exception exception){
-//							 Log.e(TAG, "failed to join to requestNtp");
-						 }
+						// NB: can't use AsyncTask for this because AsyncTask
+						// can only be initiation from the Main UI thread, and
+						// here we are inside of IntentService Thread.
+						// TODO! use ScheduledExecutorService to run this more
+						// than once...
+						// TODO! take this away from the submit password and
+						// just run on boot... need to test that as well
+						// TODO! also need to test all of this on a rooted
+						// device, and specifically on CM7.2!!!
+						// TODO! remove the isDeviceRooted function and just
+						// make it public! ... this could also be used to test
+						// to see if there is 3G vs. 2G and change it
+						// automatically
+						// TODO! also would need to receive intent callers to
+						// see if the network is very good, or what networks are
+						// available prior to switching on... I dont know if
+						// this is a broadcast receiver already?
+						// TODO! updateSystemClock will probably throw
+						// exceptions because it gets called even if
+						// NTPComparison is true... though maybe NOT?! based on
+						// the logic below?
+
+						Thread requestNtp = new Thread(mRequestNtpTime, "RequestNtpTimeThread");
+						requestNtp.start();
+						try {
+							requestNtp.join();
+						} catch (Exception exception) {
+							// Log.e(TAG, "failed to join to requestNtp");
+						}
 					} catch (Exception e) {
 					}
 				}
-//				Log.e(TAG, "Finished requesting requestNtpTime() :  needNtpComparison = " + needNtpComparison);
+				// Log.e(TAG,
+				// "Finished requesting requestNtpTime() :  needNtpComparison = "
+				// + needNtpComparison);
 				if (clockNeedsUpdate()) {
 					if (isDeviceRooted()) {
-//						Log.e(TAG, "rooted!");
+						// Log.e(TAG, "rooted!");
 						updateSystemClock();
 						if (clockUpdated) {
 
@@ -151,7 +167,7 @@ public class UpdateClockService extends IntentService {
 						}
 
 					} else {
-//						Log.e(TAG, "This device is not rooted.");
+						// Log.e(TAG, "This device is not rooted.");
 						mToastHandler.post(new Runnable() {
 							@Override
 							public void run() {
@@ -163,11 +179,10 @@ public class UpdateClockService extends IntentService {
 
 				}
 			} else {
-//				Log.e(TAG, "System Clock Does not require an update");
+				// Log.e(TAG, "System Clock Does not require an update");
 			}
 		} catch (Exception e) {
-			if (Config.LOGD)
-				Log.e(TAG, "HandleIntent try failed: " + e);
+			Log.e(TAG, "HandleIntent try failed: " + e);
 
 		}
 		mNM.cancel(NOTIFICATION);
@@ -183,25 +198,29 @@ public class UpdateClockService extends IntentService {
 	}
 
 	private void checkSystemTime() {
-//		Log.e(TAG, "CheckSystemTime is called!");
+		// Log.e(TAG, "CheckSystemTime is called!");
 
 		mSystemTime = Calendar.getInstance().getTimeInMillis();
 		long timeDifference = mSystemTime - LAST_TIME_CHECK;
 
-//		Log.e(TAG, "SystemClock.ElapsedRealtTime check was    : " + getDuration(SystemClock.elapsedRealtime()));
-//		Log.e(TAG, "last time check was    : " + getDuration(LAST_TIME_CHECK));
-//		Log.e(TAG, "current system time is: " + getDuration(mSystemTime));
-//		Log.e(TAG, "timeDifference between them is: " + getDuration(timeDifference));
+		// Log.e(TAG, "SystemClock.ElapsedRealtTime check was    : " +
+		// getDuration(SystemClock.elapsedRealtime()));
+		// Log.e(TAG, "last time check was    : " +
+		// getDuration(LAST_TIME_CHECK));
+		// Log.e(TAG, "current system time is: " + getDuration(mSystemTime));
+		// Log.e(TAG, "timeDifference between them is: " +
+		// getDuration(timeDifference));
 
 		// check to see if the time is prior to the last time or if it is >14
 		// days since last check
 		long days = 1000 * 60 * 60 * 24;
-//		Log.e(TAG, "timeDifference: " + (timeDifference) + " days: " + days);
-//		Log.e(TAG, "timeDifference / days: " + (timeDifference / days));
+		// Log.e(TAG, "timeDifference: " + (timeDifference) + " days: " + days);
+		// Log.e(TAG, "timeDifference / days: " + (timeDifference / days));
 		if (((timeDifference / days) > 14) || timeDifference < 0) {
 			// we need to update the system time!
 			needNtpComparison = true;
-//			Log.e(TAG, "We need an NtpComparison!  needNtpComparison = " + needNtpComparison);
+			// Log.e(TAG, "We need an NtpComparison!  needNtpComparison = " +
+			// needNtpComparison);
 		}
 
 	}
@@ -246,18 +265,21 @@ public class UpdateClockService extends IntentService {
 	}
 
 	private Runnable mRequestNtpTime = new Runnable() {
-//		int i = 1;
-		
+		// int i = 1;
+
 		public void run() {
 			try {
-//				Log.e(TAG, "RequestNtpTime is called and is being tried!");
+				// Log.e(TAG, "RequestNtpTime is called and is being tried!");
 
 				DatagramSocket socket = new DatagramSocket();
 				socket.setSoTimeout(timeout);
-//				Log.e(TAG, "RequestNtpTime is called and is about to test the internet connection...");
+				// Log.e(TAG,
+				// "RequestNtpTime is called and is about to test the internet connection...");
 				InetAddress address = InetAddress.getByName(host);
 
-//				Log.e(TAG, "RequestNtpTime has internet connection... inetaddress of: " + address);
+				// Log.e(TAG,
+				// "RequestNtpTime has internet connection... inetaddress of: "
+				// + address);
 
 				byte[] buffer = new byte[NTP_PACKET_SIZE];
 				DatagramPacket request = new DatagramPacket(buffer, buffer.length, address, NTP_PORT);
@@ -285,7 +307,8 @@ public class UpdateClockService extends IntentService {
 				long originateTime = readTimeStamp(buffer, ORIGINATE_TIME_OFFSET);
 				long receiveTime = readTimeStamp(buffer, RECEIVE_TIME_OFFSET);
 				long transmitTime = readTimeStamp(buffer, TRANSMIT_TIME_OFFSET);
-//				long roundTripTime = responseTicks - requestTicks - (transmitTime - receiveTime);
+				// long roundTripTime = responseTicks - requestTicks -
+				// (transmitTime - receiveTime);
 				// receiveTime = originateTime + transit + skew
 				// responseTime = transmitTime + transit - skew
 				// clockOffset = ((receiveTime - originateTime) + (transmitTime
@@ -309,45 +332,50 @@ public class UpdateClockService extends IntentService {
 				// (response rather than request time)
 				mNtpTime = responseTime + clockOffset;
 				mNtpTimeReference = responseTicks;
-//				mRoundTripTime = roundTripTime;
+				// mRoundTripTime = roundTripTime;
 
 				needNtpComparison = false;
-//				i++;
-				
+				// i++;
+
 			} catch (UnknownHostException e) {
 				needNtpComparison = true;
-				Log.d(TAG, "RequestNtpTime failed... caught UnknownHostException: " + e);
+				if(Constants.DEBUG) Log.d(TAG, "RequestNtpTime failed... caught UnknownHostException: " + e);
 				e.printStackTrace();
 			} catch (SocketException e) {
 				needNtpComparison = true;
-				Log.d(TAG, "RequestNtpTime failed... caught SocketException: " + e);
+				if(Constants.DEBUG)Log.d(TAG, "RequestNtpTime failed... caught SocketException: " + e);
 				e.printStackTrace();
 			} catch (IOException e) {
 				needNtpComparison = true;
-				Log.d(TAG, "RequestNtpTime failed... caught IOException: " + e);
+				if(Constants.DEBUG) Log.d(TAG, "RequestNtpTime failed... caught IOException: " + e);
 				e.printStackTrace();
 			}
 
-			finally{
-//				Log.d(TAG, "RequestNtpTime failed... beyond catch now. needNtpComparison: " + needNtpComparison + " i: " + i);
-//				if (needNtpComparison && i <= 5) {
-//					 postDelayed(this, i * 10 * 1000);
-//					 this.join();
-//					 Log.d(TAG, "RequestNtpTime failed... reposting 5 times every 10s, current time: " + i );
-//					 }
-//				Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			finally {
+				// Log.d(TAG,
+				// "RequestNtpTime failed... beyond catch now. needNtpComparison: "
+				// + needNtpComparison + " i: " + i);
+				// if (needNtpComparison && i <= 5) {
+				// postDelayed(this, i * 10 * 1000);
+				// this.join();
+				// Log.d(TAG,
+				// "RequestNtpTime failed... reposting 5 times every 10s, current time: "
+				// + i );
+				// }
+				// Thread.setDefaultUncaughtExceptionHandler(new
+				// UncaughtExceptionHandler() {
 				//
-//								@Override
-//								public void uncaughtException(Thread thread, Throwable ex) {
-//									//  Auto-generated method stub
-//									System.out.println("Caught " + ex);
-//									
-//								}
-//							});
+				// @Override
+				// public void uncaughtException(Thread thread, Throwable ex) {
+				// // Auto-generated method stub
+				// System.out.println("Caught " + ex);
+				//
+				// }
+				// });
 			}
-			
+
 		}
-		
+
 	};
 
 	// deleting old catch:
@@ -359,7 +387,7 @@ public class UpdateClockService extends IntentService {
 	@Override
 	public void onDestroy() {
 		// Auto-generated method stub
-//		Log.e(TAG, "onDestroy has been called!");
+		// Log.e(TAG, "onDestroy has been called!");
 		super.onDestroy();
 	}
 
@@ -368,19 +396,22 @@ public class UpdateClockService extends IntentService {
 	 * is greater than 200 seconds.
 	 */
 	private boolean clockNeedsUpdate() {
-//		Log.e(TAG, "clockNeedsUpdate Called... Asking if Clock Needs Update?");
+		// Log.e(TAG,
+		// "clockNeedsUpdate Called... Asking if Clock Needs Update?");
 		long now = mNtpTime + SystemClock.elapsedRealtime() - mNtpTimeReference;
 		mSystemTime = Calendar.getInstance().getTimeInMillis();
-//		long sys2 = System.currentTimeMillis();
+		// long sys2 = System.currentTimeMillis();
 
 		long delta = Math.abs(now - mSystemTime);
 
 		if (delta > 10) {
-//			Log.e(TAG, "clockNeedsUpdate is true b/c delta is: " + delta);
+			// Log.e(TAG, "clockNeedsUpdate is true b/c delta is: " + delta);
 			return true;
 
 		} else {
-//			Log.e(TAG, "Delta is less than 60000 already... no need to reset time and is: " + delta);
+			// Log.e(TAG,
+			// "Delta is less than 60000 already... no need to reset time and is: "
+			// + delta);
 			return false;
 		}
 	}
@@ -392,10 +423,11 @@ public class UpdateClockService extends IntentService {
 		long newSys = System.currentTimeMillis();
 		long newDelta = Math.abs(mNtpTime - newSys);
 		if (newDelta == 0) {
-//			Log.e(TAG, "System clock has been updated to NTP time");
+			// Log.e(TAG, "System clock has been updated to NTP time");
 			clockUpdated = true;
 		} else {
-//			Log.e(TAG, "Something went wrong! The Ntp-System Delta is: " + newDelta);
+			// Log.e(TAG, "Something went wrong! The Ntp-System Delta is: " +
+			// newDelta);
 			clockUpdated = false;
 		}
 
@@ -480,7 +512,7 @@ public class UpdateClockService extends IntentService {
 	}
 
 	public boolean checkRootMethod1() {
-//		String buildTags = android.os.Build.TAGS;
+		// String buildTags = android.os.Build.TAGS;
 
 		// if (buildTags != null && buildTags.contains("test-keys")) {
 		// return true;
@@ -538,19 +570,20 @@ public class UpdateClockService extends IntentService {
 				// e.printStackTrace();
 			}
 
-//			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
+			// BufferedWriter out = new BufferedWriter(new
+			// OutputStreamWriter(localProcess.getOutputStream()));
 			BufferedReader in = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
 
 			try {
 				while ((line = in.readLine()) != null) {
-					Log.d(LOG_TAG, "--> Line received: " + line);
+					if(Constants.DEBUG) Log.d(LOG_TAG, "--> Line received: " + line);
 					fullResponse.add(line);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			Log.d(LOG_TAG, "--> Full response was: " + fullResponse);
+			if(Constants.DEBUG) Log.d(LOG_TAG, "--> Full response was: " + fullResponse);
 
 			return fullResponse;
 		}
@@ -559,31 +592,31 @@ public class UpdateClockService extends IntentService {
 
 }
 
-//Logic for this function:
-	// if clock has not been checked in 2 weeks, then it may require an
-	// update but we don't yet know
-	// if/while NTP has internet access,
-	// then let us check it against the Device Time
-	// if there is a difference between the NTP and the SystemTime, then we
-	// should try to fix it
-	// if device is rooted, let's go ahead and fix it
-	// else lets tell the user to fix it.
-	// else, let's cycle through again until we get internet access
-	//
+// Logic for this function:
+// if clock has not been checked in 2 weeks, then it may require an
+// update but we don't yet know
+// if/while NTP has internet access,
+// then let us check it against the Device Time
+// if there is a difference between the NTP and the SystemTime, then we
+// should try to fix it
+// if device is rooted, let's go ahead and fix it
+// else lets tell the user to fix it.
+// else, let's cycle through again until we get internet access
+//
 
 // waiting function...
 
-//long endTime = System.currentTimeMillis() + 30 * 1000;
-//while (System.currentTimeMillis() < endTime) {
-//	synchronized (this) {
-//		try {
-//			wait(endTime - System.currentTimeMillis());
-//		} catch (Exception e) {
-//		}
-//	}
-//}
+// long endTime = System.currentTimeMillis() + 30 * 1000;
+// while (System.currentTimeMillis() < endTime) {
+// synchronized (this) {
+// try {
+// wait(endTime - System.currentTimeMillis());
+// } catch (Exception e) {
+// }
+// }
+// }
 //
-//Log.e(TAG, "RequestNtpTime has finished waiting...");
+// Log.e(TAG, "RequestNtpTime has finished waiting...");
 
 // old time zone code...
 /*

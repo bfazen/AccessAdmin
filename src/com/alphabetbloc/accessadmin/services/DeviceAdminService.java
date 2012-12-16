@@ -109,7 +109,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0) != 0) {
 			// we have a new intent from SMS
 			smsIntent = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
-			Log.d(TAG, "DeviceAdminService is Called with smsIntentExtra=" + smsIntent);
+			if(Constants.DEBUG) Log.d(TAG, "DeviceAdminService is Called with smsIntentExtra=" + smsIntent);
 			smsLine = intent.getStringExtra(Constants.SMS_LINE);
 			smsMessage = intent.getStringExtra(Constants.SMS_MESSAGE);
 			if (smsLine == null)
@@ -120,7 +120,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			// if new intent is a priority intent, set up alarms in case process
 			// is killed...
 			int standingIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
-			Log.v(TAG, "StandingIntent=" + standingIntent + " NewSMSIntent=" + smsIntent);
+			if(Constants.DEBUG) Log.v(TAG, "StandingIntent=" + standingIntent + " NewSMSIntent=" + smsIntent);
 
 			if (smsIntent >= standingIntent) {
 				// kill any old alarms so only 1 active device admin process
@@ -143,7 +143,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			// (after boot or kill, intent extras would be lost)
 			// do not reset alarms
 			smsIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
-			Log.d(TAG, "DeviceAdminService is Called with smsIntentSaved=" + smsIntent);
+			if(Constants.DEBUG) Log.d(TAG, "DeviceAdminService is Called with smsIntentSaved=" + smsIntent);
 			smsLine = mPrefs.getString(Constants.SAVED_SMS_LINE, "");
 			smsMessage = mPrefs.getString(Constants.SAVED_SMS_MESSAGE, "");
 		}
@@ -254,7 +254,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * 
 	 */
 	public void lockDevice() {
-		Log.d(TAG, "locking the device");
+		if(Constants.DEBUG) Log.d(TAG, "locking the device");
 		mDPM.lockNow();
 
 		// confirm that this worked before canceling the alarm
@@ -275,10 +275,10 @@ public class DeviceAdminService extends WakefulIntentService {
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		mPolicy.isActivePasswordSufficient();
 		if (myKM.inKeyguardRestrictedInputMode() && mPolicy.isActivePasswordSufficient()) {
-			Log.d(TAG, "screen is locked");
+			if(Constants.DEBUG) Log.d(TAG, "screen is locked");
 			return true;
 		} else if (!pm.isScreenOn() && mPolicy.isActivePasswordSufficient()) {
-			Log.d(TAG, "screen is off and password protected.");
+			if(Constants.DEBUG)Log.d(TAG, "screen is off and password protected.");
 			return true;
 		} else {
 			return false;
@@ -312,7 +312,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	public void wipeOdkData() {
 		// we don't check this one, because we dont manage the process
 		// instead we wait for a broadcast to tell us to send a message
-		Log.e(TAG, "wiping client data from device");
+		if(Constants.DEBUG) Log.e(TAG, "wiping client data from device");
 		sendSingleSMS("Wiping Client Data");
 
 		Intent i = new Intent(Constants.WIPE_DATA_SERVICE);
@@ -426,7 +426,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (!isAdminAlarmActive())
 			sendSingleSMS("All device admin alarms have been cancelled.");
 		else
-			Log.d(TAG, "Something went wrong... alarms are not canceling");
+			if(Constants.DEBUG) Log.d(TAG, "Something went wrong... alarms are not canceling");
 	}
 
 	/**
@@ -448,7 +448,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * 
 	 */
 	public void sendGPSCoordinates() {
-		Log.d(TAG, "sending GPS");
+		if(Constants.DEBUG) Log.d(TAG, "sending GPS");
 		// taken from RMaps
 		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		final Location loc1 = lm.getLastKnownLocation("gps");
@@ -558,7 +558,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		String lastSentAdminMessage = mPrefs.getString(String.valueOf(smstype), "");
 		if (message.equals(lastSentAdminMessage)) {
 			cancelAdminAlarms();
-			Log.d(TAG, "Message has already been sent. Alarm Cancelled.");
+			if(Constants.DEBUG) Log.d(TAG, "Message has already been sent. Alarm Cancelled.");
 		} else {
 			ComponentName comp = new ComponentName(mContext.getPackageName(), SendSMSService.class.getName());
 			Intent i = new Intent();

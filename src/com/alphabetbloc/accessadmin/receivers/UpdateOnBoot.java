@@ -96,7 +96,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		String registeredSimSerial = settings.getString(Constants.SIM_SERIAL, null);
 		String registeredSimLine = settings.getString(Constants.SIM_LINE, null);
 		if (registeredSimLine == null || registeredSimSerial == null) {
-			Log.e(TAG, "Registered SIM has been lost! Requesting Initial Security Setup! \n\t REGISTERED SIM LINE: " + registeredSimLine + " \n\t REGISTERED SIM SERIAL: " + registeredSimSerial);
+			if(Constants.DEBUG) Log.e(TAG, "Registered SIM has been lost! Requesting Initial Security Setup! \n\t REGISTERED SIM LINE: " + registeredSimLine + " \n\t REGISTERED SIM SERIAL: " + registeredSimSerial);
 			settings.edit().putBoolean(Constants.NEW_INSTALL, true).commit();
 			// Setup Initial Security
 			Intent i = new Intent(mContext, InitialSetupActivity.class);
@@ -110,11 +110,11 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		String currentSimLine = tm.getLine1Number();
 
 		if (currentSimLine == null || currentSimSerial == null) {
-			Log.w(TAG, "SIM has been taken out of phone or is not registering with device \n\t CURRENT SIM LINE: " + currentSimLine + " \n\t CURRENT SIM SERIAL: " + currentSimSerial);
+			if(Constants.DEBUG) Log.w(TAG, "SIM has been taken out of phone or is not registering with device \n\t CURRENT SIM LINE: " + currentSimLine + " \n\t CURRENT SIM SERIAL: " + currentSimSerial);
 			simChanged = true;
 		}
 		if (!currentSimLine.equals(registeredSimLine) || !currentSimSerial.equals(registeredSimSerial)) {
-			Log.w(TAG, "SIM has been changed from the initial registered SIM \n\t CURRENT SIM LINE: " + currentSimLine + " DOES NOT MATCH.  \n\t CURRENT SIM SERIAL: " + currentSimSerial + " DOES NOT MATCH.");
+			if(Constants.DEBUG)Log.w(TAG, "SIM has been changed from the initial registered SIM \n\t CURRENT SIM LINE: " + currentSimLine + " DOES NOT MATCH.  \n\t CURRENT SIM SERIAL: " + currentSimSerial + " DOES NOT MATCH.");
 			simChanged = true;
 		}
 		return simChanged;

@@ -96,7 +96,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	private void createSmsStrings() {
 		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String smsAdminCode = Constants.SMS_CODE_ADMIN_PREFIX + prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
-		Log.e("CODE", "smsCode=" + smsAdminCode);
+		if(Constants.DEBUG) Log.e("CODE", "smsCode=" + smsAdminCode);
 		// REQUIRE smsAdminCode:
 		lockDevice = smsAdminCode + Constants.SMS_CODE_LOCK;
 		sendGPS = smsAdminCode + Constants.SMS_CODE_GPS;

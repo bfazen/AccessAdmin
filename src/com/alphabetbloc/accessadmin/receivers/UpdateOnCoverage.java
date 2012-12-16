@@ -3,6 +3,8 @@
  */
 package com.alphabetbloc.accessadmin.receivers;
 
+import com.alphabetbloc.accessadmin.data.Constants;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,16 +42,16 @@ public class UpdateOnCoverage extends BroadcastReceiver {
 		   
 		
 //        if( "android.intent.action.CHANGE_NETWORK_STATE".equals(intent.getAction())) {
-//        	Log.e(TAG, "Double-check: Received intent name: " + intent.toString()); 
+//        	if(Constants.DEBUG) Log.e(TAG, "Double-check: Received intent name: " + intent.toString()); 
 // 
 //        	 
 //         ComponentName comp = new ComponentName(context.getPackageName(), UpdateClockService.class.getName());
 //         ComponentName service = context.startService(new Intent().setComponent(comp));
 //         if (null == service){
-//          Log.e(TAG, "Could not start service: " + comp.toString());
+//          if(Constants.DEBUG) Log.e(TAG, "Could not start service: " + comp.toString());
 //         }
 //        } else {
-//         Log.e(TAG, "Received unexpected intent: " + intent.toString());   
+//         if(Constants.DEBUG) Log.e(TAG, "Received unexpected intent: " + intent.toString());   
 //        }
         
 	}

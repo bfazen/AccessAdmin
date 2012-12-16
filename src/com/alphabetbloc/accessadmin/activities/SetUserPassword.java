@@ -1,10 +1,12 @@
 package com.alphabetbloc.accessadmin.activities;
 
 import android.app.admin.DevicePolicyManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 
 import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.Policy;
 
 public class SetUserPassword extends DeviceHoldActivity {
@@ -60,6 +63,9 @@ public class SetUserPassword extends DeviceHoldActivity {
 
 	// Initialize policy viewing screen.
 	private void refreshView() {
+		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+		if(Constants.DEBUG) Log.e("ADMIN CODE", "ADMIN CODE=" + prefs.getString(Constants.UNIQUE_DEVICE_ID, ""));
+		
 		Policy policy = new Policy(this);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.setup_password);

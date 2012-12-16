@@ -20,6 +20,8 @@ import android.app.AlarmManager;
 
 
 public class Constants {
+	//DEBUGGING
+	public static boolean DEBUG = true;
 	
 	//RECEIVERS
 	public static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
