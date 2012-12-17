@@ -3,8 +3,6 @@
  */
 package com.alphabetbloc.accessadmin.receivers;
 
-import com.alphabetbloc.accessadmin.data.Constants;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

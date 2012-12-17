@@ -343,7 +343,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	}
 
 	public void resetPassword() {
-		// TODO!: allow admin to edit this default value
+		// TODO Feature: allow admin to edit this default value in A Preference
 		// final SharedPreferences prefs = new EncryptedPreferences(this,
 		// this.getSharedPreferences(Constants.ENCRYPTED_PREFS,
 		// Context.MODE_PRIVATE));

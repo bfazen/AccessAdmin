@@ -57,7 +57,7 @@ public class UpdateOnBoot extends BroadcastReceiver {
 
 				// 1. Check on simChange
 				if (isSimChanged()) {
-					// TODO! This should be made into a SharedPreference so does
+					// TODO Feature: This should be made into a SharedPreference so does
 					// not need to be active
 					int simChangeCount = logNewSimChange();
 

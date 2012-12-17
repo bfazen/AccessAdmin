@@ -116,24 +116,25 @@ public class UpdateClockService extends IntentService {
 				// needNtpComparison);
 				synchronized (this) {
 					try {
+						// TODO! FIX THE CLOCK SERVICE!
 						// NB: can't use AsyncTask for this because AsyncTask
 						// can only be initiation from the Main UI thread, and
 						// here we are inside of IntentService Thread.
-						// TODO! use ScheduledExecutorService to run this more
+						// TODO use ScheduledExecutorService to run this more
 						// than once...
-						// TODO! take this away from the submit password and
+						// TODO take this away from the submit password and
 						// just run on boot... need to test that as well
-						// TODO! also need to test all of this on a rooted
+						// TODO also need to test all of this on a rooted
 						// device, and specifically on CM7.2!!!
-						// TODO! remove the isDeviceRooted function and just
+						// TODO remove the isDeviceRooted function and just
 						// make it public! ... this could also be used to test
 						// to see if there is 3G vs. 2G and change it
 						// automatically
-						// TODO! also would need to receive intent callers to
+						// TODO also would need to receive intent callers to
 						// see if the network is very good, or what networks are
 						// available prior to switching on... I dont know if
 						// this is a broadcast receiver already?
-						// TODO! updateSystemClock will probably throw
+						// TODO updateSystemClock will probably throw
 						// exceptions because it gets called even if
 						// NTPComparison is true... though maybe NOT?! based on
 						// the logic below?
