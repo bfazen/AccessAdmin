@@ -34,25 +34,25 @@ import android.view.WindowManager;
 import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.data.Policy;
-import com.alphabetbloc.accessadmin.receivers.AirplaneReceiver;
+import com.alphabetbloc.accessadmin.receivers.AirplaneOnReceiver;
 
 public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	protected static final int DEVICE_ADMIN = 1;
 	private static final String TAG = "DeviceHoldActivity";
 	private boolean mAirplaneMode = false;
-	private AirplaneReceiver mAirplaneReceiver;
+	private AirplaneOnReceiver mAirplaneOnReceiver;
 
 	// slightly added security, prevent exiting activity via calling into device
 	protected void startAirplaneMode() {
 		mAirplaneMode = true;
 	}
 
-	private void registerAirplaneReceiver() {
-		mAirplaneReceiver = new AirplaneReceiver();
+	private void registerAirplaneOnReceiver() {
+		mAirplaneOnReceiver = new AirplaneOnReceiver();
 		IntentFilter airplaneFilter = new IntentFilter(Constants.AIRPLANE_MODE);
-		registerReceiver(mAirplaneReceiver, airplaneFilter);
-		Log.v(TAG, "registering airplane receiver");
+		registerReceiver(mAirplaneOnReceiver, airplaneFilter);
+		if(Constants.DEBUG) Log.v(TAG, "registering airplane receiver");
 		boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
 		if (!enabled) {
 			Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 1);
@@ -66,8 +66,8 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 		if (mAirplaneMode) {
 			mAirplaneMode = false;
 
-			unregisterReceiver(mAirplaneReceiver);
-			Log.v(TAG, "unregistering airplane receiver");
+			unregisterReceiver(mAirplaneOnReceiver);
+			if(Constants.DEBUG) Log.v(TAG, "unregistering airplane receiver");
 			boolean enabled = Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) == 1;
 			if (enabled) {
 				Settings.System.putInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0);
@@ -80,7 +80,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 	}
 
 	private void unregisterAirplaneReceiver() {
-		unregisterReceiver(mAirplaneReceiver);
+		unregisterReceiver(mAirplaneOnReceiver);
 		Log.v(TAG, "unregistering airplane receiver");
 	}
 
@@ -95,7 +95,7 @@ public class DeviceHoldActivity extends Activity implements OnTouchListener {
 	protected void onResume() {
 		super.onResume();
 		if (mAirplaneMode)
-			registerAirplaneReceiver();
+			registerAirplaneOnReceiver();
 	}
 
 	// ////// CONSUMES ALL UI EVENTS ////////

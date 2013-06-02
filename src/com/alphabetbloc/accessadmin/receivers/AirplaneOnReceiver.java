@@ -24,15 +24,15 @@ import com.alphabetbloc.accessadmin.data.Policy;
  * @author Louis Fazen (louis.fazen@gmail.com)
  */
 
-public class AirplaneReceiver extends BroadcastReceiver {
+public class AirplaneOnReceiver extends BroadcastReceiver {
 
-	public AirplaneReceiver() {
+	public AirplaneOnReceiver() {
 		// Auto-generated constructor stub
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.v("AirplaneReceiver", "Airplane Receiver is receiving!");
+		Log.v("AirplaneOnReceiver", "Airplane Receiver is receiving!");
 		Policy policy = new Policy(context);
 
 		// if device is not setup:

@@ -37,6 +37,12 @@ public class Policy {
 	public static final String KEY_PASSWORD_QUALITY = "PW_QUALITY";
 	public static final String KEY_MAX_FAILED_PW = "PW_MAX_FAILED";
 	public static final String KEY_MAX_TIME_TO_LOCK = "PW_MAX_TIME_LOCK";
+	
+	public static final int DEFAULT_PASSWORD_LENGTH = 5;
+	public static final int DEFAULT_PASSWORD_QUALITY = 2;
+	public static final int DEFAULT_MAX_FAILED_PW = 50;  
+	public static final long DEFAULT_MAX_TIME_TO_LOCK = 300000L; // 5 min
+	
 	public static final String PROVIDER_ID = "PROVIDER_ID";
 
 	// Password quality choices must match arrays.xml
@@ -57,10 +63,10 @@ public class Policy {
 		mContext = context;
 		mPrefs = mContext.getSharedPreferences(SHARED_PREF, Context.MODE_PRIVATE);
 
-		mPasswordQuality = mPrefs.getInt(KEY_PASSWORD_QUALITY, 3);
-		mPasswordLength = mPrefs.getInt(KEY_PASSWORD_LENGTH, 5);
-		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, 50);
-		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, 600);
+		mPasswordQuality = mPrefs.getInt(KEY_PASSWORD_QUALITY, DEFAULT_PASSWORD_QUALITY);
+		mPasswordLength = mPrefs.getInt(KEY_PASSWORD_LENGTH, DEFAULT_PASSWORD_LENGTH);
+		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, DEFAULT_MAX_FAILED_PW);
+		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, DEFAULT_MAX_TIME_TO_LOCK);
 
 		mDPM = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mPolicyAdmin = new ComponentName(context, DeviceAdmin.class);
@@ -82,7 +88,7 @@ public class Policy {
 	 */
 	public void setPasswordQuality(int quality) {
 		mPrefs.edit().putInt(KEY_PASSWORD_QUALITY, quality).commit();
-		mPasswordQuality = mPrefs.getInt(KEY_PASSWORD_QUALITY, 3);
+		mPasswordQuality = mPrefs.getInt(KEY_PASSWORD_QUALITY, DEFAULT_PASSWORD_QUALITY);
 		mDPM.setPasswordQuality(mPolicyAdmin, PASSWORD_QUALITY_VALUES[quality]);
 	}
 
@@ -91,7 +97,7 @@ public class Policy {
 	 */
 	public void setPasswordLength(int length) {
 		mPrefs.edit().putInt(KEY_PASSWORD_LENGTH, length).commit();
-		mPasswordLength = mPrefs.getInt(KEY_PASSWORD_LENGTH, 5);
+		mPasswordLength = mPrefs.getInt(KEY_PASSWORD_LENGTH, DEFAULT_PASSWORD_LENGTH);
 		mDPM.setPasswordMinimumLength(mPolicyAdmin, length);
 	}
 
@@ -100,7 +106,7 @@ public class Policy {
 	 */
 	public void setMaxFailedPw(int attempts) {
 		mPrefs.edit().putInt(KEY_MAX_FAILED_PW, attempts).commit();
-		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, 50);
+		mMaxPwdToWipe = mPrefs.getInt(KEY_MAX_FAILED_PW, DEFAULT_MAX_FAILED_PW);
 		mDPM.setMaximumFailedPasswordsForWipe(mPolicyAdmin, attempts);
 	}
 
@@ -110,7 +116,7 @@ public class Policy {
 	 */
 	public void setMaxTimeToLock(long time) {
 		mPrefs.edit().putLong(KEY_MAX_TIME_TO_LOCK, time).commit();
-		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, 600);
+		mMaxTimeToLock = mPrefs.getLong(KEY_MAX_TIME_TO_LOCK, DEFAULT_MAX_TIME_TO_LOCK);
 		mDPM.setMaximumTimeToLock(mPolicyAdmin, time);
 //		Log.e(TAG, "max time to screen lock set to:" + time);
 	}

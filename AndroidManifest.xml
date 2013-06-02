@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="14" />
+        android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -132,7 +133,7 @@
         </receiver>
         -->
         <receiver
-            android:name="com.alphabetbloc.accessadmin.receivers.AirplaneReceiver"
+            android:name="com.alphabetbloc.accessadmin.receivers.AirplaneOnReceiver"
             android:enabled="true"
             android:label="AirplaneReceiver" >
         </receiver>
@@ -159,15 +160,6 @@
                 <action android:name="com.alphabetbloc.android.settings.WIPE_DATA_SERVICE_COMPLETE" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receivers.UpdateOnBoot"
-            android:enabled="true"
-            android:exported="true"
-            android:label="UpdateOnBoot" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
         <receiver android:name="com.commonsware.cwac.wakeful.WakelockWorkReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -176,6 +168,15 @@
             <meta-data
                 android:name="com.commonsware.cwac.wakeful"
                 android:resource="@xml/wakeful" />
+        </receiver>
+        <receiver
+            android:name=".receivers.UpdateOnBoot"
+            android:enabled="true"
+            android:exported="true"
+            android:label="UpdateOnBoot" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.UpdateOnCoverage"
