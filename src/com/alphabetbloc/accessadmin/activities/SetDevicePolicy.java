@@ -22,8 +22,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -182,6 +184,8 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 			if (!isChecked && mPolicy.isAdminActive()) {
 				mPolicy.removeActiveAdmin();
 				enableButtons(false);
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+				prefs.edit().putBoolean(Constants.NEW_INSTALL, true).commit();
 			} else if (isChecked && !mPolicy.isAdminActive()) {
 				activateDeviceAdmin();
 				enableButtons(true);

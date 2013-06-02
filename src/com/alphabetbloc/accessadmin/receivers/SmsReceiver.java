@@ -26,7 +26,7 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class SmsReceiver extends BroadcastReceiver {
 
-//	private static final String TAG = "SmsReceiver";
+	// private static final String TAG = "SmsReceiver";
 
 	private static String Imei;
 	private static String lockDevice;
@@ -62,22 +62,24 @@ public class SmsReceiver extends BroadcastReceiver {
 				for (int i = 0; i < pdus.length; i++) {
 					smsMessage[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 				}
-				
+
 				if (smsMessage.length > -1) {
 					String message = smsMessage[0].getMessageBody();
-					String substring = message.substring(0, Constants.SMS_CODE_ADMIN_PREFIX.length());
-					if(substring.equalsIgnoreCase(Constants.SMS_CODE_ADMIN_PREFIX))
-						readSMS(message);
+					String prefix = Constants.SMS_CODE_ADMIN_PREFIX;
+					if (message.length() > prefix.length()) {
+						String substring = message.substring(0, prefix.length());
+						if (substring.equalsIgnoreCase(Constants.SMS_CODE_ADMIN_PREFIX))
+							readSMS(message);
+					}
 				}
 			}
-			
+
 		} else if (intent.getAction().equals(Constants.WIPE_DATA_COMPLETE)) {
 			Intent i = new Intent(mContext, DeviceAdminService.class);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.FACTORY_RESET);
 			WakefulIntentService.sendWakefulWork(mContext, i);
 		}
 	}
-
 
 	private void readSMS(String sms) {
 		if (Imei == null)
@@ -96,7 +98,8 @@ public class SmsReceiver extends BroadcastReceiver {
 	private void createSmsStrings() {
 		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String smsAdminCode = Constants.SMS_CODE_ADMIN_PREFIX + prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
-		if(Constants.DEBUG) Log.e("CODE", "smsCode=" + smsAdminCode);
+		if (Constants.DEBUG)
+			Log.e("CODE", "smsCode=" + smsAdminCode);
 		// REQUIRE smsAdminCode:
 		lockDevice = smsAdminCode + Constants.SMS_CODE_LOCK;
 		sendGPS = smsAdminCode + Constants.SMS_CODE_GPS;
@@ -108,7 +111,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		resetPwdToDefault = smsAdminCode + Constants.SMS_CODE_RESET_PWD_DEFAULT;
 		resetPwdToSmsPwd = smsAdminCode + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
 		editAccessMrsPreference = smsAdminCode + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
-		
+
 		// DO NOT REQUIRE smsAdminCode:
 		lockSecretPwd = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_PWD_SECRET;
 		resetAdminId = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_ADMIN_ID;

@@ -24,6 +24,8 @@ import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.StringGenerator;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
+import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class ViewSmsSettings extends SherlockActivity {
 
@@ -308,6 +310,11 @@ public class ViewSmsSettings extends SherlockActivity {
 				prefs.edit().putString(Constants.UNIQUE_DEVICE_ID, rAlphaNum).commit();
 				refreshView();
 				showResultDialog(Constants.UNIQUE_DEVICE_ID);
+				
+				Intent i = new Intent(mContext, DeviceAdminService.class);
+				i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.SEND_SMS);
+					i.putExtra(Constants.SMS_MESSAGE, "AdminCode=" + rAlphaNum);
+				WakefulIntentService.sendWakefulWork(mContext, i);
 			}
 		});
 

@@ -64,8 +64,9 @@ public class SetUserPassword extends DeviceHoldActivity {
 	// Initialize policy viewing screen.
 	private void refreshView() {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
-		if(Constants.DEBUG) Log.e("ADMIN CODE", "ADMIN CODE=" + prefs.getString(Constants.UNIQUE_DEVICE_ID, ""));
-		
+		if (Constants.DEBUG)
+			Log.e("ADMIN CODE", "ADMIN CODE=" + prefs.getString(Constants.UNIQUE_DEVICE_ID, ""));
+
 		Policy policy = new Policy(this);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.setup_password);
@@ -73,51 +74,56 @@ public class SetUserPassword extends DeviceHoldActivity {
 		ImageView exclaim = (ImageView) findViewById(R.id.exclamation);
 		exclaim.setVisibility(View.VISIBLE);
 
-		// Minimum Password Length
-		TextView pwdLength = (TextView) findViewById(R.id.policy_password_length);
-		pwdLength.setText(String.valueOf(policy.getPasswordLength()));
+		if (policy.isAdminActive()) {
+			// Minimum Password Length
+			TextView pwdLength = (TextView) findViewById(R.id.policy_password_length);
+			pwdLength.setText(String.valueOf(policy.getPasswordLength()));
 
-		// Password Type/Quality
-		int pwdType = policy.getPasswordQuality();
-		TextView pwdTypeText = (TextView) findViewById(R.id.policy_password_quality);
-		pwdTypeText.setText(getResources().getStringArray(R.array.password_types)[pwdType]);
+			// Password Type/Quality
+			int pwdType = policy.getPasswordQuality();
+			TextView pwdTypeText = (TextView) findViewById(R.id.policy_password_quality);
+			pwdTypeText.setText(getResources().getStringArray(R.array.password_types)[pwdType]);
 
-		// Password Case
-		TextView pwdLock = (TextView) findViewById(R.id.policy_password_lockout);
-		pwdLock.setText(String.valueOf(policy.getMaxFailedPwd()));
+			// Password Case
+			TextView pwdLock = (TextView) findViewById(R.id.policy_password_lockout);
+			pwdLock.setText(String.valueOf(policy.getMaxFailedPwd()));
 
-		mPwdBtn = (Button) findViewById(R.id.setup_action_btn);
-		mPwdBtn.setText(R.string.change_password);
-		mPwdBtn.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				Intent intent = new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
-				startActivityForResult(intent, SET_PASSWORD);
-			}
-		});
-
-		mExitBtn = (Button) findViewById(R.id.exit);
-
-		if (!policy.isActivePasswordSufficient() || mForceResetPwd) {
-			// Launches password set-up screen in Settings.
-			setupMessage.setText(R.string.password_not_allowed);
-			exclaim.setVisibility(View.VISIBLE);
-			mExitBtn.setVisibility(View.GONE);
-			Intent data = new Intent();
-			setResult(RESULT_CANCELED, data);
-		} else {
-			// Can exit
-			setupMessage.setText(R.string.password_allowed);
-			exclaim.setVisibility(View.GONE);
-			mExitBtn.setText(R.string.exit);
-			mExitBtn.setVisibility(View.VISIBLE);
-			Intent data = new Intent();
-			setResult(RESULT_OK, data);
-			mExitBtn.setOnClickListener(new View.OnClickListener() {
+			mPwdBtn = (Button) findViewById(R.id.setup_action_btn);
+			mPwdBtn.setText(R.string.change_password);
+			mPwdBtn.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
-					finish();
+					Intent intent = new Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD);
+					startActivityForResult(intent, SET_PASSWORD);
 				}
 			});
-			stopAirplaneMode();
+
+			mExitBtn = (Button) findViewById(R.id.exit);
+
+			if (!policy.isActivePasswordSufficient() || mForceResetPwd) {
+				// Launches password set-up screen in Settings.
+				setupMessage.setText(R.string.password_not_allowed);
+				exclaim.setVisibility(View.VISIBLE);
+				mExitBtn.setVisibility(View.GONE);
+				Intent data = new Intent();
+				setResult(RESULT_CANCELED, data);
+			} else {
+				// Can exit
+				setupMessage.setText(R.string.password_allowed);
+				exclaim.setVisibility(View.GONE);
+				mExitBtn.setText(R.string.exit);
+				mExitBtn.setVisibility(View.VISIBLE);
+				Intent data = new Intent();
+				setResult(RESULT_OK, data);
+				mExitBtn.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View view) {
+						finish();
+					}
+				});
+				stopAirplaneMode();
+			}
+		} else {
+			// we are exiting after disabling the device admin
+			finish();
 		}
 	}
 
