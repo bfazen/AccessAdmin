@@ -39,7 +39,7 @@ import com.alphabetbloc.accessadmin.receivers.AirplaneOnReceiver;
 public class DeviceHoldActivity extends Activity implements OnTouchListener {
 
 	protected static final int DEVICE_ADMIN = 1;
-	private static final String TAG = "DeviceHoldActivity";
+	private static final String TAG = DeviceHoldActivity.class.getSimpleName();
 	private boolean mAirplaneMode = false;
 	private AirplaneOnReceiver mAirplaneOnReceiver;
 

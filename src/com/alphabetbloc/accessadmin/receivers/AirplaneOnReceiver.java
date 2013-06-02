@@ -32,7 +32,7 @@ public class AirplaneOnReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.v("AirplaneOnReceiver", "Airplane Receiver is receiving!");
+		Log.v("AirplaneOnReceiver", "Airplane On Receiver is receiving!");
 		Policy policy = new Policy(context);
 
 		// if device is not setup:
