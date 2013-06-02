@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.data.Constants;
@@ -25,14 +26,16 @@ import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.Policy;
 import com.alphabetbloc.accessadmin.data.StringGenerator;
 import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
+import com.alphabetbloc.accessadmin.services.DeviceAdminService;
+import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 /**
  * Activity that steps through the process of enabling the Device Policy,
  * setting up a password that follows the policy, and establishing a provider ID
- * for AccessMRS in a secure way. Uses full screen view and airplane mode
- * to prevent leaving activity via a call or SMS and interrupting the activity
- * via notifications bar. Also leads the user to setup an account on the device
- * if they wish.
+ * for AccessMRS in a secure way. Uses full screen view and airplane mode to
+ * prevent leaving activity via a call or SMS and interrupting the activity via
+ * notifications bar. Also leads the user to setup an account on the device if
+ * they wish.
  * 
  * @author Louis Fazen (louis.fazen@gmail.com)
  * 
@@ -101,7 +104,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		mRequestCode = START;
 		mResultCode = RESULT_OK;
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -136,6 +139,15 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 				mButton.setText(R.string.setup_access_mrs);
 				mStep = SETUP_ACCESS_MRS;
 				mStepText.setText(String.valueOf(SETUP_ACCESS_MRS));
+
+//				SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+//				String uniqueId = prefs.getString(Constants.UNIQUE_DEVICE_ID, null);
+//				if (uniqueId != null) {
+//					Intent i = new Intent(mContext, DeviceAdminService.class);
+//					i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.SEND_SMS);
+//					i.putExtra(Constants.SMS_MESSAGE, "AdminCode=" + uniqueId);
+//					WakefulIntentService.sendWakefulWork(mContext, i);
+//				}
 			} else {
 				mInstructionText.setText(R.string.setup_error);
 				mStep = SET_ADMIN;
@@ -190,6 +202,7 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 		String rAlphaNum = (new StringGenerator(15)).getRandomAlphaNumericString();
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		prefs.edit().putString(Constants.UNIQUE_DEVICE_ID, rAlphaNum).commit();
+
 	}
 
 	private void saveDefaultDeviceAdminPwd() {
@@ -221,13 +234,16 @@ public class InitialSetupActivity extends DeviceHoldActivity {
 	}
 
 	private void setupAccessMRS() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+		prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
+
 		if (isAccessMRSInstalled()) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-			prefs.edit().putBoolean(Constants.SHOW_MENU, true).commit();
 			Intent i = new Intent();
 			i.setComponent(new ComponentName("com.alphabetbloc.accessmrs", "com.alphabetbloc.accessmrs.ui.admin.LauncherActivity"));
 			i.putExtra("device_admin_setup", true);
 			startActivityForResult(i, SETUP_ACCESS_MRS);
+		} else {
+			Toast.makeText(this, "AccessMRS is not Installed.  Please install AccessMRS.", Toast.LENGTH_LONG).show();
 		}
 		finish();
 	}
