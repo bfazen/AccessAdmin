@@ -65,16 +65,18 @@ public class SignalStrengthService extends Service {
 						refreshClientsNow();
 					else if (countN++ > 5)
 						updateService();
-				} else if (asu < 1 || asu > 32 || countS++ > 8)
+				} else if (asu < 1 || asu > 32 || countS++ > 8) {
 					stopSelf();
-
-				if(Constants.DEBUG) Log.e(TAG, "asu=" + asu + " countN=" + countN + " countS=" + countS);
+				}
+				if (Constants.DEBUG)
+					Log.e(TAG, "asu=" + asu + " countN=" + countN + " countS=" + countS);
 				super.onSignalStrengthsChanged(signalStrength);
 			}
 
 			@Override
 			public void onServiceStateChanged(ServiceState serviceState) {
-				if(Constants.DEBUG)Log.d("louis.fazen", "Service State changed! New state = " + serviceState.getState());
+				if (Constants.DEBUG)
+					Log.d("louis.fazen", "Service State changed! New state = " + serviceState.getState());
 				super.onServiceStateChanged(serviceState);
 			}
 		};
@@ -98,7 +100,8 @@ public class SignalStrengthService extends Service {
 
 		// if (notification != null) {
 		// startForeground(NOTIFICATION, notification);
-		// if(Constants.DEBUG) Log.e(TAG, "SignalStrengthService Started in Foreground");
+		// if(Constants.DEBUG) Log.e(TAG,
+		// "SignalStrengthService Started in Foreground");
 		// }
 	}
 
@@ -116,13 +119,18 @@ public class SignalStrengthService extends Service {
 		// if 2G, then update to 3G?
 		int nt = mTelephonyManager.getNetworkType();
 		if (nt < 3)
-			if(Constants.DEBUG) Log.d(TAG, "network type =" + nt);
-//		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			if (Constants.DEBUG)
+				Log.d(TAG, "network type =" + nt);
+		// ConnectivityManager cm = (ConnectivityManager)
+		// getSystemService(Context.CONNECTIVITY_SERVICE);
 
-//		Intent launchIntent = new Intent(MOBILE_DATA_CHANGED);
+		// Intent launchIntent = new Intent(MOBILE_DATA_CHANGED);
 		// sendBroadcast(launchIntent);
-//		PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0, launchIntent, 0);
-		if(Constants.DEBUG) Log.e(TAG, "Sending a broadcast intent to change the network!");
+		// PendingIntent pi =
+		// PendingIntent.getBroadcast(getApplicationContext(), 0, launchIntent,
+		// 0);
+		if (Constants.DEBUG)
+			Log.e(TAG, "Sending a broadcast intent to change the network!");
 		/*
 		 * Intent launchIntent = new Intent(); launchIntent.setClass(context,
 		 * SettingsAppWidgetProvider.class);
@@ -157,7 +165,8 @@ public class SignalStrengthService extends Service {
 
 	@Override
 	public void onDestroy() {
-		if(Constants.DEBUG) Log.d(TAG, "Shutting down the Service" + TAG);
+		if (Constants.DEBUG)
+			Log.d(TAG, "Shutting down the Service" + TAG);
 		mNM.cancel(NOTIFICATION);
 		mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
 		countS = 0;
@@ -166,7 +175,8 @@ public class SignalStrengthService extends Service {
 		// then call:
 		if (lockStatic.isHeld()) {
 			lockStatic.release();
-			if(Constants.DEBUG) Log.e("louis.fazen", "Called lockStatic.release()=" + lockStatic.toString());
+			if (Constants.DEBUG)
+				Log.e("louis.fazen", "Called lockStatic.release()=" + lockStatic.toString());
 		}
 		super.onDestroy();
 	}
@@ -179,7 +189,8 @@ public class SignalStrengthService extends Service {
 			lockStatic.setReferenceCounted(true);
 			lockStatic.acquire();
 
-			if(Constants.DEBUG) Log.e("louis.fazen", "lockStatic.acquire()=" + lockStatic.toString());
+			if (Constants.DEBUG)
+				Log.e("louis.fazen", "lockStatic.acquire()=" + lockStatic.toString());
 
 			// PowerManager pm = (PowerManager)
 			// getSystemService(Context.POWER_SERVICE);

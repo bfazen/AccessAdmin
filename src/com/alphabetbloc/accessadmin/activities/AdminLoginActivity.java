@@ -30,6 +30,7 @@ public class AdminLoginActivity extends SherlockActivity {
 	private TextView mInstructionText;
 	private Context mContext;
 
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
