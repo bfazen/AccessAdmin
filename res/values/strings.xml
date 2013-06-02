@@ -76,6 +76,9 @@
     <string name="adwEdit">Edit</string>
     <string name="view_settings">Show Menu in App</string>
     <string name="edit_settings">Preferences</string>
+    <string name="android_settings">Android Settings</string>
+    <string name="edit_android_settings">General Settings</string>
+    <string name="settings_edit">Edit</string>
 
     <!-- Application SharedPreferences -->
     <string name="adw_menu_enabled">adw_menu_enabled</string>

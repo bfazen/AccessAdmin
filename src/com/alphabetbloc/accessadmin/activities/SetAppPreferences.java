@@ -33,7 +33,8 @@ public class SetAppPreferences extends SherlockActivity {
 	private static final String ACCESS_FORMS_PACKAGE = "com.alphabetbloc.accessforms";
 	private static final String USHAHIDI_PACKAGE = "com.ushahidi.android.app";
 	private static final String ADW_PACKAGE = "com.android.launcher";
-
+	private static final String SETTINGS_PACKAGE = "com.android.settings";
+	
 	// Intents
 	public static final String ACCESS_MRS_SET_PREFERENCE = "com.alphabetbloc.accessmrs.SET_PREFERENCE";
 	private static final String ACCESS_FORMS_SET_PREFERENCE = "com.alphabetbloc.accessforms.SET_PREFERENCE";
@@ -44,10 +45,6 @@ public class SetAppPreferences extends SherlockActivity {
 	public static final String PREFERENCE_KEY = "com.alphabetbloc.accessadmin.PREFERENCE_KEY";
 	public static final String PREFERENCE_VALUE = "com.alphabetbloc.accessadmin.PREFERENCE_VALUE";
 
-	private Button accessFormsButton;
-	private Button accessMrsButton;
-	private Button adwButton;
-	private Button ushahidiButton;
 	private CheckBox accessFormsMenuToggle;
 	private CheckBox accessMrsLogToggle;
 	private CheckBox ushahidiToggle;
@@ -63,6 +60,7 @@ public class SetAppPreferences extends SherlockActivity {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		
+		showAndroidSettings();
 		if (isPackageInstalled(ADW_PACKAGE))
 			showAdwSettings();
 		if (isPackageInstalled(ACCESS_MRS_PACKAGE))
@@ -82,9 +80,22 @@ public class SetAppPreferences extends SherlockActivity {
 		}
 	}
 
+	private void showAndroidSettings(){
+		((TableLayout) findViewById(R.id.settings_section)).setVisibility(View.VISIBLE);
+		Button settingsButton = (Button) findViewById(R.id.settingsButton);
+		settingsButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setComponent(new ComponentName(ADW_PACKAGE, "com.android.settings.Settings"));
+				startActivity(i);
+			}
+		});
+
+	}
+	
 	private void showAdwSettings() {
 		((TableLayout) findViewById(R.id.adw_section)).setVisibility(View.VISIBLE);
-		adwButton = (Button) findViewById(R.id.adwButton);
+		Button adwButton = (Button) findViewById(R.id.adwButton);
 		adwButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
@@ -100,22 +111,22 @@ public class SetAppPreferences extends SherlockActivity {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				Intent i = new Intent(ADW_SET_PREFERENCE);
-				i.putExtra(PREFERENCE_KEY, getString(R.string.show_menu_preference));
-				// Intent i = new Intent(Intent.ACTION_VIEW);
-				// i.setAction("com.android.launcher.ViewMenuPreference.ACTION");
-				// i.setComponent(new ComponentName("com.android.launcher",
-				// "com.android.launcher.ViewMenuPreference"));
+				// Intent i = new Intent(ADW_SET_PREFERENCE);
+				// i.putExtra(PREFERENCE_KEY,
+				// getString(R.string.show_menu_preference));
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setAction("com.android.launcher.ViewMenuPreference.ACTION");
+				i.setComponent(new ComponentName("com.android.launcher", "com.android.launcher.ViewMenuPreference"));
 				if (adwToggle.isChecked()) {
-					i.putExtra(PREFERENCE_VALUE, String.valueOf(true));
-					// i.putExtra("ShowMenu", true);
+					// i.putExtra(PREFERENCE_VALUE, String.valueOf(true));
+					i.putExtra("ShowMenu", true);
 					mSettings.edit().putBoolean(getString(R.string.adw_menu_enabled), true).commit();
 				} else {
-					i.putExtra(PREFERENCE_VALUE, String.valueOf(false));
-					// i.putExtra("ShowMenu", false);
+					// i.putExtra(PREFERENCE_VALUE, String.valueOf(false));
+					i.putExtra("ShowMenu", false);
 					mSettings.edit().putBoolean(getString(R.string.adw_menu_enabled), false).commit();
 				}
-				sendBroadcast(i);
+				startActivity(i);
 
 			}
 		});
@@ -123,7 +134,7 @@ public class SetAppPreferences extends SherlockActivity {
 
 	private void showAccessMrsSettings() {
 		((TableLayout) findViewById(R.id.access_mrs_section)).setVisibility(View.VISIBLE);
-		accessMrsButton = (Button) findViewById(R.id.access_mrs_button);
+		Button accessMrsButton = (Button) findViewById(R.id.access_mrs_button);
 		accessMrsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
@@ -179,7 +190,7 @@ public class SetAppPreferences extends SherlockActivity {
 
 	private void showAccessFormsSettings() {
 		((TableLayout) findViewById(R.id.access_forms_section)).setVisibility(View.VISIBLE);
-		accessFormsButton = (Button) findViewById(R.id.access_forms_button);
+		Button accessFormsButton = (Button) findViewById(R.id.access_forms_button);
 		accessFormsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
@@ -215,7 +226,7 @@ public class SetAppPreferences extends SherlockActivity {
 
 	private void showUshahidiSettings() {
 		((TableLayout) findViewById(R.id.ushahidi_section)).setVisibility(View.VISIBLE);
-		ushahidiButton = (Button) findViewById(R.id.ushahidiButton);
+		Button ushahidiButton = (Button) findViewById(R.id.ushahidiButton);
 		ushahidiButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
