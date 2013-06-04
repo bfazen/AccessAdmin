@@ -32,6 +32,7 @@ import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
 public class Policy {
 
 	public static final int REQUEST_ADD_DEVICE_ADMIN = 1;
+//	TODO: CHANGE THIS TO DEFAULT SHARED PREFS, same as WAKEFULINTENTSERVICE
 	public static final String SHARED_PREF = "SHARED_PREF";
 	public static final String KEY_PASSWORD_LENGTH = "PW_LENGTH";
 	public static final String KEY_PASSWORD_QUALITY = "PW_QUALITY";

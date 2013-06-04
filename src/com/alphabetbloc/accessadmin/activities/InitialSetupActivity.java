@@ -26,8 +26,6 @@ import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.Policy;
 import com.alphabetbloc.accessadmin.data.StringGenerator;
 import com.alphabetbloc.accessadmin.receivers.DeviceAdmin;
-import com.alphabetbloc.accessadmin.services.DeviceAdminService;
-import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 /**
  * Activity that steps through the process of enabling the Device Policy,

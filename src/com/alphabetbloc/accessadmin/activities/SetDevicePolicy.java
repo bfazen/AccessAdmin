@@ -77,6 +77,7 @@ public class SetDevicePolicy extends SherlockActivity implements ActionBar.OnNav
 	private int mMaxPwds;
 	private Resources mRes;
 
+	// TODO Feature: Need to include the Preference For SIM LOCK so that you can turn on and off SIM Lock at anytime and reset the registered SIM
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
