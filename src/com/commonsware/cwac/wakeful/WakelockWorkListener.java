@@ -49,6 +49,7 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 	}
 
 	private long getAlarmInterval(Context ctxt, int alarmtype) {
+		//TODO review these times
 		// store these in individual prefs so that they 1. can be different
 		// 2. could allow device admin to change them in new activity
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
@@ -60,8 +61,8 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 		case Constants.SEND_GPS:
 			interval = prefs.getLong(Constants.ALARM_SEND_GPS, Constants.ALARM_INTERVAL_MEDIUM);
 			break;
-		case Constants.SEND_SIM:
-			interval = prefs.getLong(Constants.ALARM_SEND_SIM, Constants.ALARM_INTERVAL_SHORT);
+		case Constants.VERIFY_SIM:
+			interval = prefs.getLong(Constants.ALARM_VERIFY_SIM, Constants.ALARM_INTERVAL_SHORT);
 			break;
 		case Constants.LOCK_SCREEN:
 			interval = prefs.getLong(Constants.ALARM_LOCK_SCREEN, Constants.ALARM_INTERVAL_SHORT);
@@ -78,8 +79,8 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 		case Constants.RESET_ADMIN_ID:
 			interval = prefs.getLong(Constants.ALARM_RESET_ADMIN_ID, Constants.ALARM_INTERVAL_SHORT);
 			break;
-		case Constants.LOCK_SECRET_PWD:
-			interval = prefs.getLong(Constants.ALARM_LOCK_SECRET_PWD, Constants.ALARM_INTERVAL_SHORT);
+		case Constants.LOCK_RANDOM_PWD:
+			interval = prefs.getLong(Constants.ALARM_LOCK_RANDOM_PWD, Constants.ALARM_INTERVAL_SHORT);
 			break;
 		case Constants.HOLD_DEVICE:
 			interval = prefs.getLong(Constants.ALARM_HOLD_DEVICE, Constants.ALARM_INTERVAL_SHORT);

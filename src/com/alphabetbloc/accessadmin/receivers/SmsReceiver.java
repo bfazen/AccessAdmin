@@ -35,7 +35,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String wipeSdOdk;
 	private static String resetPwdToDefault;
 	private static String resetPwdToSmsPwd;
-	private static String lockSecretPwd;
+	private static String lockRandomPwd;
 	private static String resetAdminId;
 	private static String holdScreen;
 	private static String stopHoldScreen;
@@ -74,11 +74,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				}
 			}
 
-		} else if (intent.getAction().equals(Constants.WIPE_DATA_COMPLETE)) {
-			Intent i = new Intent(mContext, DeviceAdminService.class);
-			i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.FACTORY_RESET);
-			WakefulIntentService.sendWakefulWork(mContext, i);
-		}
+		} 
 	}
 
 	private void readSMS(String sms) {
@@ -113,7 +109,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		editAccessMrsPreference = smsAdminCode + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
 
 		// DO NOT REQUIRE smsAdminCode:
-		lockSecretPwd = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_PWD_SECRET;
+		lockRandomPwd = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_PWD_SECRET;
 		resetAdminId = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_ADMIN_ID;
 
 	}
@@ -132,8 +128,8 @@ public class SmsReceiver extends BroadcastReceiver {
 		} else if (sms.equals(wipeSdOdk)) {
 			mExtra = Constants.WIPE_ODK_DATA;
 			return true;
-		} else if (sms.equals(lockSecretPwd)) {
-			mExtra = Constants.LOCK_SECRET_PWD;
+		} else if (sms.equals(lockRandomPwd)) {
+			mExtra = Constants.LOCK_RANDOM_PWD;
 			return true;
 		} else if (sms.equals(resetAdminId)) {
 			mExtra = Constants.RESET_ADMIN_ID;
