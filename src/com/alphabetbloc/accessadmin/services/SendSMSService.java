@@ -47,7 +47,9 @@ public class SendSMSService extends Service {
 	private ArrayList<SMS> mPendingSms = new ArrayList<SMS>();
 	private SMSSentReceiver mSmsSentReceiver;
 	private ScheduledExecutorService mExecutor = Executors.newScheduledThreadPool(5);
-
+	private SentOutboxObserver mSentObserver;
+	private ContentResolver mContentResolver;
+	
 	private SMS mCurrentSms;
 	private boolean mSentSms;
 	private boolean mDeletedSms;
@@ -70,18 +72,30 @@ public class SendSMSService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		mMessageCount++;
-		int broadcast = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
-		String phoneNumber = intent.getStringExtra(Constants.SMS_LINE);
-		String message = intent.getStringExtra(Constants.SMS_MESSAGE);
-		SMS sms = new SMS(mMessageCount, broadcast, phoneNumber, message);
-		mPendingSms.add(sms);
 
-		if (mMessageCount == 1){
-			setupReceivers();
-			sendNextSms();
+		mMessageCount++;
+		final SharedPreferences prefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+		if (intent != null) {
+
+			int broadcast = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
+			String phoneNumber = intent.getStringExtra(Constants.SMS_LINE);
+			String message = intent.getStringExtra(Constants.SMS_MESSAGE);
+			if (phoneNumber == null)
+				phoneNumber = prefs.getString(Constants.SMS_REPLY_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
+			if (message == null)
+				message = "Message has been lost";
+			SMS sms = new SMS(mMessageCount, broadcast, phoneNumber, message);
+			mPendingSms.add(sms);
+			if (Constants.DEBUG)
+				Log.v(TAG, "SendSMSService.onStartCommand Called with " + "\n\t MESSAGE= " + message + "\n\t TO= \'" + phoneNumber + "\'" + "\n\t PENDING SMS SIZE=" + mPendingSms.size() + "\n\t MESSAGE COUNT=" + mMessageCount);
+
+			if (mMessageCount == 1) {
+				setupReceivers();
+				sendNextSms();
+				if (Constants.DEBUG)
+					Log.v(TAG, "SendSMSService Setting up receivers and sending First SMS");
+			}
 		}
-		
 		return super.onStartCommand(intent, flags, startId);
 	}
 
@@ -92,9 +106,10 @@ public class SendSMSService extends Service {
 		registerReceiver(mSmsSentReceiver, new IntentFilter(SMS_SENT));
 
 		// Receive notification when message is deleted
-		SentOutboxObserver sentObserver = new SentOutboxObserver();
-		ContentResolver contentResolver = mContext.getContentResolver();
-		contentResolver.registerContentObserver(Uri.parse("content://sms/out"), true, sentObserver);
+		mSentObserver = new SentOutboxObserver();
+		mContentResolver = mContext.getContentResolver();
+//		contentResolver.registerContentObserver(Uri.parse("content://sms/out"), true, sentObserver); //ORIGINAL
+		mContentResolver.registerContentObserver(Uri.parse("content://sms/"), true, mSentObserver); //MODIFIED TODO: Change this
 	}
 
 	public void sendNextSms() {
@@ -108,6 +123,8 @@ public class SendSMSService extends Service {
 		SmsManager smsManager = SmsManager.getDefault();
 		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SMS_SENT), 0);
 		smsManager.sendTextMessage(mCurrentSms.getNumber(), null, mCurrentSms.getMessage(), sentPI, null);
+		if (Constants.DEBUG)
+			Log.v(TAG, "SENDING NEW SMS!: \n\t NUMBER =" + mCurrentSms.getNumber() + "\n\t MESSAGE=" + mCurrentSms.getMessage());
 
 		// Monitor Delivery
 		updateSmsDelivery();
@@ -121,22 +138,37 @@ public class SendSMSService extends Service {
 			public void run() {
 				boolean completedSms = mSentSms & mDeletedSms; // don't
 																// short-circuit
-				if (!completedSms && count < 60) {
+				
+				if (Constants.DEBUG)
+						Log.v(TAG, "updateSmsDelivery with: \n\t SmsSent =" + mSentSms + "\n\t SmsDeleted=" + mDeletedSms);
+				
+				if (!completedSms && count < 10) {
+//					if (!completedSms && count < 60) { TODO: REVERT THIS!
 					mExecutor.schedule(this, 3000, TimeUnit.MILLISECONDS);
+					if (Constants.DEBUG)
+						Log.v(TAG, "Wait another 3 seconds. Current cycle count=" + count);
 					count++;
 				} else {
 					// Log errors
-					if (completedSms)
-						if(Constants.DEBUG) Log.i(TAG, "SMS has been successfully sent and deleted from outbox");
-					else if (!mSentSms)
-						if(Constants.DEBUG) Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to send");
-					else if (!mDeletedSms)
-						if(Constants.DEBUG)Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to delete");
+					if (Constants.DEBUG) {
+						if (!mSentSms)
+							Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to send");
+						else if (!mDeletedSms)
+							Log.e(TAG, "Timed out after 3 minutes of waiting for SMS to delete");
+						else
+							Log.i(TAG, "SMS has been successfully sent and deleted from outbox");
+					}
 
 					// delete the SMS if haven't done so
-					if (!mSentSms && mPendingSms.size() > 0)
+					if (!mSentSms && mPendingSms.size() > 0){
+						if (Constants.DEBUG)
+							Log.e(TAG, "COULD NOT SEND SMS!! Removing SMS 0 from mPendingSms: \n\t SMS MESSAGE=" + mPendingSms.get(0).getMessage());
 						mPendingSms.remove(0);
-
+					}
+						
+					if (Constants.DEBUG)
+						Log.v(TAG, "SMS messages that are still pending=" + mPendingSms.size());
+					
 					// send next SMS, if there is one
 					if (mPendingSms.size() > 0)
 						sendNextSms();
@@ -169,7 +201,8 @@ public class SendSMSService extends Service {
 					if (sms.getId() == currentSms.getId()) {
 						int oldtotal = mPendingSms.size();
 						mPendingSms.remove(currentSms);
-						if(Constants.DEBUG) Log.v(TAG, "Removed an SMS (1/" + oldtotal + ") with id=" + sms.getId() + " current pending SMS=" + mPendingSms.size());
+						if (Constants.DEBUG)
+							Log.v(TAG, "Removed an SMS from the Pending List  (1/" + oldtotal + ") total. Removed SMS had \n\t ID=" + sms.getId() + "\n\t MESSAGE=" + sms.getMessage() + "\n\t Number of SMS that are still on pending list=" + mPendingSms.size());
 						break;
 					}
 				}
@@ -182,10 +215,14 @@ public class SendSMSService extends Service {
 
 		public SentOutboxObserver() {
 			super(null);
+			if (Constants.DEBUG)
+				Log.v(TAG, "New SentOutbox Observer Created!");
 		}
 
 		@Override
 		public void onChange(boolean selfChange) {
+			if (Constants.DEBUG)
+				Log.i(TAG, "Change to SMS Outbox. Calling deleteSmsFromOutbox to delete single SMS");
 			deleteSmsFromOutbox(false);
 			super.onChange(selfChange);
 		}
@@ -195,6 +232,9 @@ public class SendSMSService extends Service {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String line = null;
 		String message = null;
+		
+		
+		
 		if (deleteAll) {
 			line = prefs.getString(Constants.SMS_REPLY_LINE, "");
 			message = "!Reply!:";
@@ -202,6 +242,9 @@ public class SendSMSService extends Service {
 			line = mCurrentSms.getNumber();
 			message = mCurrentSms.getMessage();
 		}
+		
+		if (Constants.DEBUG)
+			Log.v(TAG, "Calling deleteSmsFromOutbox with: \n\t DELETE-ALL=" + deleteAll + "\n\t LINE=" + line + "\n\t MESSAGE=" + message);
 
 		try {
 			Uri uriSms = Uri.parse("content://sms/out");
@@ -212,21 +255,31 @@ public class SendSMSService extends Service {
 					long id = c.getLong(c.getColumnIndex("_id"));
 					String address = c.getString(c.getColumnIndex("address"));
 					String body = c.getString(c.getColumnIndex("body"));
-
+					
+					if (Constants.DEBUG)
+						Log.v(TAG, "Found SMS in the Outbox: \n\t ID=" + id + "\n\t ADDRESS=" + address + "\n\t BODY=" + body);
+					
 					if (body.contains(message) && address.equalsIgnoreCase(line)) {
 						int rows = mContext.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
 						mDeletedSms = true;
 						mDeleteCount++;
-						if(Constants.DEBUG) Log.e(TAG, "Successfully deleted " + rows + " sms from the outbox");
+						if (Constants.DEBUG)
+							Log.v(TAG, "Successfully deleted " + rows + " sms from the outbox");
 					}
 				} while (c.moveToNext());
 			}
 
 			c.close();
 		} catch (Exception e) {
-			if(Constants.DEBUG) Log.e(TAG, "Could not delete SMS from inbox: " + e.getMessage());
+			if (Constants.DEBUG)
+				Log.e(TAG, "Could not delete SMS from inbox: " + e.getMessage());
 		}
 
+	}
+
+	// JUnit Testing
+	public ArrayList<SMS> getPendingSMS() {
+		return mPendingSms;
 	}
 
 	private void stopService() {
@@ -238,13 +291,15 @@ public class SendSMSService extends Service {
 
 	@Override
 	public void onDestroy() {
-		if(Constants.DEBUG) Log.v(TAG, "Ending the SendSmsService");
+		if (Constants.DEBUG)
+			Log.v(TAG, "Ending the SendSmsService");
 		unregisterReceiver(mSmsSentReceiver);
 		mSmsSentReceiver = null;
 		super.onDestroy();
 	}
 
-	private class SMS {
+	// JUnit Testing, had to make this class public TODO: change back
+	public class SMS {
 		private int smsBroadcast;
 		private int smsId;
 		private String smsNumber;

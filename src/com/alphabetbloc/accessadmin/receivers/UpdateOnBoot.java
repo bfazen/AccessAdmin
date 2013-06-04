@@ -10,9 +10,11 @@ import android.util.Log;
 
 import com.alphabetbloc.accessadmin.activities.InitialSetupActivity;
 import com.alphabetbloc.accessadmin.data.Constants;
+import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.Policy;
 import com.alphabetbloc.accessadmin.services.DeviceAdminService;
-import com.alphabetbloc.accessadmin.services.UpdateClockService;
+import com.alphabetbloc.accessadmin.services.SendSMSService;
+import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 /**
  * Checks for a new install, a change in the SIM code, and device security
@@ -24,9 +26,8 @@ import com.alphabetbloc.accessadmin.services.UpdateClockService;
  */
 public class UpdateOnBoot extends BroadcastReceiver {
 
-	private static final String TAG = "UpdateOnBoot";
+	private static final String TAG = UpdateOnBoot.class.getSimpleName();
 	private Context mContext;
-	private int mSecurityCode;
 
 	public UpdateOnBoot() {
 		// Auto-generated constructor stub
@@ -38,12 +39,18 @@ public class UpdateOnBoot extends BroadcastReceiver {
 
 		if (Constants.BOOT_COMPLETED.equals(intent.getAction())) {
 			// always check clock...
-			mContext.startService(new Intent(mContext, UpdateClockService.class));
+			// mContext.startService(new Intent(mContext,
+			// UpdateClockService.class));
+			Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
+			timeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			mContext.startActivity(timeIntent);
+
 			Log.v("BootReceiver", "Boot Receiver is receiving!");
 			// check security...
 			Policy policy = new Policy(mContext);
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 			boolean newInstall = settings.getBoolean(Constants.NEW_INSTALL, true);
+			boolean phoneLocked = settings.getBoolean(Constants.SIM_ERROR_PHONE_LOCKED, false);
 
 			if (newInstall) {
 				// Setup Initial Security
@@ -51,27 +58,28 @@ public class UpdateOnBoot extends BroadcastReceiver {
 				i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				mContext.startActivity(i);
 
-			} else if (policy.isAdminActive()) {
+			} else if (phoneLocked) {
+				// Send SMS confirmation that data has been wiped
+				final SharedPreferences encPrefs = new EncryptedPreferences(mContext, mContext.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+				String line = encPrefs.getString(Constants.SMS_REPLY_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
+				Intent smsI = new Intent(mContext, SendSMSService.class);
+				smsI.putExtra(Constants.SMS_LINE, line);
+				smsI.putExtra(Constants.SMS_MESSAGE, "This device is booting again after being locked. Will wipe data SOON.");
+				mContext.startService(smsI);
 
+				// Hold the device in a perpetual locked state. THIS IS
+				// PERMANENT, as ALARM needs to be cancelled by admin
+				Intent i = new Intent(context, DeviceAdminService.class);
+				i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.HOLD_DEVICE_LOCKED);
+				WakefulIntentService.sendWakefulWork(context, i);
+
+			} else if (policy.isAdminActive()) {
 				// Check on Security
 
 				// 1. Check on simChange
 				if (isSimChanged()) {
-					// TODO Feature: This should be made into a SharedPreference so does
-					// not need to be active
-					int simChangeCount = logNewSimChange();
-
-					// Send new SIM to DeviceAdmin (assumes airplane mode off)
-					if (simChangeCount < 5)
-						mSecurityCode = Constants.SEND_SIM;
-
-					// Phone booted with unregistered SIM 5 times in <3 weeks,
-					// so we assume Lost or Stolen:
-					else
-						mSecurityCode = Constants.WIPE_ODK_DATA;
-
 					Intent i = new Intent(mContext, DeviceAdminService.class);
-					i.putExtra(Constants.DEVICE_ADMIN_WORK, mSecurityCode);
+					i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.VERIFY_SIM);
 					mContext.startService(i);
 				}
 
@@ -95,8 +103,14 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		String registeredSimSerial = settings.getString(Constants.SIM_SERIAL, null);
 		String registeredSimLine = settings.getString(Constants.SIM_LINE, null);
+		if (Constants.DEBUG)
+			Log.e(TAG, "Registered SIM: \n\t REGISTERED SIM LINE=\'" + registeredSimLine + "\' \n\t REGISTERED SIM SERIAL\'" + registeredSimSerial + "\'");
+
+		// TODO Feature: Need to include the Preference For SIM LOCK so that you
+		// can turn on and off SIM Lock at anytime and reset the registered SIM
 		if (registeredSimLine == null || registeredSimSerial == null) {
-			if(Constants.DEBUG) Log.e(TAG, "Registered SIM has been lost! Requesting Initial Security Setup! \n\t REGISTERED SIM LINE: " + registeredSimLine + " \n\t REGISTERED SIM SERIAL: " + registeredSimSerial);
+			if (Constants.DEBUG)
+				Log.e(TAG, "Registered SIM has been lost! Requesting Initial Security Setup! \n\t REGISTERED SIM LINE: " + registeredSimLine + " \n\t REGISTERED SIM SERIAL: " + registeredSimSerial);
 			settings.edit().putBoolean(Constants.NEW_INSTALL, true).commit();
 			// Setup Initial Security
 			Intent i = new Intent(mContext, InitialSetupActivity.class);
@@ -109,37 +123,19 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		String currentSimSerial = tm.getSimSerialNumber();
 		String currentSimLine = tm.getLine1Number();
 
-		if (currentSimLine == null || currentSimSerial == null) {
-			if(Constants.DEBUG) Log.w(TAG, "SIM has been taken out of phone or is not registering with device \n\t CURRENT SIM LINE: " + currentSimLine + " \n\t CURRENT SIM SERIAL: " + currentSimSerial);
+		if (currentSimLine == null || currentSimSerial == null || currentSimSerial.equals("")) {
+			if (Constants.DEBUG)
+				Log.w(TAG, "SIM has been taken out of phone or is not registering with device \n\t CURRENT SIM LINE: " + currentSimLine + " \n\t CURRENT SIM SERIAL: " + currentSimSerial);
+			simChanged = true;
+		} else if (!currentSimLine.equals(registeredSimLine) || !currentSimSerial.equals(registeredSimSerial)) {
+			if (Constants.DEBUG)
+				Log.w(TAG, "SIM has been changed from the initial registered SIM \n\t CURRENT SIM LINE: " + currentSimLine + " DOES NOT MATCH.  \n\t CURRENT SIM SERIAL: " + currentSimSerial + " DOES NOT MATCH.");
 			simChanged = true;
 		}
-		if (!currentSimLine.equals(registeredSimLine) || !currentSimSerial.equals(registeredSimSerial)) {
-			if(Constants.DEBUG)Log.w(TAG, "SIM has been changed from the initial registered SIM \n\t CURRENT SIM LINE: " + currentSimLine + " DOES NOT MATCH.  \n\t CURRENT SIM SERIAL: " + currentSimSerial + " DOES NOT MATCH.");
-			simChanged = true;
-		}
+		if (Constants.DEBUG)
+			Log.e(TAG, "simChanged=" + simChanged);
+
 		return simChanged;
-	}
-
-	private int logNewSimChange() {
-		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-		Long lastSimChange = settings.getLong(Constants.LAST_SIM_CHANGE, 0);
-		int simChangeCount = settings.getInt(Constants.SIM_CHANGE_COUNT, 0);
-		Long now = System.currentTimeMillis();
-
-		settings.edit().putLong(Constants.LAST_SIM_CHANGE, now).commit();
-
-		Long deltaSimChange = now - lastSimChange;
-		int week = 1000 * 60 * 60 * 24 * 7;
-		if (deltaSimChange < week) {
-			// count if booted with unregsitered SIM in last week
-			simChangeCount++;
-		} else {
-			simChangeCount = 0;
-		}
-
-		settings.edit().putInt(Constants.SIM_CHANGE_COUNT, simChangeCount).commit();
-
-		return simChangeCount;
 	}
 
 }
