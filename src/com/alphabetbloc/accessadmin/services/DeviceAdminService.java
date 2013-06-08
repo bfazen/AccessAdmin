@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -649,7 +650,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * 
 	 */
 	public void verifySIMCode() {
-		// TODO: make this into a real preference...
+		// TODO Feature: make this into a real preference...
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		boolean useSimLock = settings.getBoolean(Constants.USE_SIM_LOCK, true);
 		if (!useSimLock) {
@@ -697,7 +698,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, i, 0);
 
 		AlarmManager aM = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-		aM.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES / 3, pi); // TODO: CHANGE THIS TIME?
+		aM.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_FIFTEEN_MINUTES / 3, pi);
 	}
 
 	private int checkSimStatus() {

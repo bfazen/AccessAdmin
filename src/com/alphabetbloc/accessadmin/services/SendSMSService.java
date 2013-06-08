@@ -250,8 +250,6 @@ public class SendSMSService extends Service {
 			Log.v(TAG, "Calling deleteSmsFromOutbox with: \n\t DELETE-ALL=" + deleteAll + "\n\t LINE=" + line + "\n\t MESSAGE=" + message);
 
 		try {
-			// Uri uriSms = Uri.parse("content://sms/out"); ORIGINAL TODO:
-			// Change back?
 			Uri uriSms = Uri.parse("content://sms");
 			Cursor c = mContext.getContentResolver().query(uriSms, new String[] { "_id", "address", "body" }, "address =? ", new String[] { line }, null);
 
@@ -305,7 +303,7 @@ public class SendSMSService extends Service {
 		super.onDestroy();
 	}
 
-	// JUnit Testing, had to make this class public TODO: change back
+	// JUnit Testing, had to make this class public
 	public class SMS {
 		private int smsBroadcast;
 		private int smsId;

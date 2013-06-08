@@ -197,14 +197,20 @@
     <!-- SIM Error -->
     <string name="accessadmin_image">AccessAdmin Icon</string>
     <string name="sim_error">ERROR</string>
-   	<string name="locked_message">PHONE IS LOCKED! \n PLEASE RETURN</string>
+    <string name="locked_message">PHONE IS LOCKED! \n PLEASE RETURN</string>
     <string name="sim_message_replace_sim">TURN OFF PHONE &amp;\n REPLACE SIM NOW!</string>
-	<string name="sim_submessage_lock_phone">SIM not recognized! If you do not replace SIM, phone will LOCK PERMANENTLY</string>
-	<string name="sim_submessage_attempts_missing">STOP!!!   Missing SIM %s times! \nThis phone will LOCK PERMANENTLY if you try wrong SIM again!</string>
-	<string name="sim_submessage_attempts_change">STOP!!!   Wrong SIM tried %s times! \nThis phone will LOCK PERMANENTLY if you try wrong SIM again!</string>
-	<string name="return_info_message">PROPERTY of AMPATH. Please return to Community Health Services at Mosoriot Health Centre or call 0715050383.</string>
-	<string name="return_thin_message">PROPERTY of AMPATH. \nPlease return to: \nCommunity Health Services \nat Mosoriot Health Centre \nor call 0715050383.</string>
-	
-	 <!-- Accessibility Services: Content Description -->
+    <string name="sim_submessage_lock_phone">SIM not recognized! If you do not replace SIM, phone will LOCK PERMANENTLY</string>
+    <string name="sim_submessage_attempts_missing">STOP!!!   Missing SIM %s times! \nThis phone will LOCK PERMANENTLY if you try wrong SIM again!</string>
+    <string name="sim_submessage_attempts_change">STOP!!!   Wrong SIM tried %s times! \nThis phone will LOCK PERMANENTLY if you try wrong SIM again!</string>
+    <string name="return_info_message">PROPERTY of AMPATH. Please return to Community Health Services at Mosoriot Health Centre or call 0715050383.</string>
+    <string name="return_thin_message">PROPERTY of AMPATH. \nPlease return to: \nCommunity Health Services \nat Mosoriot Health Centre \nor call 0715050383.</string>
+
+    <!-- Accessibility Services: Content Description -->
     <string name="icon">Small Icon</string>
+
+    <!-- Time Error -->
+    <string name="wrong_datetime">Wrong Date, Time</string>
+    <string name="set_datetime">Please set current date and time to:</string>
+    <string name="ok">OK</string>
+
 </resources>

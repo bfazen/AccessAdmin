@@ -49,7 +49,7 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 	}
 
 	private long getAlarmInterval(Context ctxt, int alarmtype) {
-		//TODO review these times
+		//TODO! review these times
 		// store these in individual prefs so that they 1. can be different
 		// 2. could allow device admin to change them in new activity
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctxt);
@@ -91,8 +91,8 @@ public class WakelockWorkListener implements WakefulIntentService.AlarmListener 
 		case Constants.CANCEL_ALARMS:
 			interval = prefs.getLong(Constants.ALARM_CANCEL_ALARMS, Constants.ALARM_INTERVAL_SHORT);
 			break;
-
 		default:
+			interval = Constants.ALARM_INTERVAL_MEDIUM;
 			break;
 		}
 

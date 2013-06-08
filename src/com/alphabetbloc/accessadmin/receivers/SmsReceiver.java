@@ -87,9 +87,9 @@ public class SmsReceiver extends BroadcastReceiver {
 			createSmsStrings();
 		if (matchingSmsString(sms)) {
 			try {
-				abortBroadcast(); //TODO: Change this back
+				abortBroadcast(); 
 			} catch (Exception e) {
-				Log.e(TAG, "Unordered broadcast"); //TODO: check this occurrence in real life testing
+				Log.e(TAG, "Unordered broadcast"); 
 			}
 			
 			Intent i = new Intent(mContext, DeviceAdminService.class);

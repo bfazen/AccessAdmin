@@ -31,5 +31,5 @@
     <color name="holo_blue">#00BFFF</color>
     <color name="highlight">#ff6EB3E9</color>
     <color name="almost_white">#eeeeee</color>
-
+<color name="transparent">#00000000</color>
 </resources>

@@ -1,9 +1,12 @@
 package com.alphabetbloc.accessadmin.receivers;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -38,15 +41,13 @@ public class UpdateOnBoot extends BroadcastReceiver {
 		mContext = context;
 
 		if (Constants.BOOT_COMPLETED.equals(intent.getAction())) {
-			// always check clock...
-			// mContext.startService(new Intent(mContext,
-			// UpdateClockService.class));
-			Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
-			timeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			mContext.startActivity(timeIntent);
+			if (Constants.DEBUG)
+				Log.v(TAG, "Boot Receiver is receiving!");
 
-			Log.v("BootReceiver", "Boot Receiver is receiving!");
-			// check security...
+			// Always verify the System Time
+			updateSystemClock();
+
+			// Always check security...
 			Policy policy = new Policy(mContext);
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 			boolean newInstall = settings.getBoolean(Constants.NEW_INSTALL, true);
@@ -96,6 +97,21 @@ public class UpdateOnBoot extends BroadcastReceiver {
 
 	}
 
+	private void updateSystemClock() {
+		// always ask user to verify the clock...
+		Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
+		timeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		mContext.startActivity(timeIntent);
+
+		// set an alarm for 5 minutes to verify the time
+		Intent i = new Intent(mContext, UpdateClockReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, i, 0);
+		AlarmManager aM = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+		aM.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + (AlarmManager.INTERVAL_FIFTEEN_MINUTES / 2) , AlarmManager.INTERVAL_HOUR, pi);
+	}
+
+	
 	private boolean isSimChanged() {
 		boolean simChanged = false;
 
