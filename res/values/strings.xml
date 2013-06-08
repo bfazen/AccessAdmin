@@ -117,6 +117,15 @@
     <!-- send GPS coordiantes -->
     <string name="sms_title_gps">Get Current Location</string>
     <string name="sms_description_gps">Retreive the current location of the device by GPS if possible, or through network tower coverage otherwise. SMS will report the Latitude, Longitude, Altitude, and Accuracy where available.</string>
+    <!-- send sms -->
+    <string name="sms_title_send_sms">Reply to SMS</string>
+    <string name="sms_description_send_sms">Generate a simple SMS reply to verify AccessAdmin is installed and running.</string>
+    <!-- verify sim -->
+    <string name="sms_title_verify_sim">Verify SIM card</string>
+    <string name="sms_description_verify_sim">Verify that the SIM in this device is the original, and prompt alarm and lock device if not.</string>
+    <!-- hold lock the device -->
+    <string name="sms_title_hold_lock">Lock with Alarm</string>
+    <string name="sms_description_hold_lock">Lock device with random password and create a recurring alarm. Reset with admin code -stop-hold.</string>
     <!-- hold the device -->
     <string name="sms_title_hold">Hold Device with Message</string>
     <string name="sms_description_hold">Interrupt and hold device with message. Any message following the code \'-hold:\' will be presented to the user on a screen that is difficult to exit without shutdown. This may be used, for example, to communicate to the user while remotely wiping data in the background.</string>

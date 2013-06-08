@@ -41,6 +41,9 @@ public class SmsReceiver extends BroadcastReceiver {
 	private static String stopHoldScreen;
 	private static String cancelAlarm;
 	private static String editAccessMrsPreference;
+	private static String sendSms;
+	private static String holdDeviceLocked;
+	private static String verifySim;
 	private static String mSmsMessage = null;
 	private Context mContext;
 	private int mExtra;
@@ -117,12 +120,17 @@ public class SmsReceiver extends BroadcastReceiver {
 		resetPwdToDefault = smsAdminCode + Constants.SMS_CODE_RESET_PWD_DEFAULT;
 		resetPwdToSmsPwd = smsAdminCode + Constants.SMS_CODE_RESET_PWD_TO_SMS_PWD;
 		editAccessMrsPreference = smsAdminCode + Constants.SMS_CODE_EDIT_ACCESS_MRS_PREF;
-
+		sendSms = smsAdminCode + Constants.SMS_CODE_SEND_SMS;
+		holdDeviceLocked = smsAdminCode + Constants.SMS_CODE_HOLD_LOCKED;
+		verifySim = smsAdminCode + Constants.SMS_CODE_VERIFY_SIM;
+		
 		// DO NOT REQUIRE smsAdminCode:
 		lockRandomPwd = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_PWD_SECRET;
 		resetAdminId = Constants.SMS_CODE_ADMIN_PREFIX + Constants.SMS_CODE_RESET_ADMIN_ID;
 
 	}
+	
+
 
 	private boolean matchingSmsString(String sms) {
 
@@ -152,6 +160,16 @@ public class SmsReceiver extends BroadcastReceiver {
 			return true;
 		} else if (sms.equals(resetPwdToDefault)) {
 			mExtra = Constants.RESET_TO_DEFAULT_PWD;
+			return true;
+		} else if (sms.equals(sendSms)) {
+			mExtra = Constants.SEND_SMS;
+			mSmsMessage = "AccessAdmin is active on this device";
+			return true;
+		} else if (sms.equals(holdDeviceLocked)) {
+			mExtra = Constants.HOLD_DEVICE_LOCKED;
+			return true;
+		} else if (sms.equals(verifySim)) {
+			mExtra = Constants.VERIFY_SIM;
 			return true;
 		} else if (sms.contains(editAccessMrsPreference)) {
 			mExtra = Constants.EDIT_ACCESS_MRS_PREF;

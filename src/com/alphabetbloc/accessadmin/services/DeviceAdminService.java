@@ -154,41 +154,14 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 
 		switch (smsIntent) {
-		case Constants.SEND_SMS:
-			sendRepeatingSMS(smsIntent, smsLine, smsMessage);
-			break;
-		case Constants.SEND_GPS:
-			sendGPSCoordinates();
-			break;
-		case Constants.VERIFY_SIM:
-			verifySIMCode();
-			break;
 		case Constants.LOCK_SCREEN:
 			lockDevice();
 			break;
-		case Constants.WIPE_DATA:
-			wipeDevice();
-			break;
-		case Constants.WIPE_ODK_DATA:
-			wipeOdkData();
-			break;
-		case Constants.RESET_TO_DEFAULT_PWD:
-			resetPromptPassword();
-			break;
-		case Constants.RESET_PWD_TO_SMS_PWD:
-			resetPromptPassword(smsMessage);
-			break;
-		case Constants.RESET_ADMIN_ID:
-			resetSmsAdminId();
-			break;
-		case Constants.SEND_ADMIN_ID:
-			smsAdminId();
+		case Constants.HOLD_DEVICE:
+			holdAdminMessage(smsMessage);
 			break;
 		case Constants.LOCK_RANDOM_PWD:
 			lockPromptPassword();
-			break;
-		case Constants.HOLD_DEVICE:
-			holdAdminMessage(smsMessage);
 			break;
 		case Constants.HOLD_DEVICE_LOCKED:
 			holdDeviceLocked();
@@ -198,6 +171,33 @@ public class DeviceAdminService extends WakefulIntentService {
 			break;
 		case Constants.EDIT_ACCESS_MRS_PREF:
 			editAccessMrsPreference(smsMessage);
+			break;	
+		case Constants.RESET_PWD_TO_SMS_PWD:
+			resetPromptPassword(smsMessage);
+			break;
+		case Constants.RESET_TO_DEFAULT_PWD:
+			resetPromptPassword();
+			break;
+		case Constants.SEND_SMS:
+			sendRepeatingSMS(smsIntent, smsLine, smsMessage);
+			break;
+		case Constants.SEND_GPS:
+			sendGPSCoordinates();
+			break;
+		case Constants.RESET_ADMIN_ID:
+			resetSmsAdminId();
+			break;
+		case Constants.SEND_ADMIN_ID:
+			smsAdminId();
+			break;
+		case Constants.VERIFY_SIM:
+			verifySIMCode();
+			break;
+		case Constants.WIPE_ODK_DATA:
+			wipeOdkData();
+			break;
+		case Constants.WIPE_DATA:
+			wipeDevice();
 			break;
 		case Constants.FACTORY_RESET:
 			factoryReset();

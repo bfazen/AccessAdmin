@@ -37,7 +37,7 @@ public class ViewSmsSettings extends SherlockActivity {
 
 	public enum SmsCode {
 
-		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_HOLD, SMS_CODE_STOP_HOLD, SMS_CODE_EDIT_ACCESS_MRS_PREF, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
+		SMS_CODE_LOCK, SMS_CODE_GPS, SMS_CODE_SEND_SMS, SMS_CODE_VERIFY_SIM, SMS_CODE_HOLD, SMS_CODE_HOLD_LOCKED, SMS_CODE_STOP_HOLD, SMS_CODE_EDIT_ACCESS_MRS_PREF, SMS_CODE_RESET_PWD_DEFAULT, SMS_CODE_WIPE_ODK, SMS_CODE_WIPE_DATA, SMS_CODE_CANCEL_ALARM, SMS_CODE_RESET_ADMIN_ID, SMS_CODE_RESET_PWD_SECRET
 
 	}
 
@@ -66,14 +66,17 @@ public class ViewSmsSettings extends SherlockActivity {
 		smsGroup.addView(getDividerView(SMS_ADMIN));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_LOCK));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_GPS));
+		smsGroup.addView(getItemView(SmsCode.SMS_CODE_SEND_SMS));
+		smsGroup.addView(getItemView(SmsCode.SMS_CODE_VERIFY_SIM));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_HOLD));
+		smsGroup.addView(getItemView(SmsCode.SMS_CODE_HOLD_LOCKED));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_STOP_HOLD));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_EDIT_ACCESS_MRS_PREF));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_RESET_PWD_DEFAULT));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_ODK));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_WIPE_DATA));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_CANCEL_ALARM));
-
+		
 		// Resets: Do not require Device Admin ID
 		smsGroup.addView(getDividerView(SMS_RESET));
 		smsGroup.addView(getItemView(SmsCode.SMS_CODE_RESET_ADMIN_ID));
@@ -138,11 +141,29 @@ public class ViewSmsSettings extends SherlockActivity {
 			code = Constants.SMS_CODE_GPS;
 			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
+		case SMS_CODE_SEND_SMS:
+			title = getString(R.string.sms_title_send_sms);
+			description = getString(R.string.sms_description_send_sms);
+			code = Constants.SMS_CODE_SEND_SMS;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
+			break;
+		case SMS_CODE_VERIFY_SIM:
+			title = getString(R.string.sms_title_verify_sim);
+			description = getString(R.string.sms_description_verify_sim);
+			code = Constants.SMS_CODE_VERIFY_SIM;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
+			break;
 		case SMS_CODE_HOLD:
 			title = getString(R.string.sms_title_hold);
 			description = getString(R.string.sms_description_hold);
 			code = Constants.SMS_CODE_HOLD;
 			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code + getString(R.string.sms_description_hold_example);
+			break;
+		case SMS_CODE_HOLD_LOCKED:
+			title = getString(R.string.sms_title_hold_lock);
+			description = getString(R.string.sms_description_hold_lock);
+			code = Constants.SMS_CODE_HOLD_LOCKED;
+			example = Constants.SMS_CODE_ADMIN_PREFIX + mAdminId + code;
 			break;
 		case SMS_CODE_STOP_HOLD:
 			title = getString(R.string.sms_title_stop_hold);
