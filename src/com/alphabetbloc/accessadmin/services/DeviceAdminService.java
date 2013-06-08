@@ -239,6 +239,8 @@ public class DeviceAdminService extends WakefulIntentService {
 		android.os.SystemClock.sleep(1000 * 5);
 		if (MessageHoldActivity.sMessageHoldActive)
 			cancelAdminAlarms("Now holding device with admin message.");
+		else
+			sendSingleSMS("Unable to hold device. Alarm is still active.");
 	}
 
 	/**
@@ -250,6 +252,13 @@ public class DeviceAdminService extends WakefulIntentService {
 	 */
 	private void holdDeviceLocked() {
 		holdDevice(Constants.DEVICE_LOCKED, getString(R.string.locked_message), getString(R.string.return_thin_message), null);
+	
+		// confirm that this worked before canceling the alarm
+		android.os.SystemClock.sleep(1000 * 5);
+		if (MessageHoldActivity.sMessageHoldActive)
+			sendSingleSMS("Currently holding device. Alarm is still active.");
+		else
+			sendSingleSMS("Unable to hold device. Alarm is still active.");
 	}
 
 	/**
@@ -286,6 +295,8 @@ public class DeviceAdminService extends WakefulIntentService {
 		android.os.SystemClock.sleep(1000 * 5);
 		if (!MessageHoldActivity.sMessageHoldActive)
 			cancelAdminAlarms("Stopped device hold.");
+		else
+			sendSingleSMS("Unable to stop device hold. Alarm is still active.");
 	}
 
 	/**
@@ -300,10 +311,10 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		// confirm that this worked before canceling the alarm
 		android.os.SystemClock.sleep(1000 * 2);
-		if (isDeviceLocked()) {
+		if (isDeviceLocked())
 			cancelAdminAlarms("Locked device.");
-			sendSingleSMS("Device locked");
-		}
+		else
+			sendSingleSMS("Unable to lock device. Alarm is still active.");
 	}
 
 	/**
@@ -394,22 +405,17 @@ public class DeviceAdminService extends WakefulIntentService {
 		prefs.edit().putString(Constants.UNIQUE_DEVICE_ID, rAlphaNum).commit();
 		String newAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
 
-		if (!newAdminId.equals(oldAdminId)) {
-			resetAlarm(Constants.SEND_ADMIN_ID, "", "");
+		if (!newAdminId.equals(oldAdminId))
 			smsAdminId(); // This will in turn call CancelAdminAlarms
-		} else {
-			sendSingleSMS("Unable to reset Admin ID");
-		}
+		else
+			sendSingleSMS("Unable to reset Admin ID. Alarm is still active.");
 	}
 
 	private void smsAdminId() {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String adminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
-
-		sendRepeatingSMS(Constants.SEND_ADMIN_ID, adminId); // This will in turn
-															// call
-															// CancelAdminAlarms
-
+		sendSingleSMS("New AdminId =" + adminId); 
+		cancelAdminAlarms("Admin code has now been changed.");
 	}
 
 	// ////////////// PASSWORD RESET //////////////
@@ -422,6 +428,8 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		if (success)
 			cancelAdminAlarms("Reset password to default.");
+		else
+			sendSingleSMS("Failed to reset password to default. Alarm is still active.");
 	}
 
 	public void resetPromptPassword(String tempPassword) {
@@ -430,6 +438,8 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		if (success)
 			cancelAdminAlarms("Reset password to SMS request.");
+		else
+			sendSingleSMS("Failed to reset password to SMS request. Alarm is still active.");
 	}
 
 	/**
@@ -448,13 +458,8 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		// confirm that this worked before canceling the alarm
 		android.os.SystemClock.sleep(1000 * 5);
-		if (mDPM.resetPassword(tempPassword, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY)) {
+		if (mDPM.resetPassword(tempPassword, DevicePolicyManager.RESET_PASSWORD_REQUIRE_ENTRY))
 			reset = true;
-			sendSingleSMS("Device successfully locked with default password");
-		} else {
-			sendSingleSMS("Unable to lock device and reset to default password");
-		}
-
 		mDPM.lockNow();
 
 		// Reset Policy to force pwd change (IF stronger than tempPassword)
@@ -474,6 +479,9 @@ public class DeviceAdminService extends WakefulIntentService {
 
 		if (success)
 			cancelAdminAlarms("Reset password to new random string.");
+		else
+			sendSingleSMS("Unable to reset to new random password. Alarm is still active.");
+
 	}
 
 	/**
@@ -490,13 +498,8 @@ public class DeviceAdminService extends WakefulIntentService {
 
 			if (sendPassword)
 				sendSingleSMS("Device successfully locked with new password=" + pwd);
-			else
-				sendSingleSMS("Device successfully locked with new random password.");
-
-		} else {
-			sendSingleSMS("Unable to lock device and reset to new random password");
-		}
-
+		} 
+		
 		mDPM.lockNow();
 
 		if (randomLock) {
@@ -874,7 +877,8 @@ public class DeviceAdminService extends WakefulIntentService {
 	 */
 	public void sendRepeatingSMS(int smstype, String line, String message) {
 		String lastSentAdminMessage = mPrefs.getString(String.valueOf(smstype), "");
-		if (message.equals(lastSentAdminMessage)) {
+		String outgoingSms = SendSMSService.SMS_REPLY_PREFIX + message;
+		if (outgoingSms.equals(lastSentAdminMessage)) {
 			if (Constants.DEBUG)
 				Log.d(TAG, "Message has already been sent. Alarm Cancelled and Prefs erased.");
 
@@ -886,6 +890,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			ComponentName comp = new ComponentName(mContext.getPackageName(), SendSMSService.class.getName());
 			Intent i = new Intent();
 			i.setComponent(comp);
+			i.putExtra(Constants.SMS_SENT_CONFIRMATION, true);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, smstype);
 			i.putExtra(Constants.SMS_LINE, line);
 			i.putExtra(Constants.SMS_MESSAGE, message);

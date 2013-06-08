@@ -25,7 +25,7 @@ public class NtpToastActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		String message = getIntent().getStringExtra(NTP_MESSAGE_BODY);
-		String date = getIntent().getStringExtra(NTP_MESSAGE_BODY);
+		String date = getIntent().getStringExtra(NTP_MESSAGE_DATE);
 		AlertDialog d = createNtpDialog(message, date);
 		d.show();
 

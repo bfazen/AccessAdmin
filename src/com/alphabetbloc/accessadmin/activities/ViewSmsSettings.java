@@ -312,8 +312,7 @@ public class ViewSmsSettings extends SherlockActivity {
 				showResultDialog(Constants.UNIQUE_DEVICE_ID);
 				
 				Intent i = new Intent(mContext, DeviceAdminService.class);
-				i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.SEND_SMS);
-				i.putExtra(Constants.SMS_MESSAGE, "AdminCode=" + rAlphaNum);
+				i.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.SEND_ADMIN_ID);
 				WakefulIntentService.sendWakefulWork(mContext, i);
 			}
 		});

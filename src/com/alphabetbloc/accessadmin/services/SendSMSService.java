@@ -42,6 +42,7 @@ public class SendSMSService extends Service {
 
 	public static final String TAG = "SendSMSService";
 	private static final String SMS_SENT = "SMS_SENT";
+	public static final String SMS_REPLY_PREFIX = "!Reply!: ";
 
 	private Context mContext;
 	private ArrayList<SMS> mPendingSms = new ArrayList<SMS>();
@@ -78,13 +79,14 @@ public class SendSMSService extends Service {
 		if (intent != null) {
 
 			int broadcast = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
+			boolean needsConfirmation = intent.getBooleanExtra(Constants.SMS_SENT_CONFIRMATION, false);
 			String phoneNumber = intent.getStringExtra(Constants.SMS_LINE);
 			String message = intent.getStringExtra(Constants.SMS_MESSAGE);
 			if (phoneNumber == null)
 				phoneNumber = prefs.getString(Constants.SMS_REPLY_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
 			if (message == null)
 				message = "Message has been lost";
-			SMS sms = new SMS(mMessageCount, broadcast, phoneNumber, message);
+			SMS sms = new SMS(mMessageCount, needsConfirmation, broadcast, phoneNumber, message);
 			mPendingSms.add(sms);
 			if (Constants.DEBUG)
 				Log.v(TAG, "SendSMSService.onStartCommand Called with " + "\n\t MESSAGE= " + message + "\n\t TO= \'" + phoneNumber + "\'" + "\n\t PENDING SMS SIZE=" + mPendingSms.size() + "\n\t MESSAGE COUNT=" + mMessageCount);
@@ -199,9 +201,11 @@ public class SendSMSService extends Service {
 			if (result == Activity.RESULT_OK) {
 				// log last successfully sent message
 				mSentSms = true;
-				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-				pref.edit().putString(String.valueOf(sms.getBroadcast()), sms.getMessage()).commit();
-
+				if (sms.needsConfirmation()) {
+					SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+					pref.edit().putString(String.valueOf(sms.getBroadcast()), sms.getMessage()).commit();
+				}
+				
 				for (SMS currentSms : mPendingSms) {
 					if (sms.getId() == currentSms.getId()) {
 						int oldtotal = mPendingSms.size();
@@ -240,7 +244,7 @@ public class SendSMSService extends Service {
 
 		if (deleteAll) {
 			line = prefs.getString(Constants.SMS_REPLY_LINE, "");
-			message = "!Reply!:";
+			message = SMS_REPLY_PREFIX;
 		} else {
 			line = mCurrentSms.getNumber();
 			message = mCurrentSms.getMessage();
@@ -307,18 +311,24 @@ public class SendSMSService extends Service {
 	public class SMS {
 		private int smsBroadcast;
 		private int smsId;
+		private boolean smsConfirmation;
 		private String smsNumber;
 		private String smsMessage;
 
-		public SMS(int id, int broadcast, String phoneNumber, String message) {
+		public SMS(int id, boolean confirmation, int broadcast, String phoneNumber, String message) {
 			smsBroadcast = broadcast;
+			smsConfirmation = confirmation;
 			smsNumber = phoneNumber;
-			smsMessage = "!Reply!: " + message;
+			smsMessage = SMS_REPLY_PREFIX + message;
 			smsId = id;
 		}
 
 		public int getBroadcast() {
 			return smsBroadcast;
+		}
+
+		public boolean needsConfirmation() {
+			return smsConfirmation;
 		}
 
 		public String getNumber() {
