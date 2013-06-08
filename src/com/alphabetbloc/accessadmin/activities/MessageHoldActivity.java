@@ -127,7 +127,7 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 		if (mAdditionalInfo != null) {
 			additionalInfo.setVisibility(View.VISIBLE);
 			additionalMessage.setText(mMessage);
-		} else {
+		} else if (additionalInfo != null) {
 			additionalInfo.setVisibility(View.GONE);
 		}
 	}
@@ -149,19 +149,35 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		sMessageHoldActive = true;
-		registerAirplaneOffReceiver();
-		// if (mSoundAlarm)
-		// startAlarm();
-		Log.v(TAG, "OnResume Called");
+		if (Constants.DEBUG) Log.v(TAG, "OnResume Called");
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+		if (Constants.DEBUG) Log.v(TAG, "OnPause Called");
+	}
+
+	
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if (Constants.DEBUG) Log.v(TAG, "OnStart Called");
+		sMessageHoldActive = true;
+		registerAirplaneOffReceiver();
+		if (mSoundAlarm)
+			startAlarm();
+		
+	}
+
+	@Override
+	protected void onStop() {
+		super.onDestroy();
+		if (Constants.DEBUG) Log.v(TAG, "OnStop Called");
 		sMessageHoldActive = false;
 		unregisterAirplaneOffReceiver();
-		Log.v(TAG, "OnPause Called");
+
 		if (mPermanentHold) {
 			Intent i = new Intent(getApplicationContext(), MessageHoldActivity.class);
 			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -171,11 +187,6 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 			i.putExtra(MessageHoldActivity.ADDITIONAL_INFO, mAdditionalInfo);
 			getApplicationContext().startActivity(i);
 		}
-	}
-
-	@Override
-	protected void onStop() {
-		super.onDestroy();
 		stopAlarm();
 	}
 

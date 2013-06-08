@@ -115,14 +115,15 @@ public class DeviceAdminService extends WakefulIntentService {
 	private void resolveIntent(Intent intent) {
 		String smsLine;
 		String smsMessage;
-		int smsIntent;
+
+		int standingIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
+		int smsIntent = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
 		if (Constants.DEBUG)
-			Log.d(TAG, "DeviceAdminService Resolve Intent with extra=" + intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0));
+			Log.v(TAG, "DeviceAdminService Called with \n\tStandingIntent=" + standingIntent + " \n\tNewSMSIntent=" + smsIntent);
 
 		// May be new Intent or called from BOOT... so resolve intent:
-		if (intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0) != 0) {
+		if (smsIntent != 0) {
 			// we have a new intent from SMS
-			smsIntent = intent.getIntExtra(Constants.DEVICE_ADMIN_WORK, 0);
 			smsLine = intent.getStringExtra(Constants.SMS_LINE);
 			smsMessage = intent.getStringExtra(Constants.SMS_MESSAGE);
 			if (smsLine == null)
@@ -130,30 +131,11 @@ public class DeviceAdminService extends WakefulIntentService {
 			if (smsMessage == null)
 				smsMessage = "";
 
-			// if new intent is a priority intent, set up alarms
-			int standingIntent = mPrefs.getInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0);
-
-			if (smsIntent >= standingIntent) {
-
-				mResetAlarm = true;
-
-				// kill any old alarms so only 1 active device admin process
-				// (all alarms should have same simple pi)
-				cancelAlarms(mContext);
-
-				// schedule new alarm to continue after kill or reboot
-				mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, smsIntent).commit();
-				mPrefs.edit().putString(Constants.SAVED_SMS_LINE, smsLine).commit();
-				mPrefs.edit().putString(Constants.SAVED_SMS_MESSAGE, smsMessage).commit();
-				scheduleAlarms(new WakelockWorkListener(), mContext, true);
-
-			} else {
-				// Don't delete existing alarms of higher order intents
+			// Reset alarm only for higher order intents
+			if (smsIntent >= standingIntent)
+				resetAlarm(smsIntent, smsLine, smsMessage);
+			else
 				mResetAlarm = false;
-			}
-
-			if (Constants.DEBUG)
-				Log.v(TAG, "DeviceAdminService Called with \n\tStandingIntent=" + standingIntent + " \n\tNewSMSIntent=" + smsIntent);
 
 		} else {
 			// Service called by alarm or boot, so recreate intent from saved
@@ -164,6 +146,10 @@ public class DeviceAdminService extends WakefulIntentService {
 				Log.d(TAG, "DeviceAdminService is Called with smsIntentSaved=" + smsIntent);
 			smsLine = mPrefs.getString(Constants.SAVED_SMS_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
 			smsMessage = mPrefs.getString(Constants.SAVED_SMS_MESSAGE, "");
+
+			// ALWAYS Reset the Alarm if CancelAdminAlarms is called from Alarm
+			// or Boot because there should be no other alarms saved
+			mResetAlarm = true;
 		}
 
 		switch (smsIntent) {
@@ -194,6 +180,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		case Constants.RESET_ADMIN_ID:
 			resetSmsAdminId();
 			break;
+		case Constants.SEND_ADMIN_ID:
+			smsAdminId();
+			break;
 		case Constants.LOCK_RANDOM_PWD:
 			lockPromptPassword();
 			break;
@@ -213,9 +202,12 @@ public class DeviceAdminService extends WakefulIntentService {
 			factoryReset();
 			break;
 		case Constants.CANCEL_ALARMS:
-			cancelAdminAlarms();
+			cancelAdminAlarms(smsMessage);
 			break;
 		default:
+			cancelAdminAlarms(null);
+			if (Constants.DEBUG)
+				Log.e(TAG, "No Intent Received or Saved.");
 			break;
 		}
 	}
@@ -231,7 +223,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		i.putExtra(SetAppPreferences.PREFERENCE_VALUE, preferenceValue);
 		sendBroadcast(i);
 
-		cancelAdminAlarms();
+		cancelAdminAlarms("Requested change to AccessMRS preference \'" + preferenceKey + "\'.");
 	}
 
 	/**
@@ -245,7 +237,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		// confirm that this worked before canceling the alarm
 		android.os.SystemClock.sleep(1000 * 5);
 		if (MessageHoldActivity.sMessageHoldActive)
-			cancelAdminAlarms();
+			cancelAdminAlarms("Now holding device with admin message.");
 	}
 
 	/**
@@ -292,7 +284,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		// confirm that this worked before canceling the alarm
 		android.os.SystemClock.sleep(1000 * 5);
 		if (!MessageHoldActivity.sMessageHoldActive)
-			cancelAdminAlarms();
+			cancelAdminAlarms("Stopped device hold.");
 	}
 
 	/**
@@ -306,9 +298,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		mDPM.lockNow();
 
 		// confirm that this worked before canceling the alarm
-		android.os.SystemClock.sleep(1000 * 5);
+		android.os.SystemClock.sleep(1000 * 2);
 		if (isDeviceLocked()) {
-			cancelAdminAlarms();
+			cancelAdminAlarms("Locked device.");
 			sendSingleSMS("Device locked");
 		}
 	}
@@ -402,11 +394,21 @@ public class DeviceAdminService extends WakefulIntentService {
 		String newAdminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
 
 		if (!newAdminId.equals(oldAdminId)) {
-			cancelAdminAlarms();
-			sendRepeatingSMS(Constants.RESET_ADMIN_ID, newAdminId);
+			resetAlarm(Constants.SEND_ADMIN_ID, "", "");
+			smsAdminId(); // This will in turn call CancelAdminAlarms
 		} else {
-			sendRepeatingSMS(Constants.RESET_ADMIN_ID, "Unable to reset Admin ID");
+			sendSingleSMS("Unable to reset Admin ID");
 		}
+	}
+
+	private void smsAdminId() {
+		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+		String adminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
+
+		sendRepeatingSMS(Constants.SEND_ADMIN_ID, adminId); // This will in turn
+															// call
+															// CancelAdminAlarms
+
 	}
 
 	// ////////////// PASSWORD RESET //////////////
@@ -418,7 +420,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		showPasswordResetScreen();
 
 		if (success)
-			cancelAdminAlarms();
+			cancelAdminAlarms("Reset password to default.");
 	}
 
 	public void resetPromptPassword(String tempPassword) {
@@ -426,7 +428,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		showPasswordResetScreen();
 
 		if (success)
-			cancelAdminAlarms();
+			cancelAdminAlarms("Reset password to SMS request.");
 	}
 
 	/**
@@ -470,7 +472,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		showPasswordResetScreen();
 
 		if (success)
-			cancelAdminAlarms();
+			cancelAdminAlarms("Reset password to new random string.");
 	}
 
 	/**
@@ -495,7 +497,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 
 		mDPM.lockNow();
-		
+
 		if (randomLock) {
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 			settings.edit().putBoolean(Constants.SIM_ERROR_PHONE_LOCKED, false).commit();
@@ -511,21 +513,50 @@ public class DeviceAdminService extends WakefulIntentService {
 	}
 
 	// ////////////// CANCEL ALARMS //////////////
+	private void resetAlarm(int smsIntent, String smsMessage) {
+		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
+		String smsLine = prefs.getString(Constants.SMS_REPLY_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
+		resetAlarm(smsIntent, smsLine, smsMessage);
+	}
+
+	private void resetAlarm(int smsIntent, String smsLine, String smsMessage) {
+
+		mResetAlarm = true;
+
+		// kill any old alarms so only 1 active device admin process
+		// (all alarms should have same simple pi)
+		cancelAlarms(mContext);
+
+		// schedule new alarm to continue after kill or reboot
+		mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, smsIntent).commit();
+		mPrefs.edit().putString(Constants.SAVED_SMS_LINE, smsLine).commit();
+		mPrefs.edit().putString(Constants.SAVED_SMS_MESSAGE, smsMessage).commit();
+		scheduleAlarms(new WakelockWorkListener(), mContext, true);
+	}
+
 	/**
 	 * Cancels all Device Admin Alarms, regardless of type. Sends an SMS to the
 	 * reporting line when complete.
 	 */
-	public void cancelAdminAlarms() {
-		if (mResetAlarm) {
-			cancelAlarms(mContext);
-			mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0).commit();
-		}
+	public void cancelAdminAlarms(String message) {
+		if (!mResetAlarm)
+			return;
+
+		// Cancel everything
+		cancelAlarms(mContext);
+		mPrefs.edit().putInt(Constants.SAVED_DEVICE_ADMIN_WORK, 0).commit();
+		mPrefs.edit().remove(Constants.SAVED_SMS_LINE).commit();
+		mPrefs.edit().remove(Constants.SAVED_SMS_MESSAGE).commit();
 
 		// confirm that this worked before asking about alarms
-		android.os.SystemClock.sleep(1000 * 10);
+		android.os.SystemClock.sleep(1000 * 2);
 		if (!isAdminAlarmActive()) {
-			sendSingleSMS("All device admin alarms have been cancelled.");
+			if (message != null)
+				sendSingleSMS(message + " All alarms now cancelled.");
 		} else {
+			// Should never happen. Set an alarm to cancel alarms!
+			message = "Alarm:" + message;
+			resetAlarm(Constants.CANCEL_ALARMS, message);
 			if (Constants.DEBUG)
 				Log.d(TAG, "Something went wrong... alarms are not canceling");
 		}
@@ -604,7 +635,9 @@ public class DeviceAdminService extends WakefulIntentService {
 			sb.append("No location available");
 		}
 
-		sendRepeatingSMS(Constants.SEND_GPS, sb.toString());
+		sendRepeatingSMS(Constants.SEND_GPS, sb.toString()); // This will in
+																// turn call
+																// CancelAdminAlarms
 
 	}
 
@@ -620,7 +653,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		boolean useSimLock = settings.getBoolean(Constants.USE_SIM_LOCK, true);
 		if (!useSimLock) {
-			cancelAdminAlarms();
+			cancelAdminAlarms(null);
 			return;
 		}
 
@@ -631,7 +664,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		case SIM_VERIFIED:
 			if (Constants.DEBUG)
 				Log.v(TAG, "SIM Verified after Airplane Mode Was Turned Off");
-			cancelAdminAlarms();
+			cancelAdminAlarms(null);
 			return;
 		case SIM_CHANGED:
 			count = settings.getInt(Constants.SIM_CHANGE_COUNT, 0);
@@ -650,7 +683,11 @@ public class DeviceAdminService extends WakefulIntentService {
 			break;
 		}
 
-		sendSIMCode();
+		// SIM is missing or changed!
+		// 1. Send Repeating SMS with SIM Code
+		resetAlarm(Constants.SEND_SMS, makeSIMCodeSms());
+
+		// 2. Set Alarm to lock the phone and potentially wipe data
 		setLockPhoneAlarm(wipeData);
 	}
 
@@ -658,10 +695,9 @@ public class DeviceAdminService extends WakefulIntentService {
 		Intent i = new Intent(mContext, LockPhoneReceiver.class);
 		i.putExtra(Constants.SIM_ERROR_WIPE_DATA, wipeData);
 		PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, i, 0);
-		
+
 		AlarmManager aM = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-		aM.set(AlarmManager.RTC_WAKEUP,  System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES/3, pi);
-		
+		aM.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + AlarmManager.INTERVAL_FIFTEEN_MINUTES / 3, pi); // TODO: CHANGE THIS TIME?
 	}
 
 	private int checkSimStatus() {
@@ -792,7 +828,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * "IMEI=#################### New SIM=########## Serial=##############"
 	 * 
 	 */
-	public void sendSIMCode() {
+	public String makeSIMCodeSms() {
 		TelephonyManager tm = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 		StringBuilder sb = new StringBuilder();
 
@@ -818,7 +854,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (line == null && serial == null) {
 			sb.append("Could not obtain SIM information");
 		}
-		sendRepeatingSMS(Constants.VERIFY_SIM, sb.toString());
+		return sb.toString();
 	}
 
 	// ////////////// SEND SMS //////////////
@@ -841,7 +877,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			if (Constants.DEBUG)
 				Log.d(TAG, "Message has already been sent. Alarm Cancelled and Prefs erased.");
 
-			cancelAdminAlarms();
+			cancelAdminAlarms("Repeating SMS confirmed to be sent.");
 			mPrefs.edit().putString(String.valueOf(smstype), "").commit();
 		} else {
 			if (Constants.DEBUG)

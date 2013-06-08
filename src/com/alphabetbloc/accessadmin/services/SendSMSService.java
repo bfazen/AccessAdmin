@@ -47,9 +47,9 @@ public class SendSMSService extends Service {
 	private ArrayList<SMS> mPendingSms = new ArrayList<SMS>();
 	private SMSSentReceiver mSmsSentReceiver;
 	private ScheduledExecutorService mExecutor = Executors.newScheduledThreadPool(5);
-	private SentOutboxObserver mSentObserver;
-	private ContentResolver mContentResolver;
-	
+	private SentOutboxObserver mSentObserver = null;
+	private ContentResolver mContentResolver = null;
+
 	private SMS mCurrentSms;
 	private boolean mSentSms;
 	private boolean mDeletedSms;
@@ -102,14 +102,19 @@ public class SendSMSService extends Service {
 	private void setupReceivers() {
 
 		// Receive notification when message sends
-		mSmsSentReceiver = new SMSSentReceiver();
-		registerReceiver(mSmsSentReceiver, new IntentFilter(SMS_SENT));
+		if (mSmsSentReceiver == null) {
+			mSmsSentReceiver = new SMSSentReceiver();
+			registerReceiver(mSmsSentReceiver, new IntentFilter(SMS_SENT));
+		}
 
-		// Receive notification when message is deleted
-		mSentObserver = new SentOutboxObserver();
-		mContentResolver = mContext.getContentResolver();
-//		contentResolver.registerContentObserver(Uri.parse("content://sms/out"), true, sentObserver); //ORIGINAL
-		mContentResolver.registerContentObserver(Uri.parse("content://sms/"), true, mSentObserver); //MODIFIED TODO: Change this
+		// Receive notification when/if message is entered into SMS 'Sent Box'
+		// N.B. Deals with few AOSP mods that receive all outgoing SMS in outbox
+		// SMS sent programmatically usually do not enter SMS app's SENT.db
+		if (mSentObserver == null) {
+			mSentObserver = new SentOutboxObserver();
+			mContentResolver = mContext.getContentResolver();
+			mContentResolver.registerContentObserver(Uri.parse("content://sms"), true, mSentObserver);
+		}
 	}
 
 	public void sendNextSms() {
@@ -138,12 +143,12 @@ public class SendSMSService extends Service {
 			public void run() {
 				boolean completedSms = mSentSms & mDeletedSms; // don't
 																// short-circuit
-				
+
 				if (Constants.DEBUG)
-						Log.v(TAG, "updateSmsDelivery with: \n\t SmsSent =" + mSentSms + "\n\t SmsDeleted=" + mDeletedSms);
-				
-				if (!completedSms && count < 10) {
-//					if (!completedSms && count < 60) { TODO: REVERT THIS!
+					Log.v(TAG, "updateSmsDelivery with: \n\t SmsSent =" + mSentSms + "\n\t SmsDeleted=" + mDeletedSms);
+
+				if (!completedSms && count < 10) { // TODO CHANGE THIS BACK TO
+													// <60
 					mExecutor.schedule(this, 3000, TimeUnit.MILLISECONDS);
 					if (Constants.DEBUG)
 						Log.v(TAG, "Wait another 3 seconds. Current cycle count=" + count);
@@ -160,15 +165,15 @@ public class SendSMSService extends Service {
 					}
 
 					// delete the SMS if haven't done so
-					if (!mSentSms && mPendingSms.size() > 0){
+					if (!mSentSms && mPendingSms.size() > 0) {
 						if (Constants.DEBUG)
 							Log.e(TAG, "COULD NOT SEND SMS!! Removing SMS 0 from mPendingSms: \n\t SMS MESSAGE=" + mPendingSms.get(0).getMessage());
 						mPendingSms.remove(0);
 					}
-						
+
 					if (Constants.DEBUG)
 						Log.v(TAG, "SMS messages that are still pending=" + mPendingSms.size());
-					
+
 					// send next SMS, if there is one
 					if (mPendingSms.size() > 0)
 						sendNextSms();
@@ -232,9 +237,7 @@ public class SendSMSService extends Service {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String line = null;
 		String message = null;
-		
-		
-		
+
 		if (deleteAll) {
 			line = prefs.getString(Constants.SMS_REPLY_LINE, "");
 			message = "!Reply!:";
@@ -242,12 +245,14 @@ public class SendSMSService extends Service {
 			line = mCurrentSms.getNumber();
 			message = mCurrentSms.getMessage();
 		}
-		
+
 		if (Constants.DEBUG)
 			Log.v(TAG, "Calling deleteSmsFromOutbox with: \n\t DELETE-ALL=" + deleteAll + "\n\t LINE=" + line + "\n\t MESSAGE=" + message);
 
 		try {
-			Uri uriSms = Uri.parse("content://sms/out");
+			// Uri uriSms = Uri.parse("content://sms/out"); ORIGINAL TODO:
+			// Change back?
+			Uri uriSms = Uri.parse("content://sms");
 			Cursor c = mContext.getContentResolver().query(uriSms, new String[] { "_id", "address", "body" }, "address =? ", new String[] { line }, null);
 
 			if (c != null && c.moveToFirst()) {
@@ -255,10 +260,10 @@ public class SendSMSService extends Service {
 					long id = c.getLong(c.getColumnIndex("_id"));
 					String address = c.getString(c.getColumnIndex("address"));
 					String body = c.getString(c.getColumnIndex("body"));
-					
+
 					if (Constants.DEBUG)
 						Log.v(TAG, "Found SMS in the Outbox: \n\t ID=" + id + "\n\t ADDRESS=" + address + "\n\t BODY=" + body);
-					
+
 					if (body.contains(message) && address.equalsIgnoreCase(line)) {
 						int rows = mContext.getContentResolver().delete(Uri.parse("content://sms/" + id), null, null);
 						mDeletedSms = true;
@@ -295,6 +300,8 @@ public class SendSMSService extends Service {
 			Log.v(TAG, "Ending the SendSmsService");
 		unregisterReceiver(mSmsSentReceiver);
 		mSmsSentReceiver = null;
+		mContentResolver.unregisterContentObserver(mSentObserver);
+		mSentObserver = null;
 		super.onDestroy();
 	}
 

@@ -26,7 +26,7 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 
 public class SmsReceiver extends BroadcastReceiver {
 
-	// private static final String TAG = "SmsReceiver";
+	 private static final String TAG = SmsReceiver.class.getSimpleName();
 
 	private static String Imei;
 	private static String lockDevice;
@@ -51,6 +51,9 @@ public class SmsReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if(Constants.DEBUG)
+			Log.v("SmsReceiver", "Received a new SMS");
+		
 		mContext = context;
 		Policy policy = new Policy(context);
 		if (intent.getAction().equals(Constants.SMS_RECEIVED) && policy.isAdminActive()) {
@@ -65,6 +68,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
 				if (smsMessage.length > -1) {
 					String message = smsMessage[0].getMessageBody();
+					if(Constants.DEBUG)
+						Log.v("SmsReceiver", "Received a new SMS with \n\tMESSAGE=\'" + message + "\'");
 					String prefix = Constants.SMS_CODE_ADMIN_PREFIX;
 					if (message.length() > prefix.length()) {
 						String substring = message.substring(0, prefix.length());
@@ -81,7 +86,12 @@ public class SmsReceiver extends BroadcastReceiver {
 		if (Imei == null)
 			createSmsStrings();
 		if (matchingSmsString(sms)) {
-			abortBroadcast();
+			try {
+				abortBroadcast(); //TODO: Change this back
+			} catch (Exception e) {
+				Log.e(TAG, "Unordered broadcast"); //TODO: check this occurrence in real life testing
+			}
+			
 			Intent i = new Intent(mContext, DeviceAdminService.class);
 			i.putExtra(Constants.DEVICE_ADMIN_WORK, mExtra);
 			if (mSmsMessage != null)
