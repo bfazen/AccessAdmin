@@ -48,7 +48,7 @@
         android:background="@color/medium_gray" />
 
     <TextView
-        android:id="@+id/set_message"
+        android:id="@+id/message_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/line"
@@ -57,13 +57,13 @@
         android:layout_marginTop="7dp"
         android:text="@string/set_datetime"
         android:textColor="@color/white_color"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/message"
+        android:id="@+id/message_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/set_message"
+        android:layout_below="@+id/message_body"
         android:layout_marginBottom="7dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"

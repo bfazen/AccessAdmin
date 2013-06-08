@@ -11,42 +11,43 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.alphabetbloc.accessadmin.R;
+import com.alphabetbloc.accessadmin.data.Constants;
 
 public class NtpToastActivity extends Activity {
 
 	private static final String TAG = NtpToastActivity.class.getSimpleName();
-	public static final String NTP_MESSAGE = "ntp_message";
+	public static final String NTP_MESSAGE_BODY = "ntp_message_body";
+	public static final String NTP_MESSAGE_DATE = "ntp_message_date";
 	private Context mContext;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		String message = getIntent().getStringExtra(NTP_MESSAGE);
-		AlertDialog d = createNtpDialog(message);
+		String message = getIntent().getStringExtra(NTP_MESSAGE_BODY);
+		String date = getIntent().getStringExtra(NTP_MESSAGE_BODY);
+		AlertDialog d = createNtpDialog(message, date);
 		d.show();
 
 	}
 
-	private AlertDialog createNtpDialog(String message) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		
+	private AlertDialog createNtpDialog(String body, String date) {
 
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		final View view = inflater.inflate(R.layout.toast_ntp_update, null);
-		TextView messageView = (TextView) view.findViewById(R.id.message);
-		messageView.setText(message);
-//		builder.setMessage(message);
-//		builder.setTitle(R.string.wrong_datetime);
+		TextView bodyView = (TextView) view.findViewById(R.id.message_body);
+		TextView dateView = (TextView) view.findViewById(R.id.message_date);
+		bodyView.setText(body);
+		dateView.setText(date);
 		builder.setView(view);
-//		builder.setIcon(R.drawable.priority);
 
 		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
 				finish();
-				Log.e(TAG, "finishing activity");
+				if(Constants.DEBUG) Log.e(TAG, "finishing activity");
 			}
 		});
 

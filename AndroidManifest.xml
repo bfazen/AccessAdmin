@@ -178,6 +178,10 @@
             android:name=".receivers.LockPhoneReceiver"
             android:label="LockPhoneReceiver" >
         </receiver>
+        <receiver
+            android:name=".receivers.UpdateClockReceiver"
+            android:label="UpdateClockReceiver" >
+        </receiver>
         <receiver android:name="com.commonsware.cwac.wakeful.WakelockWorkReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

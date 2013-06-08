@@ -39,7 +39,7 @@ public class SignalStrengthService extends Service {
 	private static int countS;
 	private TelephonyManager mTelephonyManager;
 	private PhoneStateListener mPhoneStateListener;
-	private static final String TAG = "SignalStrengthService";
+	private static final String TAG = SignalStrengthService.class.getSimpleName();
 	public static final String REFRESH_BROADCAST = "com.alphabetbloc.accessmrs.services.SignalStrengthService";
 	// CM7
 	public static final String MOBILE_DATA_CHANGED = "com.alphabetbloc.android.telephony.MOBILE_DATA_CHANGED";
@@ -51,7 +51,6 @@ public class SignalStrengthService extends Service {
 
 	@Override
 	public void onCreate() {
-		createWakeLock();
 		showNotification();
 
 		mTelephonyManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -61,10 +60,8 @@ public class SignalStrengthService extends Service {
 				int asu = signalStrength.getGsmSignalStrength();
 
 				if (asu >= 7 && asu < 32) {
-					if (networkAvailable())
+					if (dataNetworkAvailable())
 						refreshClientsNow();
-					else if (countN++ > 5)
-						updateService();
 				} else if (asu < 1 || asu > 32 || countS++ > 8) {
 					stopSelf();
 				}
@@ -76,7 +73,7 @@ public class SignalStrengthService extends Service {
 			@Override
 			public void onServiceStateChanged(ServiceState serviceState) {
 				if (Constants.DEBUG)
-					Log.d("louis.fazen", "Service State changed! New state = " + serviceState.getState());
+					Log.d(TAG, "Service State changed! New state = " + serviceState.getState());
 				super.onServiceStateChanged(serviceState);
 			}
 		};
@@ -89,122 +86,51 @@ public class SignalStrengthService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	private void showNotification() {
 
+	public boolean dataNetworkAvailable() {
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		if (netInfo != null && netInfo.isConnected()) {
+			return true;
+		}
+		return false;
+	}
+
+
+	private void refreshClientsNow() {
+
+	}
+
+	private void showNotification() {
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		CharSequence text = getText(R.string.app_name);
 		Notification notification = new Notification(R.drawable.icon, text, System.currentTimeMillis());
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, AdminLoginActivity.class), Intent.FLAG_ACTIVITY_NEW_TASK);
 		notification.setLatestEventInfo(this, getText(R.string.app_name), text, contentIntent);
 		mNM.notify(NOTIFICATION, notification);
-
-		// if (notification != null) {
-		// startForeground(NOTIFICATION, notification);
-		// if(Constants.DEBUG) Log.e(TAG,
-		// "SignalStrengthService Started in Foreground");
-		// }
 	}
 
-	private boolean networkAvailable() {
-		boolean dataNetwork = false;
-		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-		if (activeNetworkInfo != null)
-			dataNetwork = true;
-		return dataNetwork;
-	}
+	/*
+	 * int iconLevel = -1; if (asu <= 2 || asu == 99) iconLevel = 0; // 0 or
+	 * 99 = no signal else if (asu >= 12) iconLevel = 4; // very good signal
+	 * else if (asu >= 8) iconLevel = 3; // good signal else if (asu >= 5)
+	 * iconLevel = 2; // poor signal else iconLevel = 1; // <5 is very poor
+	 * signal
+	 */
 
-	// TODO! IS SIGNAL STRENGTH SRVICE RUNNING? Update the service connection!!!
-	private void updateService() {
-		// if 2G, then update to 3G?
-		int nt = mTelephonyManager.getNetworkType();
-		if (nt < 3)
-			if (Constants.DEBUG)
-				Log.d(TAG, "network type =" + nt);
-		// ConnectivityManager cm = (ConnectivityManager)
-		// getSystemService(Context.CONNECTIVITY_SERVICE);
-
-		// Intent launchIntent = new Intent(MOBILE_DATA_CHANGED);
-		// sendBroadcast(launchIntent);
-		// PendingIntent pi =
-		// PendingIntent.getBroadcast(getApplicationContext(), 0, launchIntent,
-		// 0);
-		if (Constants.DEBUG)
-			Log.e(TAG, "Sending a broadcast intent to change the network!");
-		/*
-		 * Intent launchIntent = new Intent(); launchIntent.setClass(context,
-		 * SettingsAppWidgetProvider.class);
-		 * launchIntent.addCategory(Intent.CATEGORY_ALTERNATIVE);
-		 * launchIntent.setData(Uri.parse("custom:" + buttonId)); PendingIntent
-		 * pi = PendingIntent.getBroadcast(getApplicationContext(), 0,
-		 * launchIntent, 0);
-		 */
-
-		countS = 0;
-		countN = 0;
-
-		/*
-		 * int iconLevel = -1; if (asu <= 2 || asu == 99) iconLevel = 0; // 0 or
-		 * 99 = no signal else if (asu >= 12) iconLevel = 4; // very good signal
-		 * else if (asu >= 8) iconLevel = 3; // good signal else if (asu >= 5)
-		 * iconLevel = 2; // poor signal else iconLevel = 1; // <5 is very poor
-		 * signal
-		 */
-
-		/*
-		 * switch (nt) { case 1: return GPRS; case 2: return EDGE; case 3:
-		 * return UMTS; case 8: return HSDPA; case 9: return HSUPA; case 10:
-		 * return HSPA; default: return UNKNOWN; }
-		 */
-
-	}
-
-	private void refreshClientsNow() {
-
-	}
-
+	/*
+	 * switch (nt) { case 1: return GPRS; case 2: return EDGE; case 3:
+	 * return UMTS; case 8: return HSDPA; case 9: return HSUPA; case 10:
+	 * return HSPA; default: return UNKNOWN; }
+	 */
+	
 	@Override
 	public void onDestroy() {
 		if (Constants.DEBUG)
 			Log.d(TAG, "Shutting down the Service" + TAG);
 		mNM.cancel(NOTIFICATION);
 		mTelephonyManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_NONE);
-		countS = 0;
-		countN = 0;
-
-		// then call:
-		if (lockStatic.isHeld()) {
-			lockStatic.release();
-			if (Constants.DEBUG)
-				Log.e("louis.fazen", "Called lockStatic.release()=" + lockStatic.toString());
-		}
 		super.onDestroy();
-	}
-
-	private void createWakeLock() {
-		// first call:
-		if (lockStatic == null) {
-			PowerManager mgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			lockStatic = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, NAME);
-			lockStatic.setReferenceCounted(true);
-			lockStatic.acquire();
-
-			if (Constants.DEBUG)
-				Log.e("louis.fazen", "lockStatic.acquire()=" + lockStatic.toString());
-
-			// PowerManager pm = (PowerManager)
-			// getSystemService(Context.POWER_SERVICE);
-			// lockStatic =
-			// mgr.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK|PowerManager.ACQUIRE_CAUSES_WAKEUP,
-			// "bbbb");
-			// lockStatic.acquire();
-
-			// may need:
-			// getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN |
-			// WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-			// WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-		}
-
 	}
 
 }

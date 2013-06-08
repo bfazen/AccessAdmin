@@ -82,6 +82,7 @@ public class UpdateClockService extends IntentService {
 	private long mNtpTimeReference = -1;
 
 	// ADDED BY ME:;
+	private static final long MINIMUM_CLOCK_TIME = 1370713699558L;
 	private Context mContext;
 	private int timeout = 10000;
 	private String host = "pool.ntp.org";
@@ -100,7 +101,7 @@ public class UpdateClockService extends IntentService {
 
 		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 		boolean phoneLocked = settings.getBoolean(Constants.SIM_ERROR_PHONE_LOCKED, false);
-		if (phoneLocked){
+		if (phoneLocked) {
 			Log.e(TAG, "Skipping System Time Check while device is locked.");
 			return;
 		}
@@ -126,9 +127,16 @@ public class UpdateClockService extends IntentService {
 		// Check to see if it was able to obtain Ntp time
 		if (mNtpTime > 0 && mNtpTimeReference > 0) {
 			if (clockNeedsUpdate())
-				requestUserUpdate();
+				requestUserUpdate(true);
 			else
 				cancelUpdateClockAlarms();
+			
+		} else if (System.currentTimeMillis() < MINIMUM_CLOCK_TIME) {
+			
+			requestUserUpdate(false);
+			if (Constants.DEBUG)
+				Log.e(TAG, "Time is very far off... prompting user to reset the time");
+			
 		} else {
 			Log.e(TAG, "Could not obtain the NTP Time. Alarm will continue to run every hour.");
 		}
@@ -226,7 +234,24 @@ public class UpdateClockService extends IntentService {
 	 * Prompt the user to set the system clock to correct date and time (rather
 	 * than rely on root permissions).
 	 */
-	private void requestUserUpdate() {
+	private void requestUserUpdate(boolean knownNtpTime) {
+		
+		//Set up appropriate strings for alert dialog
+		String messageBody = "";
+		String dateString = "";
+		
+		if (knownNtpTime) {
+			long now = mNtpTime + (SystemClock.elapsedRealtime() - mNtpTimeReference);
+			Date date = new Date();
+			date.setTime(now);
+			messageBody = mContext.getString(R.string.set_datetime);
+			dateString = new SimpleDateFormat("EEE, MMM dd, yyyy 'at' KK:mm a ' ('HH:mm')'").format(date);
+		} else {
+			messageBody = mContext.getString(R.string.set_datetime_unknown);
+			dateString = "";
+		}
+		
+		//show date and time preferences
 		try {
 			Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
 			timeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -234,15 +259,12 @@ public class UpdateClockService extends IntentService {
 		} catch (Exception e) {
 			Log.e(TAG, "Could not launch Date and Time Settings on this device.");
 		}
-
-		long now = mNtpTime + (SystemClock.elapsedRealtime() - mNtpTimeReference);
-		Date date = new Date();
-		date.setTime(now);
-		String dateString = new SimpleDateFormat("EEE, MMM dd, yyyy 'at' KK:mm a ' ('HH:mm')'").format(date);
-
+		
+		//Show alert dialog
 		Intent i = new Intent(mContext, NtpToastActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		i.putExtra(NtpToastActivity.NTP_MESSAGE, dateString);
+		i.putExtra(NtpToastActivity.NTP_MESSAGE_BODY, messageBody);
+		i.putExtra(NtpToastActivity.NTP_MESSAGE_DATE, dateString);
 		mContext.startActivity(i);
 
 	}

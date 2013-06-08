@@ -211,6 +211,7 @@
     <!-- Time Error -->
     <string name="wrong_datetime">Wrong Date, Time</string>
     <string name="set_datetime">Please set current date and time to:</string>
+    <string name="set_datetime_unknown">Please reset the phone clock to today\'s date and time.</string>
     <string name="ok">OK</string>
 
 </resources>
