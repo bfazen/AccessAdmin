@@ -44,6 +44,7 @@ public class Constants {
 	public static final String LAST_SENT_GPS_MESSAGE = "last_sent_gps_message";
 	public static final String LAST_SENT_SIM_MESSAGE = "last_sent_sim_message";
 	public static final String PERFORM_FACTORY_RESET = "perform_factory_reset";
+	public static final String SMS_SENT_CONFIRMATION = "sms_sent_confirmation";
 	
 	//SMS CODES
 	public static final String SMS_CODE_ADMIN_PREFIX = "AdminCode=";
@@ -59,7 +60,10 @@ public class Constants {
 	public static final String SMS_CODE_RESET_ADMIN_ID = "create.new.admin.id.and.sms.to.admin";
 	public static final String SMS_CODE_RESET_PWD_TO_SMS_PWD = "-reset-pwd:";
 	public static final String SMS_CODE_EDIT_ACCESS_MRS_PREF = "-accessmrs-pref:";
-	
+	public static final String SMS_CODE_VERIFY_SIM = "-check-sim";
+	public static final String SMS_CODE_HOLD_LOCKED = "-hold-lock";
+	public static final String SMS_CODE_SEND_SMS = "-sms";
+
 	//DEVICE ADMIN ACTIONS: IN ORDER OF PRIORITY
 	public static final int LOCK_SCREEN = 100;
 	public static final int HOLD_DEVICE = 200;
@@ -72,6 +76,7 @@ public class Constants {
 	public static final int SEND_SMS = 900;
 	public static final int SEND_GPS = 1000;
 	public static final int RESET_ADMIN_ID = 1100;
+	public static final int SEND_ADMIN_ID = 1150;
 	public static final int VERIFY_SIM = 1200;
 	public static final int WIPE_ODK_DATA = 1300;
 	public static final int WIPE_DATA = 1400;
@@ -91,20 +96,25 @@ public class Constants {
 	public static final String ALARM_WIPE_DATA = "ALARM_WIPE_DATA";
 	public static final String ALARM_CANCEL_ALARMS = "ALARM_CANCEL_ALARMS";
 	public static final String ALARM_FACTORY_RESET = "ALARM_FACTORY_RESET";
+	public static final String ALARM_HOLD_DEVICE_LOCKED = "ALARM_HOLD_DEVICE_LOCKED";
+	public static final String ALARM_RESET_PWD_TO_SMS_PWD = "ALARM_RESET_PWD_TO_SMS_PWD";
+	public static final String ALARM_STOP_HOLD_DEVICE = "ALARM_STOP_HOLD_DEVICE";
+	public static final String ALARM_SEND_ADMIN_ID = "ALARM_SEND_ADMIN_ID";
 	
-	public static final Long ALARM_INTERVAL_SHORT = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 20; //45 seconds
-	public static final Long ALARM_INTERVAL_MEDIUM = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 3; // 5 minutes
+	public static final Long ALARM_INTERVAL_ALWAYS = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 30; //30 seconds
+	public static final Long ALARM_INTERVAL_SHORT = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15; //1 min
+	public static final Long ALARM_INTERVAL_MEDIUM = AlarmManager.INTERVAL_FIFTEEN_MINUTES; // 15 minutes
 	public static final Long ALARM_INTERVAL_LONG = AlarmManager.INTERVAL_HOUR * 2; // 2 hours
 	
 	//ENCRYPTED PREFERENCES:
 	public static final String UNIQUE_DEVICE_ID = "unique_device_id";
 	public static final String SMS_REPLY_LINE = "sms_reply_line";
-
+	public static final String DEFAULT_SMS_REPLY_LINE = "0715050383"; 
 	public static final String DEFAULT_PASSWORD = "default_password"; 
 	public static final String SECRET_PASSWORD = "secret_password";
 	public static final String ENCRYPTED_PREFS = "encrypted_prefs";
 	public static final String ADMIN_PASSWORD = "admin_password";
-
+	public static final String DEFAULT_ADMIN_PASSWORD = "";
 	
 	public static final int RESULT_ENABLE = 1;
 	
@@ -142,6 +152,8 @@ public class Constants {
 	public static final String ADMIN_PWD_COUNT = "last_pwd_count";
 
 	public static final String SHOW_MENU = "show_admin_menu";
+
+
 
 	
 }

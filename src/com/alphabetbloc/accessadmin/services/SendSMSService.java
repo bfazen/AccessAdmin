@@ -149,8 +149,7 @@ public class SendSMSService extends Service {
 				if (Constants.DEBUG)
 					Log.v(TAG, "updateSmsDelivery with: \n\t SmsSent =" + mSentSms + "\n\t SmsDeleted=" + mDeletedSms);
 
-				if (!completedSms && count < 10) { // TODO CHANGE THIS BACK TO
-													// <60
+				if (!completedSms && count < 60) { 
 					mExecutor.schedule(this, 3000, TimeUnit.MILLISECONDS);
 					if (Constants.DEBUG)
 						Log.v(TAG, "Wait another 3 seconds. Current cycle count=" + count);
