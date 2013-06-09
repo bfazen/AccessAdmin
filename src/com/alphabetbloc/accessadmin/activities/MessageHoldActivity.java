@@ -51,11 +51,11 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 	public static final String MESSAGE = "message";
 	public static final String SUBMESSAGE = "submessage";
 	public static final String ADDITIONAL_INFO = "additional_info";
-	private int mHoldType = 0;
-	private String mMessage = "";
-	private String mSubMessage = "";
-	private String mAdditionalInfo = "";
-	private boolean mPermanentHold = false;
+	public static int sHoldType = 0;
+	public static String sMessage = "";
+	public static String sSubMessage = "";
+	public static String sAdditionalInfo = "";
+	public static boolean sPermanentHold = false;
 
 	// Alarm
 	private boolean mSoundAlarm = false;
@@ -77,31 +77,32 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		// start, stop, or change the message of the activity
 		boolean stopHold = getIntent().getBooleanExtra(STOP_HOLD, false);
 		if (stopHold) {
 			unregisterAirplaneOffReceiver();
-			mPermanentHold = false;
+			sPermanentHold = false;
 			finish();
 		} else {
-			createView();
+			refreshView();
 		}
 	}
 
-	private void createView() {
+
+	private void refreshView() {
+		
 		// create the correct view
-		mHoldType = getIntent().getIntExtra(Constants.HOLD_TYPE, 0);
-		switch (mHoldType) {
+		sHoldType = getIntent().getIntExtra(Constants.HOLD_TYPE, 0);
+		switch (sHoldType) {
 		case Constants.SIM_ERROR:
 		case Constants.DEVICE_LOCKED:
-			mPermanentHold = true;
+			sPermanentHold = true;
 			mSoundAlarm = true;
 			setContentView(R.layout.hold_alarm);
 			break;
 		case Constants.ADMIN_MESSAGE:
 		default:
-			mPermanentHold = false;
+			sPermanentHold = false;
 			mSoundAlarm = false;
 			setContentView(R.layout.admin_message);
 			break;
@@ -109,24 +110,24 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 
 		// Set the text content
 		// Message
-		mMessage = getIntent().getStringExtra(MESSAGE);
+		sMessage = getIntent().getStringExtra(MESSAGE);
 		TextView message = (TextView) findViewById(R.id.message);
-		if (mMessage != null)
-			message.setText(mMessage);
+		if (sMessage != null)
+			message.setText(sMessage);
 
 		// Sub-Message
-		mSubMessage = getIntent().getStringExtra(SUBMESSAGE);
+		sSubMessage = getIntent().getStringExtra(SUBMESSAGE);
 		TextView submessage = (TextView) findViewById(R.id.submessage);
-		if (mSubMessage != null)
-			submessage.setText(mSubMessage);
+		if (sSubMessage != null)
+			submessage.setText(sSubMessage);
 
 		// Additional Info
-		mAdditionalInfo = getIntent().getStringExtra(ADDITIONAL_INFO);
+		sAdditionalInfo = getIntent().getStringExtra(ADDITIONAL_INFO);
 		RelativeLayout additionalInfo = (RelativeLayout) findViewById(R.id.additional_info);
 		TextView additionalMessage = (TextView) findViewById(R.id.additional_message);
-		if (mAdditionalInfo != null) {
+		if (sAdditionalInfo != null) {
 			additionalInfo.setVisibility(View.VISIBLE);
-			additionalMessage.setText(mMessage);
+			additionalMessage.setText(sAdditionalInfo);
 		} else if (additionalInfo != null) {
 			additionalInfo.setVisibility(View.GONE);
 		}
@@ -167,24 +168,21 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 		sMessageHoldActive = true;
 		registerAirplaneOffReceiver();
 		if (mSoundAlarm)
-			startAlarm();
-		
+			startAlarm();	
 	}
 
 	@Override
 	protected void onStop() {
 		super.onDestroy();
-		if (Constants.DEBUG) Log.v(TAG, "OnStop Called");
 		sMessageHoldActive = false;
 		unregisterAirplaneOffReceiver();
-
-		if (mPermanentHold) {
+		if (sPermanentHold) {
 			Intent i = new Intent(getApplicationContext(), MessageHoldActivity.class);
 			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			i.putExtra(Constants.HOLD_TYPE, mHoldType);
-			i.putExtra(MessageHoldActivity.MESSAGE, mMessage);
-			i.putExtra(MessageHoldActivity.SUBMESSAGE, mSubMessage);
-			i.putExtra(MessageHoldActivity.ADDITIONAL_INFO, mAdditionalInfo);
+			i.putExtra(Constants.HOLD_TYPE, sHoldType);
+			i.putExtra(MessageHoldActivity.MESSAGE, sMessage);
+			i.putExtra(MessageHoldActivity.SUBMESSAGE, sSubMessage);
+			i.putExtra(MessageHoldActivity.ADDITIONAL_INFO, sAdditionalInfo);
 			getApplicationContext().startActivity(i);
 		}
 		stopAlarm();
@@ -257,8 +255,8 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 		switch (item.getItemId()) {
 		case DEVICE_ADMIN:
 			Intent i = new Intent(getApplicationContext(), AdminLoginActivity.class);
-			if (mPermanentHold) {
-				mPermanentHold = false;
+			if (sPermanentHold) {
+				sPermanentHold = false;
 				startActivityForResult(i, RETURN_PERM_HOLD);
 			} else
 				startActivityForResult(i, ADMIN_OPTIONS);
@@ -272,7 +270,7 @@ public class MessageHoldActivity extends Activity implements OnTouchListener {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == RETURN_PERM_HOLD)
-			mPermanentHold = true;
+			sPermanentHold = true;
 	}
 
 	// Consume all UI events except Menu, Exit and Pwd Btns

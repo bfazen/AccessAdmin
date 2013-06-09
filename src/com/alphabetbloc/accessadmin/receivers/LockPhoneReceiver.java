@@ -29,15 +29,15 @@ public class LockPhoneReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
-		// 1. Lock the phone with random password and present password prompt
-		Intent passwordI = new Intent(context, DeviceAdminService.class);
-		passwordI.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.LOCK_RANDOM_PWD);
-		WakefulIntentService.sendWakefulWork(context, passwordI);
-
-		// 2. Show LOCK message PERMANENTLY. Can ONLY be reset by Admin Code.
+		// 1. Show LOCK message PERMANENTLY. Can ONLY be reset by Admin Code.
 		Intent holdI = new Intent(context, DeviceAdminService.class);
 		holdI.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.HOLD_DEVICE_LOCKED);
 		WakefulIntentService.sendWakefulWork(context, holdI);
+
+		// 2. Lock the phone with random password and present password prompt
+		Intent passwordI = new Intent(context, DeviceAdminService.class);
+		passwordI.putExtra(Constants.DEVICE_ADMIN_WORK, Constants.LOCK_RANDOM_PWD);
+		WakefulIntentService.sendWakefulWork(context, passwordI);
 
 		// 3. Check if phone booted wrong SIM too many times and may be stolen
 		boolean wipeData = intent.getBooleanExtra(Constants.SIM_ERROR_WIPE_DATA, false);

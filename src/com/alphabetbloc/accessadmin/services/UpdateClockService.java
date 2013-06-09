@@ -18,8 +18,6 @@ package com.alphabetbloc.accessadmin.services;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -127,16 +125,16 @@ public class UpdateClockService extends IntentService {
 		// Check to see if it was able to obtain Ntp time
 		if (mNtpTime > 0 && mNtpTimeReference > 0) {
 			if (clockNeedsUpdate())
-				requestUserUpdate(true);
+				requestUserUpdate();
 			else
 				cancelUpdateClockAlarms();
-			
+
 		} else if (System.currentTimeMillis() < MINIMUM_CLOCK_TIME) {
-			
-			requestUserUpdate(false);
+
+			requestUserUpdate();
 			if (Constants.DEBUG)
 				Log.e(TAG, "Time is very far off... prompting user to reset the time");
-			
+
 		} else {
 			Log.e(TAG, "Could not obtain the NTP Time. Alarm will continue to run every hour.");
 		}
@@ -234,24 +232,9 @@ public class UpdateClockService extends IntentService {
 	 * Prompt the user to set the system clock to correct date and time (rather
 	 * than rely on root permissions).
 	 */
-	private void requestUserUpdate(boolean knownNtpTime) {
-		
-		//Set up appropriate strings for alert dialog
-		String messageBody = "";
-		String dateString = "";
-		
-		if (knownNtpTime) {
-			long now = mNtpTime + (SystemClock.elapsedRealtime() - mNtpTimeReference);
-			Date date = new Date();
-			date.setTime(now);
-			messageBody = mContext.getString(R.string.set_datetime);
-			dateString = new SimpleDateFormat("EEE, MMM dd, yyyy 'at' KK:mm a ' ('HH:mm')'").format(date);
-		} else {
-			messageBody = mContext.getString(R.string.set_datetime_unknown);
-			dateString = "";
-		}
-		
-		//show date and time preferences
+	private void requestUserUpdate() {
+
+		// show date and time preferences first
 		try {
 			Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
 			timeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -259,14 +242,15 @@ public class UpdateClockService extends IntentService {
 		} catch (Exception e) {
 			Log.e(TAG, "Could not launch Date and Time Settings on this device.");
 		}
-		
-		//Show alert dialog
-		Intent i = new Intent(mContext, NtpToastActivity.class);
-		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		i.putExtra(NtpToastActivity.NTP_MESSAGE_BODY, messageBody);
-		i.putExtra(NtpToastActivity.NTP_MESSAGE_DATE, dateString);
-		mContext.startActivity(i);
 
+		// Show alert dialog on top
+		Intent i = new Intent(mContext, NtpToastActivity.class);
+		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		if (mNtpTime > 0 && mNtpTimeReference > 0) {
+			i.putExtra(NtpToastActivity.NTP_TIME, mNtpTime);
+			i.putExtra(NtpToastActivity.NTP_TIME_REFERENCE, mNtpTimeReference);
+		}
+		mContext.startActivity(i);
 	}
 
 	/**

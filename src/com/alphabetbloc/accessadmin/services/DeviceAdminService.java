@@ -171,7 +171,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			break;
 		case Constants.EDIT_ACCESS_MRS_PREF:
 			editAccessMrsPreference(smsMessage);
-			break;	
+			break;
 		case Constants.RESET_PWD_TO_SMS_PWD:
 			resetPromptPassword(smsMessage);
 			break;
@@ -251,8 +251,33 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * holds the device with the device locked message.
 	 */
 	private void holdDeviceLocked() {
-		holdDevice(Constants.DEVICE_LOCKED, getString(R.string.locked_message), getString(R.string.return_thin_message), null);
-	
+		
+		// Dont repeat the intent if already active
+		if (MessageHoldActivity.sMessageHoldActive && MessageHoldActivity.sHoldType == Constants.DEVICE_LOCKED)
+			return;
+
+		if (MessageHoldActivity.sMessageHoldActive && MessageHoldActivity.sPermanentHold) {
+			if (Constants.DEBUG)
+				Log.e(TAG, "Updating ongoing activity with HoldType=" + MessageHoldActivity.sHoldType);
+			
+			// Update current activity if already locked in another activity type
+			MessageHoldActivity.sHoldType = Constants.DEVICE_LOCKED;
+			MessageHoldActivity.sMessage = getString(R.string.locked_message);
+			MessageHoldActivity.sSubMessage = getString(R.string.return_thin_message);
+			MessageHoldActivity.sAdditionalInfo = null;
+
+		} else {
+
+			// Start new activity
+			Intent i = new Intent(mContext, MessageHoldActivity.class);
+			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			i.putExtra(Constants.HOLD_TYPE, Constants.DEVICE_LOCKED);
+			i.putExtra(MessageHoldActivity.MESSAGE, getString(R.string.locked_message));
+			i.putExtra(MessageHoldActivity.SUBMESSAGE, getString(R.string.return_thin_message));
+			mContext.startActivity(i);
+		
+		}
+
 		// confirm that this worked before canceling the alarm
 		android.os.SystemClock.sleep(1000 * 5);
 		if (MessageHoldActivity.sMessageHoldActive)
@@ -273,6 +298,9 @@ public class DeviceAdminService extends WakefulIntentService {
 	 * 
 	 */
 	private void holdDevice(int holdType, String message, String subMessage, String additionalInfo) {
+		if (Constants.DEBUG)
+			Log.e(TAG, "Hold Device is being called with MessageHoldType=" + holdType);
+
 		Intent i = new Intent(mContext, MessageHoldActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		i.putExtra(Constants.HOLD_TYPE, holdType);
@@ -281,11 +309,14 @@ public class DeviceAdminService extends WakefulIntentService {
 		if (subMessage != null)
 			i.putExtra(MessageHoldActivity.SUBMESSAGE, subMessage);
 		if (additionalInfo != null)
-			i.putExtra(MessageHoldActivity.SUBMESSAGE, additionalInfo);
+			i.putExtra(MessageHoldActivity.ADDITIONAL_INFO, additionalInfo);
 		mContext.startActivity(i);
+
 	}
 
 	private void stopHoldDevice() {
+		if (Constants.DEBUG)
+			Log.e(TAG, "StopHoldDevice is being called.");
 		Intent i = new Intent(mContext, MessageHoldActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		i.putExtra(MessageHoldActivity.STOP_HOLD, true);
@@ -414,7 +445,7 @@ public class DeviceAdminService extends WakefulIntentService {
 	private void smsAdminId() {
 		final SharedPreferences prefs = new EncryptedPreferences(this, this.getSharedPreferences(Constants.ENCRYPTED_PREFS, Context.MODE_PRIVATE));
 		String adminId = prefs.getString(Constants.UNIQUE_DEVICE_ID, "");
-		sendSingleSMS("New AdminId =" + adminId); 
+		sendSingleSMS("New AdminId =" + adminId);
 		cancelAdminAlarms("Admin code has now been changed.");
 	}
 
@@ -498,13 +529,13 @@ public class DeviceAdminService extends WakefulIntentService {
 
 			if (sendPassword)
 				sendSingleSMS("Device successfully locked with new password=" + pwd);
-		} 
-		
+		}
+
 		mDPM.lockNow();
 
 		if (randomLock) {
 			SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
-			settings.edit().putBoolean(Constants.SIM_ERROR_PHONE_LOCKED, false).commit();
+			settings.edit().putBoolean(Constants.SIM_ERROR_PHONE_LOCKED, true).commit();
 		}
 		return randomLock;
 	}
@@ -672,18 +703,18 @@ public class DeviceAdminService extends WakefulIntentService {
 			return;
 		case SIM_CHANGED:
 			count = settings.getInt(Constants.SIM_CHANGE_COUNT, 0);
-			if (count < 3)
+			if (count < 2)
 				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_lock_phone), getString(R.string.return_info_message));
 			else
-				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_attempts_change), getString(R.string.return_info_message));
+				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_attempts_change, count), getString(R.string.return_info_message));
 			break;
 		case SIM_MISSING:
 		default:
 			count = settings.getInt(Constants.SIM_MISSING_COUNT, 0);
-			if (count < 3)
+			if (count < 2)
 				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_lock_phone), getString(R.string.return_info_message));
 			else
-				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_attempts_missing), getString(R.string.return_info_message));
+				holdDevice(Constants.SIM_ERROR, getString(R.string.sim_message_replace_sim), getString(R.string.sim_submessage_attempts_missing, count), getString(R.string.return_info_message));
 			break;
 		}
 
@@ -719,9 +750,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
 		String currentSimSerial = tm.getSimSerialNumber();
 		String currentSimLine = tm.getLine1Number();
-		if (currentSimLine.equals(registeredSimLine) && currentSimSerial.equals(registeredSimSerial)) {
-			simStatus = SIM_VERIFIED;
-		} else if (currentSimLine == null || currentSimSerial == null || currentSimSerial.equals("")) {
+		if (currentSimLine == null || currentSimSerial == null || currentSimSerial.equals("")) {
 			if (Constants.DEBUG)
 				Log.w(TAG, "SIM has been taken out of phone or is not registering with device \n\t CURRENT SIM LINE: " + currentSimLine + " \n\t CURRENT SIM SERIAL: " + currentSimSerial);
 			simStatus = SIM_MISSING;
@@ -730,6 +759,9 @@ public class DeviceAdminService extends WakefulIntentService {
 			if (Constants.DEBUG)
 				Log.w(TAG, "SIM has been changed from the initial registered SIM \n\t CURRENT SIM LINE: " + currentSimLine + " DOES NOT MATCH.  \n\t CURRENT SIM SERIAL: " + currentSimSerial + " DOES NOT MATCH.");
 			simStatus = SIM_CHANGED;
+
+		} else if (currentSimLine.equals(registeredSimLine) && currentSimSerial.equals(registeredSimSerial)) {
+			simStatus = SIM_VERIFIED;
 		}
 
 		return simStatus;
@@ -784,7 +816,7 @@ public class DeviceAdminService extends WakefulIntentService {
 		}
 
 		// Get threshold for locking phone
-		int simLockThreshold = settings.getInt(simThresholdPref, 5);
+		int simLockThreshold = settings.getInt(simThresholdPref, 7);
 
 		// Record all most recent SIM Changes in the Count Period set in Prefs
 		int simCountPeriod = settings.getInt(simCountPeriodPref, 7);
@@ -882,7 +914,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			if (Constants.DEBUG)
 				Log.d(TAG, "Message has already been sent. Alarm Cancelled and Prefs erased.");
 
-			cancelAdminAlarms("Repeating SMS confirmed to be sent.");
+			cancelAdminAlarms("All SMS now confirmed as successfully sent.");
 			mPrefs.edit().putString(String.valueOf(smstype), "").commit();
 		} else {
 			if (Constants.DEBUG)
