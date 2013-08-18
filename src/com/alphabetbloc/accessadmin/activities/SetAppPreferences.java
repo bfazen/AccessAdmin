@@ -86,7 +86,7 @@ public class SetAppPreferences extends SherlockActivity {
 		settingsButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setComponent(new ComponentName(ADW_PACKAGE, "com.android.settings.Settings"));
+				i.setComponent(new ComponentName(SETTINGS_PACKAGE, "com.android.settings.Settings"));
 				startActivity(i);
 			}
 		});
