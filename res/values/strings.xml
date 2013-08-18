@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">AccessAdmin</string>
+    <string name="app_version">1.1</string>
     <!-- ADMIN STRINGS -->
     <string name="device_settings">Device Settings</string>
 
@@ -219,6 +220,7 @@
 
     <!-- Time Error -->
     <string name="wrong_datetime">Wrong Date, Time</string>
+    <string name="set_timezone">Please set time zone to:</string>
     <string name="set_datetime">Please set current date and time to:</string>
     <string name="set_datetime_unknown">Please reset the phone clock to today\'s date and time.</string>
     <string name="ok">OK</string>

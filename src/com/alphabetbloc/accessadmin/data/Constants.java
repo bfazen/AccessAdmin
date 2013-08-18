@@ -21,7 +21,7 @@ import android.app.AlarmManager;
 
 public class Constants {
 	//DEBUGGING
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 	
 	//RECEIVERS
 	public static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
@@ -153,7 +153,8 @@ public class Constants {
 
 	public static final String SHOW_MENU = "show_admin_menu";
 
-
+	public static final String DEFAULT_TIME_ZONE = "default_time_zone";
+	public static final String DEFAULT_TIME_ZONE_UI_STRING = "default_time_zone_ui_string";
 
 	
 }

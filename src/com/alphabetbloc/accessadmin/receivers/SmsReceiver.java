@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import com.alphabetbloc.accessadmin.R;
 import com.alphabetbloc.accessadmin.data.Constants;
 import com.alphabetbloc.accessadmin.data.EncryptedPreferences;
 import com.alphabetbloc.accessadmin.data.Policy;
@@ -163,7 +164,7 @@ public class SmsReceiver extends BroadcastReceiver {
 			return true;
 		} else if (sms.equals(sendSms)) {
 			mExtra = Constants.SEND_SMS;
-			mSmsMessage = "AccessAdmin is active on this device";
+			mSmsMessage = "AccessAdmin is active on this device. Version = " + mContext.getString(R.string.app_version);
 			return true;
 		} else if (sms.equals(holdDeviceLocked)) {
 			mExtra = Constants.HOLD_DEVICE_LOCKED;

@@ -128,7 +128,7 @@ public class DeviceAdminService extends WakefulIntentService {
 			smsLine = intent.getStringExtra(Constants.SMS_LINE);
 			smsMessage = intent.getStringExtra(Constants.SMS_MESSAGE);
 			if (smsLine == null)
-				smsLine = Constants.DEFAULT_SMS_REPLY_LINE;
+				smsLine = mPrefs.getString(Constants.SMS_REPLY_LINE, Constants.DEFAULT_SMS_REPLY_LINE);
 			if (smsMessage == null)
 				smsMessage = "";
 

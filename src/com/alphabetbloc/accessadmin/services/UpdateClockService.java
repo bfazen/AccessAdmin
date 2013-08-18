@@ -18,6 +18,7 @@ package com.alphabetbloc.accessadmin.services;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.TimeZone;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -123,21 +124,49 @@ public class UpdateClockService extends IntentService {
 		}
 
 		// Check to see if it was able to obtain Ntp time
+		boolean cancelAlarm = false;
+
+		boolean updateTimeZone = false;
+		if (timezoneNeedsUpdate())
+			updateTimeZone = true;
+
+		boolean updateTime = false;
+		if (System.currentTimeMillis() < MINIMUM_CLOCK_TIME)
+			updateTime = true;
+
 		if (mNtpTime > 0 && mNtpTimeReference > 0) {
 			if (clockNeedsUpdate())
-				requestUserUpdate();
+				updateTime = true;
 			else
-				cancelUpdateClockAlarms();
-
-		} else if (System.currentTimeMillis() < MINIMUM_CLOCK_TIME) {
-
-			requestUserUpdate();
-			if (Constants.DEBUG)
-				Log.e(TAG, "Time is very far off... prompting user to reset the time");
-
-		} else {
-			Log.e(TAG, "Could not obtain the NTP Time. Alarm will continue to run every hour.");
+				cancelAlarm = true;
 		}
+
+		if (updateTimeZone || updateTime) {
+			requestUserUpdate(updateTimeZone, updateTime);
+		} else if (!updateTimeZone && cancelAlarm) {
+			cancelUpdateClockAlarms();
+		}
+
+		// if (mNtpTime > 0 && mNtpTimeReference > 0) {
+		// if (clockNeedsUpdate())
+		// requestUserUpdate();
+		// else
+		// cancelUpdateClockAlarms();
+		//
+		// } else if (timezoneNeedsUpdate()) {
+		// requestUserUpdate();
+		//
+		// } else if (System.currentTimeMillis() < MINIMUM_CLOCK_TIME) {
+		//
+		// requestUserUpdate();
+		// if (Constants.DEBUG)
+		// Log.e(TAG,
+		// "Time is very far off... prompting user to reset the time");
+		//
+		// } else {
+		// Log.e(TAG,
+		// "Could not obtain the NTP Time. Alarm will continue to run every hour.");
+		// }
 
 		mNM.cancel(NOTIFICATION);
 	}
@@ -206,12 +235,28 @@ public class UpdateClockService extends IntentService {
 
 	};
 
+	private boolean timezoneNeedsUpdate() {
+		// check timezone
+		SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+		TimeZone tz = TimeZone.getDefault();
+		String id = tz.getID();
+		String localId = settings.getString(Constants.DEFAULT_TIME_ZONE, "Africa/Nairobi");
+		if (!id.equalsIgnoreCase(localId)) {
+			if (Constants.DEBUG)
+				Log.e(TAG, "clockNeedsUpdate is true because the timezone is wrong. Current Timezone=" + id);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	/**
 	 * Compares the NTPTime with the SystemTime. Returns true if the difference
 	 * is greater than 200 seconds.
 	 */
 	private boolean clockNeedsUpdate() {
 
+		// check time
 		long realTime = mNtpTime + (SystemClock.elapsedRealtime() - mNtpTimeReference);
 		long systemTime = System.currentTimeMillis();
 
@@ -232,8 +277,9 @@ public class UpdateClockService extends IntentService {
 	 * Prompt the user to set the system clock to correct date and time (rather
 	 * than rely on root permissions).
 	 */
-	private void requestUserUpdate() {
-
+	private void requestUserUpdate(boolean updateTimeZone, boolean updateTime) {
+		if (Constants.DEBUG)
+			Log.e(TAG, "Requesting User to update the time");
 		// show date and time preferences first
 		try {
 			Intent timeIntent = new Intent(android.provider.Settings.ACTION_DATE_SETTINGS);
@@ -246,6 +292,8 @@ public class UpdateClockService extends IntentService {
 		// Show alert dialog on top
 		Intent i = new Intent(mContext, NtpToastActivity.class);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		i.putExtra(NtpToastActivity.CHANGE_TIMEZONE, updateTimeZone);
+		i.putExtra(NtpToastActivity.CHANGE_TIME, updateTime);
 		if (mNtpTime > 0 && mNtpTimeReference > 0) {
 			i.putExtra(NtpToastActivity.NTP_TIME, mNtpTime);
 			i.putExtra(NtpToastActivity.NTP_TIME_REFERENCE, mNtpTimeReference);
