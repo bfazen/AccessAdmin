@@ -63,7 +63,7 @@
     <string name="device_admin">Device Administration</string>
     <string name="updating_data">Updating Data</string>
     <string name="please_wait">Please Wait</string>
-    <string name="default_pwd">***REMOVED***</string>
+    <string name="default_pwd">default_pwd</string>
     <string name="btn_submit">Submit</string>
 
     <!-- Application Settings -->
